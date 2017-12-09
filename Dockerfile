@@ -22,4 +22,4 @@ ARG db_driver
 RUN if [ "$db_driver" = "postgres" ]; then apk add --no-cache py3-psycopg2; fi
 RUN if [ "$db_driver" = "mysql" ]; then pipenv install --system pymysql; fi
 
-CMD gunicorn -b 0.0.0.0:8081 api.app --log-file=-
+CMD gunicorn -b 0.0.0.0:8081 nerium.app --log-file=-

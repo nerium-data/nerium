@@ -3,8 +3,7 @@ import os
 import unittest
 from tempfile import NamedTemporaryFile
 
-import api
-from nerium import ResultSet
+import nerium
 
 os.environ['DATABASE_URL'] = 'sqlite:///'
 
@@ -14,10 +13,11 @@ EXPECTED = dict(
     data=[[1.25, '2017-09-09T00:00:00', 'Hello', 'Björk Guðmundsdóttir'],
           [42.0, '2031-05-25T00:00:00', 'Howdy', 'ƺƺƺƺ']])
 
-TEST_SQL = """select cast(1.25 as float) as foo
+TEST_SQL = """select cast(1.25 as float) as foo  -- float check
+                    -- timestamp check
                    , strftime('%Y-%m-%dT%H:%M:%S', '2017-09-09') as bar
-                   , 'Hello' as quux
-                   , 'Björk Guðmundsdóttir' as quuux
+                   , 'Hello' as quux  -- ascii string check
+                   , 'Björk Guðmundsdóttir' as quuux  -- unicode check
                union
               select 42
                    , strftime('%Y-%m-%dT%H:%M:%S','2031-05-25')
@@ -42,18 +42,16 @@ def tearDownModule():
 
 
 class TestResultSet(unittest.TestCase):
-    """TODO: test internal methods"""
-
     def test_results_expected(self):
-        loader = ResultSet()
+        loader = nerium.ResultSet()
         result = loader.result(report_name)
 
         self.assertEqual(result, EXPECTED)
 
 
-class TestAPI(unittest.TestCase):
+class Testnerium(unittest.TestCase):
     def setUp(self):
-        self.app = api.app.test_client()
+        self.app = nerium.app.test_client()
 
     def test_response(self):
         endpoint = '/{}'.format(report_name)
