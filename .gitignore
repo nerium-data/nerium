@@ -1,0 +1,23 @@
+# Ignore generated directories
+*venv
+
+# Ignore generated files
+*.pyc
+
+# Ignore other specific files
+.project
+.pydevproject
+.settings
+.idea
+
+build
+dist
+*.egg-info
+
+# tym-specific :/
+_junk_drawer
+.env
+.DS_Store
+.pgpass
+Pipfile.lock
+sqls/*.sql
