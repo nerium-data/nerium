@@ -47,6 +47,7 @@ HTML table representation of report at `/table/<string:report_name>?<params>`
 
 (in no particular order)
 - Parameter discovery endpoint
+- Report listing endpoint
 - Plugin architecture
 - Configurable JSON output formatters
 - Static output file generator
@@ -54,5 +55,5 @@ HTML table representation of report at `/table/<string:report_name>?<params>`
 - More data visualization formats; move template/viz logic to separate client app
 - JWT authentication
 - Granular permissions settings
-- Swagger docs for endpoints
+- Swagger docs
 - Health check/default query endpoint
