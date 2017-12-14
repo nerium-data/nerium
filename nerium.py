@@ -10,8 +10,10 @@ from flask.json import JSONEncoder
 from flask_restful import Api, Resource
 
 # Provision environment as needed
-if not os.getenv('DATABASE_URL'):
+if find_dotenv():
     load_dotenv(find_dotenv())
+else:
+    load_dotenv('/dotenv/.env')
 
 # Instantiate and configure app
 app = Flask(__name__)

@@ -49,7 +49,7 @@ class TestResultSet(unittest.TestCase):
         self.assertEqual(result, EXPECTED)
 
 
-class Testnerium(unittest.TestCase):
+class TestAPI(unittest.TestCase):
     def setUp(self):
         self.app = nerium.app.test_client()
 

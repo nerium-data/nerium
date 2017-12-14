@@ -22,3 +22,6 @@ _junk_drawer
 .pgpass
 Pipfile.lock
 sqls/*.sql
+
+# Built binary
+gcsfuse/gcsfuse

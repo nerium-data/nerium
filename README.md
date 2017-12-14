@@ -9,6 +9,10 @@ Inspired in roughly equal measure by [SQueaLy](https://hashedin.com/2017/04/24/s
 ## Install/Run
 
 ```
+$ docker build --rm -t gcsfuse-build -f gcsfuse/
+
+$ docker run --rm -v $(pwd)/gcsfuse:/save gcsfuse-build
+
 $ docker build --rm [ --build-arg db_driver={ postgres | mysql } ] -t nerium .
 
 $ docker run -d --name=nerium_svc \

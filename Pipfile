@@ -8,18 +8,19 @@ name = "pypi"
 [dev-packages]
 
 isort = "*"
+"psycopg2" = "*"
 
 
 [packages]
 
-Flask = "*"
-Flask-Table = "*"
-Flask-RESTful = "*"
+flask = "*"
+flask-table = "*"
+flask-restful = "*"
 records = "*"
 python-dotenv = "*"
 simplejson = "*"
 gunicorn = "*"
-Frozen-Flask = "*"
+frozen-flask = "*"
 
 
 [requires]
