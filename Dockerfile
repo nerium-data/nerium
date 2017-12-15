@@ -16,6 +16,7 @@ RUN set -ex && pip3 install pipenv --upgrade
 
 # Copy in the code
 COPY *.py /app/
+COPY Pipfile /app/
 WORKDIR /app
 VOLUME /app/sqls
 # Install requirements
