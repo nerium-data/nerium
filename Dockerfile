@@ -1,6 +1,11 @@
-FROM alpine:3.6
-MAINTAINER tym@adops.com
+# build gcsfuse for alpine
+FROM golang:1-alpine as gcsfuse-build
+RUN apk add --no-cache git
+RUN go get github.com/googlecloudplatform/gcsfuse
+RUN chmod +x /go/bin/gcsfuse
 
+
+FROM alpine:3.6
 # Install python3 & pipenv
 # Not using python:3-alpine to avoid installing separarate python3
 #   for psycopg2 install
@@ -14,7 +19,7 @@ COPY *.py /app/
 WORKDIR /app
 VOLUME /app/sqls
 # Install requirements
-ADD  gcsfuse/gcsfuse /usr/local/bin/
+COPY --from=gcsfuse-build  /go/bin/gcsfuse /usr/local/bin/
 RUN pipenv install --system
 
 # $db_driver may be one of "postgres" or "mysql"
