@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import abc
+import decimal
 import os
 from abc import ABC
 
 import records
 from dotenv import find_dotenv, load_dotenv
 from flask import Flask, request
+from flask.json import JSONEncoder
 from flask_restful import Api, Resource
 
 # Provision environment as needed
@@ -21,6 +23,23 @@ api = Api(app)
 app.config['DATABASE_URL'] = os.getenv('DATABASE_URL',
                                        'sqlite:///?check_same_thread=False')
 app.config['QUERY_PATH'] = os.getenv('QUERY_PATH', 'query_files')
+
+
+class ResultJSONEncoder(JSONEncoder):
+    """ Add simple default encodings for Decimals and Datetimes.
+    Why `json` doesn't do this out of the box is beyond me. >:(
+    """
+    def default(self, obj):
+        if isinstance(obj, decimal.Decimal):
+            return str(obj)
+        elif hasattr(obj, 'isoformat'):
+            return obj.isoformat()
+        else:
+            return obj
+        return JSONEncoder.default(self, obj)
+
+
+app.config['RESTFUL_JSON'] = {'cls': ResultJSONEncoder}
 
 
 class ResultSet(ABC):
