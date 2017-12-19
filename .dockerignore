@@ -4,3 +4,4 @@
 _junk_drawer/
 Pipfile.lock
 sqls/
+query_files/

@@ -18,7 +18,7 @@ RUN set -ex && pip3 install pipenv --upgrade
 COPY *.py /app/
 COPY Pipfile /app/
 WORKDIR /app
-VOLUME /app/sqls
+VOLUME /app/query_files
 # Install requirements
 COPY --from=gcsfuse-build  /go/bin/gcsfuse /usr/local/bin/
 RUN pipenv install --system

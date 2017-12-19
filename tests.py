@@ -1,17 +1,26 @@
 import json
 import os
 import unittest
+# from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 
 import nerium
 
-os.environ['DATABASE_URL'] = 'sqlite:///'
+# TODO: test moar methods
 
+os.environ['DATABASE_URL'] = 'sqlite:///'
 # Fixtures
-EXPECTED = dict(
-    columns=['foo', 'bar', 'quux', 'quuux'],
-    data=[[1.25, '2017-09-09T00:00:00', 'Hello', 'Björk Guðmundsdóttir'],
-          [42.0, '2031-05-25T00:00:00', 'Howdy', 'ƺƺƺƺ']])
+EXPECTED = [{
+    'foo': 1.25,
+    'bar': '2017-09-09',
+    'quux': 'Hello',
+    'quuux': 'Björk Guðmundsdóttir'
+}, {
+    'foo': 42,
+    'bar': '2031-05-25',
+    'quux': 'yo',
+    'quuux': 'ƺƺƺƺ'
+}]
 
 TEST_SQL = """select cast(1.25 as float) as foo  -- float check
                     -- timestamp check
@@ -21,7 +30,7 @@ TEST_SQL = """select cast(1.25 as float) as foo  -- float check
                union
               select 42
                    , strftime('%Y-%m-%dT%H:%M:%S','2031-05-25')
-                   , 'Howdy'
+                   , 'yo'
                    , 'ƺƺƺƺ';
            """
 
@@ -30,7 +39,8 @@ def setUpModule():
     global sql_file
     global report_name
     with NamedTemporaryFile(
-            dir='sqls', suffix='.sql', mode='w', delete=False) as _sql_file:
+            dir='query_files', suffix='.sql', mode='w',
+            delete=False) as _sql_file:
         sql_file = _sql_file
         sql_file.write(TEST_SQL)
         _report_name = os.path.basename(sql_file.name)
@@ -41,24 +51,23 @@ def tearDownModule():
     os.remove(sql_file.name)
 
 
-class TestResultSet(unittest.TestCase):
+class TestSQLResultSet(unittest.TestCase):
     def test_results_expected(self):
-        loader = nerium.ResultSet()
-        result = loader.result(report_name)
-
+        loader = nerium.SQLResultSet(report_name)
+        result = loader.result()
         self.assertEqual(result, EXPECTED)
 
 
-class TestAPI(unittest.TestCase):
+class TestSQLAPI(unittest.TestCase):
     def setUp(self):
         self.app = nerium.app.test_client()
 
     def test_response(self):
-        endpoint = '/{}'.format(report_name)
+        endpoint = '/v1/sql/{}/'.format(report_name)
         response = self.app.get(endpoint)  # noqa F841
 
     def test_response_expected(self):
-        endpoint = '/{}'.format(report_name)
+        endpoint = '/v1/sql/{}/'.format(report_name)
         response = self.app.get(endpoint)
         self.assertEqual(EXPECTED, json.loads(response.get_data()))
 

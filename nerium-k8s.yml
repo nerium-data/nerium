@@ -27,7 +27,7 @@ spec:
         lifecycle:
           postStart:
             exec:
-              command: ["gcsfuse", "nerium-sql", "/app/sqls"]
+              command: ["gcsfuse", "nerium-sql", "/app/query_files"]
           preStop:
             exec:
               command: ["fusermount", "-u", "/app/sqls"]
