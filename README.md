@@ -33,9 +33,9 @@ $ curl http://localhost:8081/<report_name>?<params>
 
 ### URLs
 
-`/v1/<string:report_name>/?<params>`
-`/v1/<string:query_type>/<string:report_name>/?<params>`
-`/v1/sql/<string:report_name>/<string:format>/?<params>`
+`/v1/<string:report_name>/?<params>`  
+`/v1/<string:query_type>/<string:report_name>/?<params>`  
+`/v1/sql/<string:report_name>/<string:format>/?<params>`  
 `/v1/sql/<string:report_name>/compact/?<params>`
 
 `report_name` should match the name of a given SQL file, minus the `.sql` extension. Params are as specified in the queries themselves.
@@ -53,7 +53,7 @@ Unknown values passed to `query_type` or `format` will silently fall back to def
 
 **Code**: 200
 
-**Content**:
+**Content**:  
 'default': `[{<column_name>:<row_value>, etc..., }, {etc...}, ]`  
 'compact': `{"columns": [<list of column names>], "data": [<array of row value arrays>]}`
 
