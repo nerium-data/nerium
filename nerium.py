@@ -1,97 +1,142 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import decimal
+import abc
 import os
+from abc import ABC
 
 import records
 from dotenv import find_dotenv, load_dotenv
-from flask import Flask, current_app, render_template, request
-from flask.json import JSONEncoder
+from flask import Flask, request
 from flask_restful import Api, Resource
 
 # Provision environment as needed
-if not os.getenv('DATABASE_URL'):
+if find_dotenv():
     load_dotenv(find_dotenv())
+else:
+    load_dotenv('/dotenv/.env')
 
 # Instantiate and configure app
 app = Flask(__name__)
 api = Api(app)
-app.config['DATABASE_URL'] = os.getenv('DATABASE_URL', 'sqlite:///')
-app.config['SQL_PATH'] = os.getenv('SQL_PATH', 'sqls')
+app.config['DATABASE_URL'] = os.getenv('DATABASE_URL',
+                                       'sqlite:///?check_same_thread=False')
+app.config['QUERY_PATH'] = os.getenv('QUERY_PATH', 'query_files')
 
 
-class ResultJSONEncoder(JSONEncoder):
-    """ Add simple default encodings for Decimals and Datetimes.
-    Why `json` doesn't do this out of the box is beyond me. >:(
-    """
-    def default(self, obj):
-        if isinstance(obj, decimal.Decimal):
-            return str(obj)
-        elif hasattr(obj, 'isoformat'):
-            return obj.isoformat()
-        else:
-            return obj
-        return JSONEncoder.default(self, obj)
+class ResultSet(ABC):
+    """Generic result set class template.
 
+    Loads data source and query fetch query
+    results by submitting query to data source with expected parameters.
 
-app.config['RESTFUL_JSON'] = {'cls': ResultJSONEncoder}
-
-
-class ResultSet:
-    """Finds SQL query file, and executes query against database configured
-    in $DATABASE_URL. Returns results as dict formatted like
-
-    `{"columns": [<list of column names>], "data": [<list of rows as lists>]}`
 
     Args:
-        report_name (str): Name of chosen query file, without the .sql extension
-    """
-    # Find SQL file matching report_name
-    def get_sql(self, report_name):
-        try:
-            sql_dir = current_app.config['SQL_PATH']
-        except RuntimeError:  # so this works outside requests for testing
-            sql_dir = os.getenv('SQL_PATH', 'sqls')
-        filename = '{}.sql'.format(report_name)
-        sql_file = os.path.join(sql_dir, filename)
-        return sql_file
+        report_name (str): Name of chosen query file, without the extension
+        kwargs: Parameter keys and values to bind to query
 
-    # Submit query, apply serialization cleaner method to data values,
-    #    return results in dict
-    def result(self, report_name, **kwargs):
+    Usage:
+        Subclass and override 'query_type' attribute with a file extension
+        to seek in QUERY_PATH directory, and provide a 'result' method
+    """
+
+    def __init__(self, report_name, **kwargs):
+        self.report_name = report_name
+        self.kwargs = kwargs
+
+    @property
+    @abc.abstractmethod
+    def query_type(self):
+        return None
+
+    def get_file(self):
+        filename = '.'.join([self.report_name, self.query_type])
+        query_file = os.path.join(app.config['QUERY_PATH'], filename)
+        return query_file
+
+    @abc.abstractmethod
+    def result(self):
+        """ Return query results as a JSON-serializable Python structure
+        (generally a list of dictionaries)
+        """
+        return
+
+
+class SQLResultSet(ResultSet):
+    """ SQL database query implementation of ResultSet, using Records library
+    to fetch a dataset from configured report_name
+    """
+
+    @property
+    def query_type(self):
+        return ('sql')
+
+    query_db = records.Database(app.config['DATABASE_URL'])
+
+    def result(self):
         try:
-            query_db = records.Database(current_app.config['DATABASE_URL'])
-        except RuntimeError:
-            query_db = records.Database(os.getenv('DATABASE_URL', 'sqlite:///'))
-        result = query_db.query_file(self.get_sql(report_name), **kwargs)
-        cols = result.dataset.headers
-        rows = [list(row.values()) for row in result.all(as_ordereddict=True)]
-        format_dict = dict(columns=cols, data=rows)
-        return format_dict
+            rows = self.query_db.query_file(self.get_file(), **self.kwargs)
+            result = rows.as_dict()
+        except IOError as e:
+            result = [{'Error': e, }, ]
+        return result
+
+
+class ResultFormatter(ABC):
+    def __init__(self, result):
+        self.result = result
+
+    @abc.abstractmethod
+    def format_results(self):
+        """ Transform result set structure and return new structure
+        """
+        return
+
+
+class CompactFormatter(ResultFormatter):
+    """ Returns dict in format
+    {"columns": [<list of column names>], "data": [<array of row value arrays>]}
+    """
+    # TODO: some graceful error handling, in case of bad input format, etc.
+    def format_results(self):
+        raw = self.result
+        columns = list(raw[0].keys())
+        data = [tuple(row.values()) for row in raw]
+        formatted = dict(columns=columns, data=data)
+        return formatted
 
 
 class ReportAPI(Resource):
-    """ Calls ResultSet.result() and returns JSON in compact format like
-
-    `{"columns": [<list of column names>],
-      "data": [<array of row value arrays>]}`
+    """ Calls ResultSet.result() and returns JSON
     """
-    def get(self, report_name):
-        loader = ResultSet()
-        payload = loader.result(report_name, **request.args.to_dict())
+    # Poor man's plugin registration.
+    # TODO: formalize this with `__subclasses__()` method
+    query_type_lookup = {'sql': SQLResultSet, }
+    format_lookup = {'compact': CompactFormatter, }
+
+    def get(self, report_name, query_type='sql', format_='default'):
+        # Lookup query_type and fetch result from corresponding class
+        try:
+            result_cls = self.query_type_lookup[query_type]
+        except KeyError:
+            result_cls = SQLResultSet
+        loader = result_cls(report_name, **request.args.to_dict())
+        query_result = loader.result()
+
+        try:
+            format_cls = self.format_lookup[format_]
+            payload = format_cls(query_result).format_results()
+        except KeyError:
+            # TODO: add logging and log a warning here
+            #     and/or return format not found message to client(?)
+            payload = query_result
         return payload
 
 
-api.add_resource(ReportAPI, '/<string:report_name>',
-                 '/report/<string:report_name>')
-
-
-@app.route('/table/<string:report_name>')
-def report_table(report_name):
-    loader = ResultSet()
-    payload = loader.result(report_name, **request.args.to_dict())
-    return render_template(
-        'table.html', columns=payload['columns'], data=payload['data'])
+api.add_resource(
+    ReportAPI,
+    '/v1/<string:report_name>/',
+    '/v1/<string:query_type>/<string:report_name>/',
+    '/v1/<string:query_type>/<string:report_name>/<string:format_>/')
 
 
 if __name__ == '__main__':
