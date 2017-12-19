@@ -113,7 +113,7 @@ class ReportAPI(Resource):
     query_type_lookup = {'sql': SQLResultSet, }
     format_lookup = {'compact': CompactFormatter, }
 
-    def get(self, report_name, query_type='sql', format='default'):
+    def get(self, report_name, query_type='sql', format_='default'):
         # Lookup query_type and fetch result from corresponding class
         try:
             result_cls = self.query_type_lookup[query_type]
@@ -123,7 +123,7 @@ class ReportAPI(Resource):
         query_result = loader.result()
 
         try:
-            format_cls = self.format_lookup[format]
+            format_cls = self.format_lookup[format_]
             payload = format_cls(query_result).format_results()
         except KeyError:
             # TODO: add logging and log a warning here
@@ -136,7 +136,7 @@ api.add_resource(
     ReportAPI,
     '/v1/<string:report_name>/',
     '/v1/<string:query_type>/<string:report_name>/',
-    '/v1/<string:query_type>/<string:report_name>/<string:format>/')
+    '/v1/<string:query_type>/<string:report_name>/<string:format_>/')
 
 
 if __name__ == '__main__':
