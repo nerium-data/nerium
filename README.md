@@ -54,7 +54,7 @@ Unknown values passed to `query_type` or `format` will silently fall back to def
 **Code**: 200
 
 **Content**:
-'default': [{<column_name>:<row_value>, etc..., }, {etc...}, ]
+'default': `[{<column_name>:<row_value>, etc..., }, {etc...}, ]`  
 'compact': `{"columns": [<list of column names>], "data": [<array of row value arrays>]}`
 
 ## Sketchy Roadmap/TODOs
