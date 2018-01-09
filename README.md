@@ -55,12 +55,8 @@ Unknown values passed to `query_type` or `format` will silently fall back to def
 
 **Content**:  
 'default': `[{<column_name>:<row_value>, etc..., }, {etc...}, ]`  
-<<<<<<< HEAD
-'compact': `{"columns": [<list of column names>], "data": [<array of row value arrays>]}`
-=======
 'compact': `{"columns": [<list of column names>], "data": [<array of row value arrays>]}`  
 'affix': `{"error": false, "response": {<'default' array of result objects>}, "metadata":{"executed": <timestamp>, "params": {<array of name-value pairs submitted to query with request>}}}`
->>>>>>> Add TakeiResultSet and AffixFormatter subclasses
 
 ## Sketchy Roadmap/TODOs
 
