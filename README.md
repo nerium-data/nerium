@@ -67,8 +67,9 @@ Unknown values passed to `query_type` or `format` will silently fall back to def
 - Improve/mature plugin architecture
     - Separate base classes to a library
     - Implementation subclasses in `contrib` package
-- Configurable JSON output formatters
+    - Subclass registration mechanism
+- Configurable/flexible JSON output formatters (`AffixFormatter` could do with less hard-coding)
 - Template/data visualization logic (separate client app that can output HTML or chart formats on its other end)
 - Static output file generator (another client app)
 - Swagger docs
-- Health check/default query endpoint
+- Health check/default query endpoint (Own git commit hash report(?))
