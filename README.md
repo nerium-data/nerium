@@ -8,7 +8,7 @@ Currently supports SQL queries via [Records](https://github.com/kennethreitz/rec
 
 Default JSON output is an array of objects, one per result row, with database column names as keys. A `compact` JSON output format may also be requested, with separate `column` (array of column names) and `data` (array of row value arrays) nodes for compactness.
 
-Docker image may be specified to include Python driver for Postgres or MySQL with `--build-arg db_driver=[ postgres | mysql ]` at build time.
+Docker image may be specified to include Python driver for Postgres or MySQL with `--build-arg db_driver=[ postgres | mysql ]` at build time. (In theory, Nerium can already support any backend that SQLAlchemy can, but since none of these are hard dependencies, drivers aren't included in Pipfile, and Dockerfile only supports those we're using at OAO.)
 
 Nerium is inspired in roughly equal measure by [SQueaLy](https://hashedin.com/2017/04/24/squealy-intro-how-to-build-customized-dashboard/) and [Pelican](https://blog.getpelican.com/). It hopes to be something like [Superset](https://superset.incubator.apache.org/) when it grows up.
 
@@ -55,7 +55,8 @@ Unknown values passed to `query_type` or `format` will silently fall back to def
 
 **Content**:  
 'default': `[{<column_name>:<row_value>, etc..., }, {etc...}, ]`  
-'compact': `{"columns": [<list of column names>], "data": [<array of row value arrays>]}`
+'compact': `{"columns": [<list of column names>], "data": [<array of row value arrays>]}`  
+'affix': `{"error": false, "response": {<'default' array of result objects>}, "metadata":{"executed": <timestamp>, "params": {<array of name-value pairs submitted to query with request>}}}`
 
 ## Sketchy Roadmap/TODOs
 
@@ -64,8 +65,10 @@ Unknown values passed to `query_type` or `format` will silently fall back to def
 - Report listing endpoint
 - ~~Plugin architecture~~
 - Improve/mature plugin architecture
+    - Separate base classes to a library
+    - Implementation subclasses in `contrib` package
 - Configurable JSON output formatters
-- More data visualization formats, semantic tagging in table template; move template/viz logic to separate client app
+- Template/data visualization logic (separate client app that can output HTML or chart formats on its other end)
 - Static output file generator (another client app)
 - Swagger docs
 - Health check/default query endpoint

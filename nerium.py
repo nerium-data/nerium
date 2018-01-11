@@ -4,6 +4,7 @@ import abc
 import decimal
 import os
 from abc import ABC
+from datetime import datetime
 
 import records
 from dotenv import find_dotenv, load_dotenv
@@ -42,6 +43,7 @@ class ResultJSONEncoder(JSONEncoder):
 app.config['RESTFUL_JSON'] = {'cls': ResultJSONEncoder}
 
 
+# BASE CLASSES
 class ResultSet(ABC):
     """Generic result set class template.
 
@@ -80,6 +82,18 @@ class ResultSet(ABC):
         return
 
 
+class ResultFormatter(ABC):
+    def __init__(self, result):
+        self.result = result
+
+    @abc.abstractmethod
+    def format_results(self):
+        """ Transform result set structure and return new structure
+        """
+        return
+
+
+# `ResultSet` IMPLEMENTATION SUBCLASSES
 class SQLResultSet(ResultSet):
     """ SQL database query implementation of ResultSet, using Records library
     to fetch a dataset from configured report_name
@@ -96,21 +110,62 @@ class SQLResultSet(ResultSet):
             rows = self.query_db.query_file(self.get_file(), **self.kwargs)
             result = rows.as_dict()
         except IOError as e:
-            result = [{'Error': e, }, ]
+            result = [{'error': repr(e)}, ]
         return result
 
 
-class ResultFormatter(ABC):
-    def __init__(self, result):
-        self.result = result
+class TakeiResultSet(ResultSet):
+    """ Handle table name substitution in takei queries
 
-    @abc.abstractmethod
-    def format_results(self):
-        """ Transform result set structure and return new structure
-        """
-        return
+        **NOTE** Normally I (@tym-oao) am opposed to project names in code,
+        and particularly in something like a class name. In this limited case
+        it is acceptable and deliberate, because the table name substitution
+        being done to set up the queries is gross, and it is fondly to be
+        wished that this code will serve only as a legacy stopgap, and that we
+        will soon burn this bridge behind us to light our way forward.
+
+        TL;DR: let's not merge this to master in its present form, k?
+    """
+    # TODO: Factor this whole thing out. Stop using queries that conditionally
+    #     access different tables for the same data. Stop using MySQL.
+
+    # Also TODO: In the meantime, at least get this into its own "contrib"
+    #     implementation
+
+    @property
+    def query_type(self):
+        return('sql')
+
+    query_db = records.Database(app.config['DATABASE_URL'])
+    table_list = query_db.get_table_names()
+
+    def result(self):
+        if 'client_id' in self.kwargs.keys():
+            tbl_name = "{}_daily".format(self.kwargs['client_id'])
+            if tbl_name not in self.table_list:
+                result = [{'error': 'Table {} not found in database'}, ]
+                return result
+            try:
+                tbl_name = '`{}`'.format(tbl_name)
+                with open(self.get_file(), 'r') as _query_file:
+                    sql_query = _query_file.read()
+                    sql_query = sql_query.replace('TABLE_NAME', tbl_name)
+                    rows = self.query_db.query(sql_query, **self.kwargs)
+                    result = rows.as_dict()
+                return result
+            except IOError as e:
+                result = [{'error': repr(e)}, ]
+                return result
+        else:
+            try:
+                rows = self.query_db.query_file(self.get_file(), **self.kwargs)
+                result = rows.as_dict()
+            except IOError as e:
+                result = [{'error': repr(e)}, ]
+            return result
 
 
+# `ResultFormatter` IMPLEMENTATION SUBCLASSES
 class CompactFormatter(ResultFormatter):
     """ Returns dict in format
     {"columns": [<list of column names>], "data": [<array of row value arrays>]}
@@ -124,13 +179,37 @@ class CompactFormatter(ResultFormatter):
         return formatted
 
 
+class AffixFormatter(ResultFormatter):
+    """ Wrap default object array with error and metadata details
+    """
+    def format_results(self):
+        if 'error' in self.result[0].keys():
+            return self.result
+
+        formatted = {}
+        formatted['error'] = False
+        formatted['response'] = self.result
+        formatted['metadata'] = {}
+        formatted['metadata']['executed'] = datetime.now().isoformat()
+        formatted['metadata']['params'] = request.args.to_dict()
+        return formatted
+
+
+# LIL FLASK APP
 class ReportAPI(Resource):
     """ Calls ResultSet.result() and returns JSON
+
+        Given a report_name, query_type, and format_ (via URL routes), this
+        Flask-RESTful Resource submits the query matching the report_name to
+        the appropriate query_type subclass and optionally format results
+        via the matching format_cls and let Resource do its JSON thing
     """
     # Poor man's plugin registration.
     # TODO: formalize this with `__subclasses__()` method
-    query_type_lookup = {'sql': SQLResultSet, }
-    format_lookup = {'compact': CompactFormatter, }
+    # TODO: unless and until doing this dynamically with `__subclasses__()`
+    #     let's move this to a separate config
+    query_type_lookup = {'sql': SQLResultSet, 'takei': TakeiResultSet}
+    format_lookup = {'compact': CompactFormatter, 'affix': AffixFormatter}
 
     def get(self, report_name, query_type='sql', format_='default'):
         # Lookup query_type and fetch result from corresponding class
@@ -145,6 +224,7 @@ class ReportAPI(Resource):
             format_cls = self.format_lookup[format_]
             payload = format_cls(query_result).format_results()
         except KeyError:
+            """ Return default serialization """
             # TODO: add logging and log a warning here
             #     and/or return format not found message to client(?)
             payload = query_result
