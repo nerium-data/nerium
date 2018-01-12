@@ -1,8 +1,6 @@
-import os
-
-import records
-# from app import app
 from nerium import ResultSet
+from nerium.contrib.queryable.record import RecordsQueryable
+from nerium.contrib.queryable.takei import TakeiQueryable
 
 
 class TakeiResultSet(ResultSet):
@@ -20,17 +18,14 @@ class TakeiResultSet(ResultSet):
     # TODO: Factor this whole thing out. Stop using queries that conditionally
     #     access different tables for the same data. Stop using MySQL.
 
-    # Also TODO: In the meantime, at least get this into its own "contrib"
-    #     implementation
-
     @property
     def query_type(self):
         return('sql')
 
-    db = os.getenv('DATABASE_URL', 'sqlite:///?check_same_thread=False')
-    query_db = records.Database(db)
-    # query_db = records.Database(app.config['DATABASE_URL'])
-    table_list = query_db.get_table_names()
+    @property
+    def table_list(self):
+        db = TakeiQueryable()
+        return db.get_table_list(self.get_file())
 
     def result(self):
         if 'client_id' in self.kwargs.keys():
@@ -43,16 +38,16 @@ class TakeiResultSet(ResultSet):
                 with open(self.get_file(), 'r') as _query_file:
                     sql_query = _query_file.read()
                     sql_query = sql_query.replace('TABLE_NAME', tbl_name)
-                    rows = self.query_db.query(sql_query, **self.kwargs)
-                    result = rows.as_dict()
+                    db = TakeiQueryable()
+                    result = db.results(sql_query, **self.kwargs)
                 return result
             except IOError as e:
                 result = [{'error': repr(e)}, ]
                 return result
         else:
             try:
-                rows = self.query_db.query_file(self.get_file(), **self.kwargs)
-                result = rows.as_dict()
+                db = RecordsQueryable()
+                result = db.results(self.get_file(), **self.kwargs)
             except IOError as e:
                 result = [{'error': repr(e)}, ]
             return result

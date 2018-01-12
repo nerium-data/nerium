@@ -40,7 +40,7 @@ def setUpModule():
     global sql_file
     global report_name
     with NamedTemporaryFile(
-            dir='query_files', suffix='.sql', mode='w',
+            dir='query_files', suffix='.lite.sql', mode='w',
             delete=False) as _sql_file:
         sql_file = _sql_file
         sql_file.write(TEST_SQL)

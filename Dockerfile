@@ -23,10 +23,8 @@ VOLUME /app/query_files
 COPY --from=gcsfuse-build  /go/bin/gcsfuse /usr/local/bin/
 RUN pipenv install --system
 
-# $db_driver may be one of "postgres" or "mysql"
-ARG db_driver
 
-RUN if [ "$db_driver" = "postgres" ]; then apk add --no-cache py3-psycopg2; fi
-RUN if [ "$db_driver" = "mysql" ]; then pipenv install --system pymysql; fi
+apk add --no-cache py3-psycopg2
+pipenv install --system pymysql
 
-CMD gunicorn -b 0.0.0.0:8081 nerium:app --log-file=-
+CMD gunicorn -b 0.0.0.0:8081 app:app --log-file=-

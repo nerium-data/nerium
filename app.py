@@ -1,29 +1,18 @@
 import decimal
-import os
+# import os
 
 from flask import Flask, request
 from flask.json import JSONEncoder
 from flask_restful import Api, Resource
-from nerium.contrib.formatter import (affix,
-                                      compact)
-from nerium.contrib.resultset import (sql,
-                                      takei)
+from nerium.contrib.formatter import (AffixFormatter,
+                                      CompactFormatter)
+from nerium.contrib.resultset import (SQLResultSet,
+                                      TakeiResultSet)
 
-
-# Query name registration system query_name -> (script, type)
-
-# PgSqlQueryable.query(script, params) -> ResultSet
-# BGSqlQueryable.Query(script, params)
-
-# (query_name, [param,]) v
-# {query_name: (script_file, instantiable_queryable)}
 
 # Instantiate and configure app
 app = Flask(__name__)
 api = Api(app)
-app.config['DATABASE_URL'] = os.getenv('DATABASE_URL',
-                                       'sqlite:///?check_same_thread=False')
-app.config['QUERY_PATH'] = os.getenv('QUERY_PATH', 'query_files')
 
 
 class ResultJSONEncoder(JSONEncoder):
@@ -56,17 +45,17 @@ class ReportAPI(Resource):
     # TODO: formalize this with `__subclasses__()` method
     # TODO: unless and until doing this dynamically with `__subclasses__()`
     #     let's move this to a separate config
-    query_type_lookup = {'sql': sql.SQLResultSet,
-                         'takei': takei.TakeiResultSet}
-    format_lookup = {'compact': compact.CompactFormatter,
-                     'affix': affix.AffixFormatter}
+    query_type_lookup = {'sql': SQLResultSet,
+                         'takei': TakeiResultSet}
+    format_lookup = {'compact': CompactFormatter,
+                     'affix': AffixFormatter}
 
     def get(self, report_name, query_type='sql', format_='default'):
         # Lookup query_type and fetch result from corresponding class
         try:
             result_cls = self.query_type_lookup[query_type]
         except KeyError:
-            result_cls = sql.SQLResultSet
+            result_cls = SQLResultSet
 
         loader = result_cls(report_name,
                             **request.args.to_dict())
