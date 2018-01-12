@@ -9,7 +9,7 @@ import nerium
 
 # TODO: test moar methods
 
-os.environ['DATABASE_URL'] = 'sqlite:///'
+os.environ['LITESQL_BACKEND'] = 'sqlite:///'
 # Fixtures
 EXPECTED = [{
     'foo': 1.25,
@@ -22,7 +22,7 @@ EXPECTED = [{
     'quux': 'yo',
     'quuux': 'ƺƺƺƺ'
 }]
-# T%H:%M:%S
+
 TEST_SQL = """select cast(1.25 as float) as foo  -- float check
                     -- timestamp check
                    , strftime('%Y-%m-%d', '2017-09-09') as bar

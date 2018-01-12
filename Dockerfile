@@ -16,6 +16,7 @@ RUN set -ex && pip3 install pipenv --upgrade
 
 # Copy in the code
 COPY *.py /app/
+COPY nerium/ /app/nerium/
 COPY Pipfile /app/
 WORKDIR /app
 VOLUME /app/query_files
@@ -24,7 +25,9 @@ COPY --from=gcsfuse-build  /go/bin/gcsfuse /usr/local/bin/
 RUN pipenv install --system
 
 
-apk add --no-cache py3-psycopg2
-pipenv install --system pymysql
+RUN apk add --no-cache py3-psycopg2
+RUN pipenv install --system pymysql
+
+RUN python3 /app/setup.py install
 
 CMD gunicorn -b 0.0.0.0:8081 app:app --log-file=-
