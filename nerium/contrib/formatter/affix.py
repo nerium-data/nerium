@@ -15,6 +15,6 @@ class AffixFormatter(ResultFormatter):
         formatted['error'] = False
         formatted['response'] = self.result
         formatted['metadata'] = {}
-        formatted['metadata']['executed'] = datetime.now().isoformat()
+        formatted['metadata']['executed'] = datetime.datetime.now().isoformat()
         formatted['metadata']['params'] = request.args.to_dict()
         return formatted
