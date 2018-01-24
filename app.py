@@ -32,6 +32,11 @@ class ResultJSONEncoder(JSONEncoder):
 app.config['RESTFUL_JSON'] = {'cls': ResultJSONEncoder}
 
 
+class BaseRoute(Resource):
+    def get(self):
+        return {"status": "ok"}
+
+
 # LIL FLASK APP
 class ReportAPI(Resource):
     """ Calls ResultSet.result() and returns JSON
@@ -76,8 +81,14 @@ api.add_resource(
     ReportAPI,
     '/v1/<string:report_name>/',
     '/v1/<string:query_type>/<string:report_name>/',
-    '/v1/<string:query_type>/<string:report_name>/<string:format_>/')
+    '/v1/<string:query_type>/<string:report_name>/<string:format_>/',
+    strict_slashes=False)
 
+api.add_resource(
+    BaseRoute,
+    '/',
+    '/v1/',
+    strict_slashes=False)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8081)
