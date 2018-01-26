@@ -4,8 +4,8 @@ import abc
 import os
 from abc import ABC
 
-# from app import app
 from dotenv import find_dotenv, load_dotenv
+import sqlalchemy
 
 # Provision environment as needed
 if find_dotenv():
@@ -46,6 +46,19 @@ class ResultSet(ABC):
         q_path = os.getenv('QUERY_PATH', 'query_files')
         query_file = os.path.join(q_path, filename)
         return query_file
+
+    def get_params(self):
+        with open(self.get_file(), 'r') as qf:
+            query_data = qf.read()
+        query = sqlalchemy.text(query_data)
+        # get_children will get all elements related to the query
+        bind_parameters = query.get_children()
+        needed_params = [bparam.key
+                         for bparam in bind_parameters
+                         if isinstance(bparam,
+                                       sqlalchemy.sql.expression.BindParameter)
+                         ]
+        return needed_params
 
     @abc.abstractmethod
     def result(self):

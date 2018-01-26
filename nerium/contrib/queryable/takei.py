@@ -14,9 +14,13 @@ class TakeiQueryable():
 
     def results(self, query, **kwargs):
         backend_code = self.parse(query)
-        backend = records.Database(self.backend_lookup(backend_code))
-        results = backend.query(query, **kwargs)
-        return results.as_dict()
+        try:
+            backend = records.Database(self.backend_lookup(backend_code))
+            results = backend.query(query, **kwargs)
+            result_dict = results.as_dict()
+        except Exception as e:
+            result_dict = [{'error': repr(e)}]
+        return result_dict
 
     def get_table_list(self, query_file):
         backend_code = self.parse(query_file)
@@ -30,6 +34,8 @@ class TakeiQueryable():
         return ''.join(file_parts[1:])
 
     def backend_lookup(self, backend_code):
-        backend = os.getenv('{}_BACKEND'.format(backend_code.upper()),
-                            "NO BACKEND")
+        try:
+            backend = os.getenv('{}_BACKEND'.format(backend_code.upper()))
+        except Exception:
+            backend = os.getenv('DATABASE_URL', "NO BACKEND")
         return backend

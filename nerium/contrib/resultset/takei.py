@@ -1,3 +1,4 @@
+import sqlalchemy
 from nerium import ResultSet
 from nerium.contrib.queryable.record import RecordsQueryable
 from nerium.contrib.queryable.takei import TakeiQueryable
@@ -44,10 +45,16 @@ class TakeiResultSet(ResultSet):
             except IOError as e:
                 result = [{'error': repr(e)}, ]
                 return result
+            except (sqlalchemy.exc.OperationalError,
+                    sqlalchemy.exc.InternalError) as e:
+                result = [{'error': repr(e)}, ]
         else:
             try:
                 db = RecordsQueryable()
                 result = db.results(self.get_file(), **self.kwargs)
             except IOError as e:
+                result = [{'error': repr(e)}, ]
+            except (sqlalchemy.exc.OperationalError,
+                    sqlalchemy.exc.InternalError) as e:
                 result = [{'error': repr(e)}, ]
             return result

@@ -1,7 +1,6 @@
 from nerium import ResultFormatter
 
 
-# `ResultFormatter` IMPLEMENTATION SUBCLASSES
 class CompactFormatter(ResultFormatter):
     """ Returns dict in format
     {"columns": [<list of column names>], "data": [<array of row value arrays>]}
