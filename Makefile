@@ -8,7 +8,7 @@ deploy-results: check_secret
 	kubectl create -f nerium-k8s.yml
 	kubectl set image deployments/nerium nerium=us.gcr.io/lexical-cider-93918/nerium:latest
 
-	kubectl expose deployment nerium --type=NodePort --port=80 --target-port=8081
+	kubectl expose deployment nerium --name=results --type=NodePort --port=80 --target-port=8081
 
 destroy-results:
 	gcloud container clusters get-credentials playground

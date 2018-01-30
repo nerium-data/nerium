@@ -12,6 +12,20 @@ class SQLResultSet(ResultSet):
     def query_type(self):
         return ('sql')
 
+    # TODO: abstract method of base class or concrete implementation here?
+    def get_params(self):
+        with open(self.get_file(), 'r') as qf:
+            query_data = qf.read()
+        query = sqlalchemy.text(query_data)
+        # get_children will get all elements related to the query
+        bind_parameters = query.get_children()
+        needed_params = [bparam.key
+                         for bparam in bind_parameters
+                         if isinstance(bparam,
+                                       sqlalchemy.sql.expression.BindParameter)
+                         ]
+        return needed_params
+
     def result(self):
         try:
             db = RecordsQueryable()

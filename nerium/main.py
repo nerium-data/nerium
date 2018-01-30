@@ -47,19 +47,6 @@ class ResultSet(ABC):
         query_file = os.path.join(q_path, filename)
         return query_file
 
-    def get_params(self):
-        with open(self.get_file(), 'r') as qf:
-            query_data = qf.read()
-        query = sqlalchemy.text(query_data)
-        # get_children will get all elements related to the query
-        bind_parameters = query.get_children()
-        needed_params = [bparam.key
-                         for bparam in bind_parameters
-                         if isinstance(bparam,
-                                       sqlalchemy.sql.expression.BindParameter)
-                         ]
-        return needed_params
-
     @abc.abstractmethod
     def result(self):
         """ Return query results as a JSON-serializable Python structure
