@@ -1,7 +1,7 @@
 from nerium import ResultFormatter
 
 
-class CompactFormatter(ResultFormatter):
+class AvroFormatter(ResultFormatter):
     """ Returns dict in an Avro Schema format
     """
     def format_results(self):
