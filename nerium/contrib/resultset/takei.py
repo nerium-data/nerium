@@ -32,25 +32,19 @@ class TakeiResultSet(SQLResultSet):
         backend = self.backend_lookup(backend_name)
         db = records.Database(backend)
 
-        if 'client_id' in self.kwargs.keys():
-            sql_query = self.table_substitution(db, self.kwargs['client_id'])
-            if sql_query[0] == 'missing':
-                tbl_name = sql_query[1]
-                result = [
-                    {
-                        'error':
-                        'Table {} not found in database'.format(tbl_name)
-                    },
-                ]
-                return result
-            try:
-                result = db.query(sql_query, **self.kwargs)
-            except Exception as e:
-                result = [{'error': repr(e)}, ]
-        else:
-            try:
-                result = db.query_file(self.get_query_path(), **self.kwargs)
-            except Exception as e:
-                result = [{'error': repr(e)}, ]
+        sql_query = self.table_substitution(db, self.kwargs['client_id'])
+        if sql_query[0] == 'missing':
+            tbl_name = sql_query[1]
+            result = [
+                {
+                    'error':
+                    'Table {} not found in database'.format(tbl_name)
+                },
+            ]
+            return result
+        try:
+            result = db.query(sql_query, **self.kwargs)
+        except Exception as e:
+            result = [{'error': repr(e)}, ]
         result = result.as_dict()
         return result
