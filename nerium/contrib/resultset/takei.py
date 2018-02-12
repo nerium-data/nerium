@@ -1,6 +1,7 @@
+import os
 import re
-import records
 
+import records
 from nerium.contrib.resultset.sql import SQLResultSet
 
 
@@ -11,8 +12,8 @@ class TakeiResultSet(SQLResultSet):
     # replace legacy 'takei-web-app' MySQL instance
 
     def table_substitution(self, db, client_id):
-        table_list = db.get_table_list()
-        with open(self.get_file(), 'r') as _query_file:
+        table_list = db.get_table_names()
+        with open(self.get_query_path(), 'r') as _query_file:
             sql_query = _query_file.read()
         if '_TABLE' not in sql_query:
             return sql_query
@@ -28,11 +29,14 @@ class TakeiResultSet(SQLResultSet):
         return sql_query
 
     def result(self):
-        backend_name = self.get_query_path().parent.name
-        backend = self.backend_lookup(backend_name)
+        backend_path = self.get_query_path().parent
+        backend_template = self.backend_lookup(backend_path)
+        takei_pwd = os.getenv('MYSQL_PWD', None)
+        backend = backend_template.format(password=takei_pwd)
         db = records.Database(backend)
 
-        sql_query = self.table_substitution(db, self.kwargs['client_id'])
+        client_id = self.kwargs.get('client_id', 0)
+        sql_query = self.table_substitution(db, client_id)
         if sql_query[0] == 'missing':
             tbl_name = sql_query[1]
             result = [
