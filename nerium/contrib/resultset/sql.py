@@ -14,9 +14,7 @@ class SQLResultSet(ResultSet):
         env_location = backend_path / '.env'
         if env_location.is_file():
             load_dotenv(env_location, override=True)
-        elif find_dotenv():
-            load_dotenv(find_dotenv(), override=True)
-        return os.getenv('DBURL', 'NOT_CONFIGURED')
+        return os.getenv('DATABASE_URL', 'NOT_CONFIGURED')
 
     def result(self):
         try:
