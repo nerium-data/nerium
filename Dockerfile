@@ -10,7 +10,7 @@ FROM alpine:3.6
 # Not using python:3-alpine to avoid installing separarate python3
 #   for psycopg2 install
 # Symlinking python3 to /bin/python helps pipenv find it below
-RUN apk add --no-cache python3 fuse\
+RUN apk add --no-cache python3 fuse py3-psycopg2\
     && ln -s /usr/bin/python3 /bin/python
 RUN set -ex && pip3 install pipenv --upgrade
 
@@ -24,8 +24,6 @@ VOLUME /app/query_files
 COPY --from=gcsfuse-build  /go/bin/gcsfuse /usr/local/bin/
 RUN pipenv install --system
 
-
-RUN apk add --no-cache py3-psycopg2
 RUN pipenv install --system pymysql
 
 RUN python3 /app/setup.py install
