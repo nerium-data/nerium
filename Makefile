@@ -1,7 +1,10 @@
 deploy:
-#	docker build -f Testenv -t neriumtestenv .
-#	docker run -it neriumtestenv python tests.py
+	docker build -f Testenv -t neriumtestenv .
+	docker run -it neriumtestenv python tests.py
 	gcloud app deploy
+
+todo:
+	grep -r "TODO" .
 
 #integrate:
 # pull the current branch
