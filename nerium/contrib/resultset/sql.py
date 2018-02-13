@@ -1,6 +1,8 @@
-import sqlalchemy
+import os
+
+import records
+from dotenv import load_dotenv
 from nerium import ResultSet
-from nerium.contrib.queryable.record import RecordsQueryable
 
 
 class SQLResultSet(ResultSet):
@@ -8,40 +10,19 @@ class SQLResultSet(ResultSet):
     to fetch a dataset from configured report_name
     """
 
-    @property
-    def query_type(self):
-        return ('sql')
-
-    # TODO: abstract method of base class or concrete implementation here?
-    def get_params(self):
-        with open(self.get_file(), 'r') as qf:
-            query_data = qf.read()
-        query = sqlalchemy.text(query_data)
-        # get_children will get all elements related to the query
-        bind_parameters = query.get_children()
-        needed_params = [bparam.key
-                         for bparam in bind_parameters
-                         if isinstance(bparam,
-                                       sqlalchemy.sql.expression.BindParameter)
-                         ]
-        return needed_params
+    def backend_lookup(self, backend_path):
+        env_location = backend_path / '.env'
+        if env_location.is_file():
+            load_dotenv(env_location, override=True)
+        return os.getenv('DATABASE_URL', 'NOT_CONFIGURED')
 
     def result(self):
         try:
-            db = RecordsQueryable()
-            params = self.get_params()
-            kwarg_set = set(self.kwargs.keys())
-            if set(params) != kwarg_set:
-                excess = set(params).symmetric_difference(kwarg_set)
-                result = [{'error': "required parameters: {params} --- "
-                                    "excess/missing: {excess}"
-                                    .format(params=params,
-                                            excess=list(excess))}]
-            else:
-                result = db.results(self.get_file(), **self.kwargs)
-        except IOError as e:
-            result = [{'error': repr(e)}, ]
-        except (sqlalchemy.exc.OperationalError,
-                sqlalchemy.exc.InternalError) as e:
+            backend_path = self.get_query_path().parent
+            backend = self.backend_lookup(backend_path)
+            db = records.Database(backend)
+            result = db.query_file(self.get_query_path(), **self.kwargs)
+            result = result.as_dict()
+        except Exception as e:
             result = [{'error': repr(e)}, ]
         return result

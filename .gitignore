@@ -15,11 +15,7 @@ build
 dist
 *.egg-info
 
-# tym-specific :/
-_junk_drawer
 .env
-.DS_Store
-.pgpass
 Pipfile.lock
 sqls/*.sql
 *.sql

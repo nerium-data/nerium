@@ -1,60 +1,56 @@
-import sqlalchemy
-from nerium import ResultSet
-from nerium.contrib.queryable.record import RecordsQueryable
-from nerium.contrib.queryable.takei import TakeiQueryable
+import os
+import re
+
+import records
+from nerium.contrib.resultset.sql import SQLResultSet
 
 
-class TakeiResultSet(ResultSet):
+class TakeiResultSet(SQLResultSet):
     """ Handle table name substitution in takei queries
-
-        **NOTE** Normally I (@tym-oao) am opposed to project names in code,
-        and particularly in something like a class name. In this limited case
-        it is acceptable and deliberate, because the table name substitution
-        being done to set up the queries is gross, and it is fondly to be
-        wished that this code will serve only as a legacy stopgap, and that we
-        will soon burn this bridge behind us to light our way forward.
-
-        TL;DR: let's not merge this to master in its present form, k?
     """
-    # TODO: Factor this whole thing out. Stop using queries that conditionally
-    #     access different tables for the same data. Stop using MySQL.
+    # TODO: Remove this module as soon as we can
+    # replace legacy 'takei-web-app' MySQL instance
 
-    @property
-    def query_type(self):
-        return('sql')
-
-    @property
-    def table_list(self):
-        db = TakeiQueryable()
-        return db.get_table_list(self.get_file())
+    def table_substitution(self, db, client_id):
+        table_list = db.get_table_names()
+        with open(self.get_query_path(), 'r') as _query_file:
+            sql_query = _query_file.read()
+        if '_TABLE' not in sql_query:
+            return sql_query
+        table_tokens = re.findall(r'\w+_TABLE\b', sql_query)
+        table_norm = [i.lower().replace('_table', '') for i in table_tokens]
+        table_sub = ['`{}_{}`'.format(client_id, i) for i in table_norm]
+        for table in table_sub:
+            if table not in table_list:
+                return ('missing', table)
+        table_map = list(zip(table_tokens, table_sub))
+        for map in table_map:
+            sql_query = sql_query.replace(map[0], map[1])
+        return sql_query
 
     def result(self):
-        if 'client_id' in self.kwargs.keys():
-            tbl_name = "{}_daily".format(self.kwargs['client_id'])
-            if tbl_name not in self.table_list:
-                result = [{'error': 'Table {} not found in database'}, ]
-                return result
-            try:
-                tbl_name = '`{}`'.format(tbl_name)
-                with open(self.get_file(), 'r') as _query_file:
-                    sql_query = _query_file.read()
-                    sql_query = sql_query.replace('TABLE_NAME', tbl_name)
-                    db = TakeiQueryable()
-                    result = db.results(sql_query, **self.kwargs)
-                return result
-            except IOError as e:
-                result = [{'error': repr(e)}, ]
-                return result
-            except (sqlalchemy.exc.OperationalError,
-                    sqlalchemy.exc.InternalError) as e:
-                result = [{'error': repr(e)}, ]
-        else:
-            try:
-                db = RecordsQueryable()
-                result = db.results(self.get_file(), **self.kwargs)
-            except IOError as e:
-                result = [{'error': repr(e)}, ]
-            except (sqlalchemy.exc.OperationalError,
-                    sqlalchemy.exc.InternalError) as e:
-                result = [{'error': repr(e)}, ]
+        backend_path = self.get_query_path().parent
+        backend_template = self.backend_lookup(backend_path)
+        takei_pwd = os.getenv('MYSQL_PWD', None)
+        # pymysql ignores password in the env
+        # return gracefully if no template in dburl
+        backend = backend_template.format(password=takei_pwd)
+        db = records.Database(backend)
+
+        client_id = self.kwargs.get('client_id', -1)
+        sql_query = self.table_substitution(db, client_id)
+        if sql_query[0] == 'missing':
+            tbl_name = sql_query[1]
+            result = [
+                {
+                    'error':
+                    'Table {} not found in database'.format(tbl_name)
+                },
+            ]
             return result
+        try:
+            result = db.query(sql_query, **self.kwargs)
+        except Exception as e:
+            result = [{'error': repr(e)}, ]
+        result = result.as_dict()
+        return result
