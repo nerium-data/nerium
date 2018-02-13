@@ -9,7 +9,8 @@ import nerium
 
 # TODO: test moar methods
 
-os.environ['LITESQL_BACKEND'] = 'sqlite:///'
+# TODO: make tests run+improve
+os.environ['DATABASE_URL'] = 'sqlite:///'
 # Fixtures
 EXPECTED = [{
     'foo': 1.25,
@@ -40,7 +41,7 @@ def setUpModule():
     global sql_file
     global report_name
     with NamedTemporaryFile(
-            dir='query_files', suffix='.lite.sql', mode='w',
+            dir='query_files', suffix='.sql', mode='w',
             delete=False) as _sql_file:
         sql_file = _sql_file
         sql_file.write(TEST_SQL)
@@ -55,7 +56,7 @@ def tearDownModule():
 class TestSQLResultSet(unittest.TestCase):
     def test_results_expected(self):
         loader = nerium.contrib.resultset.sql.SQLResultSet(report_name)
-        result = loader.result()
+        result = loader.result_set()
         self.assertEqual(result, EXPECTED)
 
 
