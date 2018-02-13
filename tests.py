@@ -4,10 +4,12 @@ import unittest
 # from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 
+import app
 import nerium
 
 # TODO: test moar methods
 
+# TODO: make tests run+improve
 os.environ['DATABASE_URL'] = 'sqlite:///'
 # Fixtures
 EXPECTED = [{
@@ -24,12 +26,12 @@ EXPECTED = [{
 
 TEST_SQL = """select cast(1.25 as float) as foo  -- float check
                     -- timestamp check
-                   , strftime('%Y-%m-%dT%H:%M:%S', '2017-09-09') as bar
+                   , strftime('%Y-%m-%d', '2017-09-09') as bar
                    , 'Hello' as quux  -- ascii string check
                    , 'Björk Guðmundsdóttir' as quuux  -- unicode check
                union
               select 42
-                   , strftime('%Y-%m-%dT%H:%M:%S','2031-05-25')
+                   , strftime('%Y-%m-%d','2031-05-25')
                    , 'yo'
                    , 'ƺƺƺƺ';
            """
@@ -53,14 +55,14 @@ def tearDownModule():
 
 class TestSQLResultSet(unittest.TestCase):
     def test_results_expected(self):
-        loader = nerium.SQLResultSet(report_name)
-        result = loader.result()
+        loader = nerium.contrib.resultset.sql.SQLResultSet(report_name)
+        result = loader.result_set()
         self.assertEqual(result, EXPECTED)
 
 
 class TestSQLAPI(unittest.TestCase):
     def setUp(self):
-        self.app = nerium.app.test_client()
+        self.app = app.app.test_client()
 
     def test_response(self):
         endpoint = '/v1/sql/{}/'.format(report_name)

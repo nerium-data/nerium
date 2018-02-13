@@ -34,16 +34,16 @@ $ curl http://localhost:8081/<report_name>?<params>
 ### URLs
 
 `/v1/<string:report_name>/?<params>`  
-`/v1/<string:query_type>/<string:report_name>/?<params>`  
+`/v1/<string:query_extension>/<string:report_name>/?<params>`  
 `/v1/sql/<string:report_name>/<string:format>/?<params>`  
 `/v1/sql/<string:report_name>/compact/?<params>`
 
 `report_name` should match the name of a given SQL file, minus the `.sql` extension. Params are as specified in the queries themselves.
 
-`query_type` is an optional file extension string and defaults to 'sql'
-`format` is an optional formatter name, and defaults to 'default'. 'compact' is also available, as noted above. (Note that while optional, if you wish to specify a format, you must include the query_type also.)
+`query_extension` is an optional file extension string and defaults to 'sql'
+`format` is an optional formatter name, and defaults to 'default'. 'compact' is also available, as noted above. (Note that while optional, if you wish to specify a format, you must include the query_extension also.)
 
-Unknown values passed to `query_type` or `format` will silently fall back to defaults.
+Unknown values passed to `query_extension` or `format` will silently fall back to defaults.
 
 ### Method
 
