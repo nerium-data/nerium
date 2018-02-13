@@ -27,10 +27,29 @@ spec:
         lifecycle:
           postStart:
             exec:
-              command: ["gcsfuse", "nerium-sql", "/app/query_files"]
+              command: ["gcsfuse", "nerium-queries", "/app/query_files"]
           preStop:
             exec:
               command: ["fusermount", "-u", "/app/query_files"]
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.09
+        command:
+          - /cloud_sql_proxy
+          - --dir=/cloudsql
+          - -credential_file=/secrets/cloudsql/credentials.json
+          - -instances=lexical-cider-93918:us-central1:takei-web-app=tcp:3306
+        imagePullPolicy: IfNotPresent
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /secrets/cloudsql
+          name: cloudsql-instance-credentials
+          readOnly: true
+        - mountPath: /etc/ssl/certs
+          name: ca-certificates
+        - mountPath: /cloudsql
+          name: cloudsql
       volumes:
       - name: dotenv
         secret:
@@ -43,3 +62,9 @@ spec:
       - name: ca-certificates
         hostPath:
           path: /etc/ssl/certs
+      - name: cloudsql-instance-credentials
+        secret:
+          secretName: cloudsql-service-credentials
+          defaultMode: 420
+      - emptyDir: {}
+        name: cloudsql
