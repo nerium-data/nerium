@@ -10,6 +10,7 @@ import nerium
 # TODO: test moar methods
 
 # TODO: make tests run+improve
+os.environ['DATABASE_URL'] = 'sqlite:///'
 # Fixtures
 EXPECTED = [{
     'foo': 1.25,
@@ -55,7 +56,7 @@ def tearDownModule():
 class TestSQLResultSet(unittest.TestCase):
     def test_results_expected(self):
         loader = nerium.contrib.resultset.sql.SQLResultSet(report_name)
-        result = loader.result()
+        result = loader.result_set()
         self.assertEqual(result, EXPECTED)
 
 
