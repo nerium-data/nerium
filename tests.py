@@ -9,7 +9,7 @@ import nerium
 
 # TODO: test moar methods
 
-os.environ['LITESQL_BACKEND'] = 'sqlite:///'
+# TODO: make tests run+improve
 # Fixtures
 EXPECTED = [{
     'foo': 1.25,
@@ -40,7 +40,7 @@ def setUpModule():
     global sql_file
     global report_name
     with NamedTemporaryFile(
-            dir='query_files', suffix='.lite.sql', mode='w',
+            dir='query_files', suffix='.sql', mode='w',
             delete=False) as _sql_file:
         sql_file = _sql_file
         sql_file.write(TEST_SQL)
