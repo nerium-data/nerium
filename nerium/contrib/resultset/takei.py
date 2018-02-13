@@ -32,10 +32,12 @@ class TakeiResultSet(SQLResultSet):
         backend_path = self.get_query_path().parent
         backend_template = self.backend_lookup(backend_path)
         takei_pwd = os.getenv('MYSQL_PWD', None)
+        # pymysql ignores password in the env
+        # return gracefully if no template in dburl
         backend = backend_template.format(password=takei_pwd)
         db = records.Database(backend)
 
-        client_id = self.kwargs.get('client_id', 0)
+        client_id = self.kwargs.get('client_id', -1)
         sql_query = self.table_substitution(db, client_id)
         if sql_query[0] == 'missing':
             tbl_name = sql_query[1]
