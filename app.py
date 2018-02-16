@@ -5,7 +5,7 @@ from flask import Flask, request
 from flask.json import JSONEncoder
 from flask_restful import Api, Resource
 from nerium.contrib.formatter import (AffixFormatter, CompactFormatter)
-from nerium.contrib.resultset import (SQLResultSet, TakeiResultSet)
+from nerium.contrib.resultset import SQLResultSet
 
 # Instantiate and configure app
 app = Flask(__name__)
@@ -48,7 +48,7 @@ class ReportAPI(Resource):
     # TODO: formalize this with `__subclasses__()` method
     # TODO: unless and until doing this dynamically with `__subclasses__()`
     #     let's move this to a separate config
-    query_extension_lookup = {'sql': SQLResultSet, 'takei': TakeiResultSet}
+    query_extension_lookup = {'sql': SQLResultSet, }
     format_lookup = {'compact': CompactFormatter, 'affix': AffixFormatter}
 
     def get(self, report_name, query_extension='sql', format_='default'):
