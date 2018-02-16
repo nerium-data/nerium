@@ -24,7 +24,6 @@ VOLUME /app/query_files
 COPY --from=gcsfuse-build  /go/bin/gcsfuse /usr/local/bin/
 RUN pipenv install --system
 
-RUN pipenv install --system pymysql
 
 RUN python3 /app/setup.py install
 
