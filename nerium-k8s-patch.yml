@@ -1,19 +1,8 @@
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name: nerium
 spec:
-  replicas: 1
   template:
-    metadata:
-      labels:
-        app: nerium
     spec:
       containers:
       - name: nerium
-        image: us.gcr.io/lexical-cider-93918/nerium:latest
-        ports:
-        - containerPort: 8081
         volumeMounts:
         - name: dotenv
           mountPath: /dotenv
