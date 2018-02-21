@@ -43,6 +43,12 @@ cluster:
 ifndef CLUSTER
 	$(error CLUSTER is undefined)
 endif
+	-gcloud container clusters create $(CLUSTER) \
+		--preemptible \
+		--enable-autoscaling \
+		--num-nodes 1 \
+		--min-nodes 0 \
+		--max-nodes 5
 	gcloud container clusters get-credentials $(CLUSTER)
 
 
