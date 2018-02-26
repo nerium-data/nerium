@@ -48,7 +48,8 @@ endif
 		--enable-autoscaling \
 		--num-nodes 1 \
 		--min-nodes 0 \
-		--max-nodes 5
+		--max-nodes 5 \
+		--scopes https://www.googleapis.com/auth/cloud_debugger
 	gcloud container clusters get-credentials $(CLUSTER)
 
 
