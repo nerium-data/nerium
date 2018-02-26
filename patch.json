@@ -1,0 +1,73 @@
+{
+  "spec": {
+    "template": {
+      "spec": {
+        "containers": [
+          {
+            "name": "{{service_name}}",
+            "volumeMounts": [
+              {
+                "name": "dotenv",
+                "mountPath": "/dotenv"
+              },
+              {
+                "mountPath": "/etc/ssl/certs",
+                "name": "ca-certificates"
+              }
+            ],
+            "securityContext": {
+              "capabilities": {
+                "add": [
+                  "SYS_ADMIN"
+                ]
+              },
+              "privileged": true
+            },
+            "lifecycle": {
+              "postStart": {
+                "exec": {
+                  "command": [
+                    "gcsfuse",
+                    "nerium-queries",
+                    "/app/query_files"
+                  ]
+                }
+              },
+              "preStop": {
+                "exec": {
+                  "command": [
+                    "fusermount",
+                    "-u",
+                    "/app/query_files"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "volumes": [
+          {
+            "name": "dotenv",
+            "secret": {
+              "secretName": "nerium-dotenv",
+              "defaultMode": 256,
+              "items": [
+                {
+                  "key": ".env",
+                  "mode": 256,
+                  "path": ".env"
+                }
+              ]
+            }
+          },
+          {
+            "name": "ca-certificates",
+            "hostPath": {
+              "path": "/etc/ssl/certs"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
