@@ -6,20 +6,12 @@ spec:
         volumeMounts:
         - name: dotenv
           mountPath: /dotenv
-        - mountPath: /etc/ssl/certs
-          name: ca-certificates
-        securityContext:
-          capabilities:
-            add:
-            - SYS_ADMIN
-          privileged: true
-        lifecycle:
-          postStart:
-            exec:
-              command: ["gcsfuse", "nerium-queries", "/app/query_files"]
-          preStop:
-            exec:
-              command: ["fusermount", "-u", "/app/query_files"]
+        - name: queries-lite-volume
+          mountPath: /app/query_files/lite
+        - name: queries-data-mart-schubert-volume
+          mountPath: /app/query_files/data-mart-schubert
+        - name: queries-warehouse-volume
+          mountPath: /app/query_files/warehouse
       volumes:
       - name: dotenv
         secret:
@@ -29,6 +21,12 @@ spec:
           - key: .env
             mode: 0400
             path: .env
-      - name: ca-certificates
-        hostPath:
-          path: /etc/ssl/certs
+      - name: queries-lite-volume
+        configMap:
+          name: queries-lite
+      - name: queries-data-mart-schubert-volume
+        configMap:
+          name: queries-data-mart-schubert
+      - name: queries-warehouse-volume
+        configMap:
+          name: queries-warehouse
