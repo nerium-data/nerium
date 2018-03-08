@@ -8,9 +8,6 @@ class AffixFormatter(ResultFormatter):
     """ Wrap default object array with error and metadata details
     """
     def format_results(self):
-        if 'error' in self.result[0].keys():
-            return self.result
-
         formatted = {}
         formatted['error'] = False
         formatted['response'] = self.result

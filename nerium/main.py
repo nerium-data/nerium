@@ -71,6 +71,12 @@ class ResultFormatter(ABC):
     def __init__(self, result):
         self.result = result
 
+    def formatted_results(self):
+        if 'error' in self.result[0].keys():
+            return self.result
+        else:
+            return self.format_results()
+
     @abc.abstractmethod
     def format_results(self):
         """ Transform result set structure and return new structure
