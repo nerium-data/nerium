@@ -16,9 +16,5 @@ dist
 *.egg-info
 
 .env
-Pipfile.lock
 sqls/*.sql
 *.sql
-
-# Built binary
-gcsfuse/gcsfuse
