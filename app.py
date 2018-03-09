@@ -3,7 +3,7 @@ import decimal
 
 from flask import Flask, request
 from flask.json import JSONEncoder
-from flask_restful import Api, Resource, reqparse
+from flask_restful import Api, Resource
 from nerium.contrib.formatter import (AffixFormatter, CompactFormatter,
                                       CsvFormatter)
 from nerium.contrib.resultset import SQLResultSet
@@ -83,7 +83,6 @@ class ReportAPI(Resource):
             # TODO: add logging and log a warning here
             #     and/or return format not found message to client(?)
             payload = query_result
-        # else:
         return payload
 
 
