@@ -40,8 +40,8 @@ class BaseRoute(Resource):
 class ReportAPI(Resource):
     """ Calls ResultSet.result() and returns JSON
 
-        Given a report_name, query_extension, and format_ (via URL routes),
-        this Flask-RESTful Resource submits the query matching the report_name
+        Given a query_name, query_extension, and format_ (via URL routes),
+        this Flask-RESTful Resource submits the query matching the query_name
         to the appropriate query_extension subclass and optionally format
         results via the matching format_cls and let Resource do its JSON thing
     """
@@ -58,7 +58,7 @@ class ReportAPI(Resource):
         'csv': CsvFormatter,
     }
 
-    def get(self, report_name, query_extension='sql', format_='default'):
+    def get(self, query_name, query_extension='sql', format_='default'):
         # Lookup query_extension and fetch result from corresponding class
         # TODO: Consider adding this to query subdirectory dotenv
         #      (or something) - With backend_lookup and unique report names,
@@ -68,8 +68,12 @@ class ReportAPI(Resource):
         except KeyError:
             result_cls = SQLResultSet
 
-        loader = result_cls(report_name, **request.args.to_dict())
+        loader = result_cls(query_name, **request.args.to_dict())
         query_result = loader.result_set()
+
+        ne_format = request.args.get("ne_format")
+        if ne_format:
+            format_ = ne_format
 
         if format_ in self.format_lookup.keys():
             format_cls = self.format_lookup[format_]
@@ -84,9 +88,7 @@ class ReportAPI(Resource):
 
 api.add_resource(
     ReportAPI,
-    '/v1/<string:report_name>/',
-    '/v1/<string:query_extension>/<string:report_name>/',
-    '/v1/<string:query_extension>/<string:report_name>/<string:format_>/',
+    '/v1/<string:query_name>/',
     strict_slashes=False)
 
 api.add_resource(BaseRoute, '/', '/v1/', strict_slashes=False)

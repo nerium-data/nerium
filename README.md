@@ -24,7 +24,7 @@ $ docker run -d --name=nerium_svc \
 -v /local/path/to/query_files:/app/query_files \
 -p 8081:8081 nerium
 
-$ curl http://localhost:8081/v1/<report_name>?<params>
+$ curl http://localhost:8081/v1/<query_name>?<params>
 ```
 
 ## Configuration
@@ -35,15 +35,11 @@ $ curl http://localhost:8081/v1/<report_name>?<params>
 
 ### URLs
 
-`/v1/<string:report_name>/?<params>`  
-`/v1/<string:query_extension>/<string:report_name>/?<params>`  
-`/v1/sql/<string:report_name>/<string:format>/?<params>`  
-`/v1/sql/<string:report_name>/compact/?<params>`
+`/v1/<string:query_name>/?[ne_format=<formatter>]&<query_params>`
 
-`report_name` should match the name of a given query script file, minus the file extension. Params are as specified in the queries themselves.
+`query_name` should match the name of a given query script file, minus the file extension. Params are as specified in the queries themselves.
 
-`query_extension` is an optional file extension string and defaults to 'sql'
-`format` is an optional formatter name, and defaults to 'default'. 'compact' is also available, as noted above. (Note that while optional, if you wish to specify a format, you must include the query_extension also.)
+`ne_format` may be passed as in the query string as an optional formatter name, and defaults to 'default'. Other supported `contrib` options are described in Content section below.
 
 Unknown values passed to `query_extension` or `format` will silently fall back to defaults.
 

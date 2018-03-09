@@ -7,7 +7,7 @@ from nerium import ResultSet
 
 class SQLResultSet(ResultSet):
     """ SQL database query implementation of ResultSet, using Records library
-    to fetch a dataset from configured report_name
+    to fetch a dataset from configured query_name
     """
 
     def backend_lookup(self, backend_path):

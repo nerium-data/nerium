@@ -39,14 +39,14 @@ TEST_SQL = """select cast(1.25 as float) as foo  -- float check
 
 def setUpModule():
     global sql_file
-    global report_name
+    global query_name
     with NamedTemporaryFile(
             dir='query_files', suffix='.sql', mode='w',
             delete=False) as _sql_file:
         sql_file = _sql_file
         sql_file.write(TEST_SQL)
         _report_name = os.path.basename(sql_file.name)
-        report_name = os.path.splitext(_report_name)[0]
+        query_name = os.path.splitext(_report_name)[0]
 
 
 def tearDownModule():
@@ -55,7 +55,7 @@ def tearDownModule():
 
 class TestSQLResultSet(unittest.TestCase):
     def test_results_expected(self):
-        loader = nerium.contrib.resultset.sql.SQLResultSet(report_name)
+        loader = nerium.contrib.resultset.sql.SQLResultSet(query_name)
         result = loader.result_set()
         self.assertEqual(result, EXPECTED)
 
@@ -65,11 +65,11 @@ class TestSQLAPI(unittest.TestCase):
         self.app = app.app.test_client()
 
     def test_response(self):
-        endpoint = '/v1/sql/{}/'.format(report_name)
+        endpoint = '/v1/sql/{}/'.format(query_name)
         response = self.app.get(endpoint)  # noqa F841
 
     def test_response_expected(self):
-        endpoint = '/v1/sql/{}/'.format(report_name)
+        endpoint = '/v1/sql/{}/'.format(query_name)
         response = self.app.get(endpoint)
         self.assertEqual(EXPECTED, json.loads(response.get_data()))
 
