@@ -23,15 +23,15 @@ class ResultSet(ABC):
 
 
     Args:
-        report_name (str): Name of chosen query file, without the extension
+        query_name (str): Name of chosen query file, without the extension
         kwargs: Parameter keys and values to bind to query
 
     Usage:
         Subclass and provide a 'result' method
     """
 
-    def __init__(self, report_name, **kwargs):
-        self.report_name = report_name
+    def __init__(self, query_name, **kwargs):
+        self.query_name = query_name
         self.kwargs = kwargs
 
     def get_query_path(self):
@@ -40,7 +40,7 @@ class ResultSet(ABC):
         files = [i for i in flat_directory if i.is_file()]
         try:
             query_path = next(
-                i for i in sorted(files) if i.stem == self.report_name)
+                i for i in sorted(files) if i.stem == self.query_name)
             return query_path
         except StopIteration:
             return None
@@ -53,7 +53,7 @@ class ResultSet(ABC):
             return [
                 {
                     'error': "No query found matching {}".format(
-                        self.report_name)
+                        self.query_name)
                 },
             ]
         else:
@@ -73,7 +73,7 @@ class ResultFormatter(ABC):
 
     def formatted_results(self):
         if 'error' in self.result[0].keys():
-            return self.result
+            return self.result, 400
         else:
             return self.format_results()
 
