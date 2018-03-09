@@ -4,7 +4,8 @@ import decimal
 from flask import Flask, request
 from flask.json import JSONEncoder
 from flask_restful import Api, Resource
-from nerium.contrib.formatter import (AffixFormatter, CompactFormatter)
+from nerium.contrib.formatter import (AffixFormatter, CompactFormatter,
+                                      CsvFormatter)
 from nerium.contrib.resultset import SQLResultSet
 
 # Instantiate and configure app
@@ -48,8 +49,14 @@ class ReportAPI(Resource):
     # TODO: formalize this with `__subclasses__()` method
     # TODO: unless and until doing this dynamically with `__subclasses__()`
     #     let's move this to a separate config
-    query_extension_lookup = {'sql': SQLResultSet, }
-    format_lookup = {'compact': CompactFormatter, 'affix': AffixFormatter}
+    query_extension_lookup = {
+        'sql': SQLResultSet,
+    }
+    format_lookup = {
+        'compact': CompactFormatter,
+        'affix': AffixFormatter,
+        'csv': CsvFormatter,
+    }
 
     def get(self, report_name, query_extension='sql', format_='default'):
         # Lookup query_extension and fetch result from corresponding class
@@ -66,7 +73,7 @@ class ReportAPI(Resource):
 
         if format_ in self.format_lookup.keys():
             format_cls = self.format_lookup[format_]
-            payload = format_cls(query_result).format_results()
+            payload = format_cls(query_result).formatted_results()
         else:
             """ Return default serialization """
             # TODO: add logging and log a warning here
