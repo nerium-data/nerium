@@ -12,14 +12,11 @@ isort = "*"
 
 [packages]
 
-flask = "*"
-flask-table = "*"
-flask-restful = "*"
+Flask = "*"
+Flask-RESTful = "*"
 records = "*"
 python-dotenv = "*"
-simplejson = "*"
 gunicorn = "*"
-frozen-flask = "*"
 "e1839a8" = {path = ".", editable = true}
 
 
