@@ -9,8 +9,6 @@ from nerium.contrib.formatter import (AffixFormatter, CompactFormatter,
 from nerium.contrib.resultset import SQLResultSet
 from werkzeug.exceptions import HTTPException
 
-# import os
-
 
 # Instantiate and configure app
 app = Flask(__name__)
@@ -92,7 +90,8 @@ class ReportAPI(Resource):
             """ Return default serialization """
             # TODO: return format not found message to client(?)
             if format_:
-                logging.warning('format "{}" not found. Using default result ˝format.')
+                logging.warning(
+                    'format "{}" not found. Using default result ˝format.')
             if 'error' in query_result[0].keys():
                 # Add 400 code to default-format error messages
                 payload = query_result, 400
