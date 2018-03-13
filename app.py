@@ -1,16 +1,24 @@
 import decimal
-# import os
+import logging
 
-from flask import Flask, request
+from flask import Flask, jsonify, request
 from flask.json import JSONEncoder
 from flask_restful import Api, Resource
 from nerium.contrib.formatter import (AffixFormatter, CompactFormatter,
                                       CsvFormatter)
 from nerium.contrib.resultset import SQLResultSet
+from werkzeug.exceptions import HTTPException
+
 
 # Instantiate and configure app
 app = Flask(__name__)
 api = Api(app)
+
+
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
 
 
 class ResultJSONEncoder(JSONEncoder):
@@ -80,9 +88,15 @@ class ReportAPI(Resource):
             payload = format_cls(query_result).formatted_results()
         else:
             """ Return default serialization """
-            # TODO: add logging and log a warning here
-            #     and/or return format not found message to client(?)
-            payload = query_result
+            # TODO: return format not found message to client(?)
+            if format_:
+                logging.warning(
+                    'format "{}" not found. Using default result ˝format.')
+            if 'error' in query_result[0].keys():
+                # Add 400 code to default-format error messages
+                payload = query_result, 400
+            else:
+                payload = query_result
         return payload
 
 
@@ -90,8 +104,16 @@ api.add_resource(
     ReportAPI,
     '/v1/<string:query_name>/',
     strict_slashes=False)
-
 api.add_resource(BaseRoute, '/', '/v1/', strict_slashes=False)
+
+
+@app.errorhandler(Exception)
+def handle_error(e):
+    code = 500
+    if isinstance(e, HTTPException):
+        code = e.code
+    return jsonify(error=str(e)), code
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=8081)

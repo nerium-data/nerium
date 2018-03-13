@@ -54,7 +54,7 @@ class ResultSet(ABC):
                 {
                     'error': "No query found matching {}".format(
                         self.query_name)
-                },
+                }
             ]
         else:
             return self.result()
