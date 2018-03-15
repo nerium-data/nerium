@@ -44,6 +44,11 @@ class BaseRoute(Resource):
         return {"status": "ok"}
 
 
+@api.representation("text/csv")
+def output_csv(data, code, headers=None):
+    resp = app.make_response((data, code, headers))
+    return resp 
+
 # LIL FLASK APP
 class ReportAPI(Resource):
     """ Calls ResultSet.result() and returns JSON
