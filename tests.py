@@ -5,11 +5,10 @@ import unittest
 from tempfile import NamedTemporaryFile
 
 import app
-import nerium
+from nerium import Query
 
 # TODO: test moar methods
 
-# TODO: make tests run+improve
 os.environ['DATABASE_URL'] = 'sqlite:///'
 # Fixtures
 EXPECTED = [{
@@ -53,23 +52,23 @@ def tearDownModule():
     os.remove(sql_file.name)
 
 
-class TestSQLResultSet(unittest.TestCase):
+class TestQuery(unittest.TestCase):
     def test_results_expected(self):
-        loader = nerium.contrib.resultset.sql.SQLResultSet(query_name)
+        loader = Query(query_name)
         result = loader.result_set()
         self.assertEqual(result, EXPECTED)
 
 
-class TestSQLAPI(unittest.TestCase):
+class TestAPI(unittest.TestCase):
     def setUp(self):
         self.app = app.app.test_client()
 
     def test_response(self):
-        endpoint = '/v1/sql/{}/'.format(query_name)
+        endpoint = '/v1/{}/'.format(query_name)
         response = self.app.get(endpoint)  # noqa F841
 
     def test_response_expected(self):
-        endpoint = '/v1/sql/{}/'.format(query_name)
+        endpoint = '/v1/{}/'.format(query_name)
         response = self.app.get(endpoint)
         self.assertEqual(EXPECTED, json.loads(response.get_data()))
 

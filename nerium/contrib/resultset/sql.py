@@ -18,10 +18,10 @@ class SQLResultSet(ResultSet):
 
     def result(self):
         try:
-            backend_path = self.get_query_path().parent
+            backend_path = self.query_path.parent
             backend = self.backend_lookup(backend_path)
             db = records.Database(backend)
-            result = db.query_file(self.get_query_path(), **self.kwargs)
+            result = db.query_file(self.query_path, **self.kwargs)
             result = result.as_dict()
         except Exception as e:
             result = [{'error': repr(e)}, ]
