@@ -60,7 +60,7 @@ class ReportAPI(Resource):
         ne_format = request.args.get("ne_format")
         if ne_format:
             format_ = ne_format
-        
+
         # Pass results through matching formatter
         formatter = ResultFormat(query_result, format_)
         payload = formatter.formatted_results()
