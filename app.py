@@ -65,6 +65,8 @@ async def result_status(request, handler):
     try:
         if 'error' in result[0].keys():
             return web.json_response(result, status=400)
+        else:
+            return web.json_response(result)
     # exception for health check OK method
     except KeyError:
         return web.json_response(result)
