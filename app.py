@@ -7,7 +7,7 @@ def serial_date(obj):
     if hasattr(obj, 'isoformat'):
         return obj.isoformat()
     else:
-        return obj
+        return str(obj)
 
 
 async def base_route(request):
@@ -68,7 +68,7 @@ async def result_status(request, handler):
         else:
             return web.json_response(result)
     # exception for health check OK method
-    except KeyError:
+    except (KeyError, IndexError):
         return web.json_response(result)
 
 
