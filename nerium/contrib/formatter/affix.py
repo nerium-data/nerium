@@ -1,6 +1,5 @@
 import datetime
 
-from flask import request
 from nerium import ResultFormatter
 
 
@@ -13,6 +12,5 @@ class AffixFormatter(ResultFormatter):
         formatted['response'] = self.result
         formatted['metadata'] = {}
         formatted['metadata']['executed'] = datetime.datetime.now().isoformat()
-        # TODO: Lib shouldn't depend on Flask. Get these params another way
-        formatted['metadata']['params'] = request.args.to_dict()
+        formatted['metadata']['params'] = self.kwargs
         return formatted

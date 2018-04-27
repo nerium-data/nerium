@@ -5,13 +5,12 @@ name = "pypi"
 
 [dev-packages]
 isort = "*"
+"psycopg2" = "*"
 
 [packages]
-Flask = "*"
-Flask-RESTful = "*"
+aiohttp = "*"
 records = "*"
 python-dotenv = "*"
-gunicorn = "*"
 "e1839a8" = {path = ".", editable = true}
 
 [requires]

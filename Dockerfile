@@ -14,6 +14,6 @@ COPY Pipfile* /app/
 WORKDIR /app
 RUN pipenv install --system
 VOLUME /app/query_files
-# Install requirements (includes local setup.py)
+EXPOSE 8080
 
-CMD gunicorn -c gunicorn-conf.py app:app 
+CMD python app.py
