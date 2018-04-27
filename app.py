@@ -64,12 +64,17 @@ async def result_status(request, handler):
     result = json.loads(resp.text)
     try:
         if 'error' in result[0].keys():
-            return web.json_response(result, status=400)
+            # need to find a way to pass more info through here. :(
+            raise web.HTTPBadRequest
+            #return web.json_response(result, status=400)
         else:
             return web.json_response(result)
     # exception for health check OK method
-    except (KeyError, IndexError):
+    except KeyError:
         return web.json_response(result)
+    except IndexError:
+        raise web.HTTPNoContent
+        #return web.json_response(result, status=204)
 
 
 app = web.Application(middlewares=[formatter, result_status])
