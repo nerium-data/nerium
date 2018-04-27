@@ -1,6 +1,7 @@
+import json
+
 from aiohttp import web
 from nerium import Query, ResultFormat
-import json
 
 
 def serial_date(obj):
@@ -44,10 +45,7 @@ async def formatter(request, handler):
     # Take out 'ne_format' and pass the rest along to the formatter
     params = dict(request.rel_url.query)
     params.pop('ne_format', None)
-    formatter = ResultFormat(
-        result,
-        format_,
-        **params)
+    formatter = ResultFormat(result, format_, **params)
 
     payload = formatter.formatted_results()
     if isinstance(payload, str):
@@ -64,17 +62,15 @@ async def result_status(request, handler):
     result = json.loads(resp.text)
     try:
         if 'error' in result[0].keys():
-            # need to find a way to pass more info through here. :(
-            raise web.HTTPBadRequest
-            #return web.json_response(result, status=400)
+            raise web.HTTPBadRequest(body=resp.text)
         else:
             return web.json_response(result)
     # exception for health check OK method
     except KeyError:
         return web.json_response(result)
+    # empty result set
     except IndexError:
         raise web.HTTPNoContent
-        #return web.json_response(result, status=204)
 
 
 app = web.Application(middlewares=[formatter, result_status])
