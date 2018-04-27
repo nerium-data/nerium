@@ -70,9 +70,7 @@ async def result_status(request, handler):
         return web.json_response(result)
 
 
-app = web.Application(middlewares=[
-    formatter,
-])
+app = web.Application(middlewares=[formatter, result_status])
 app.router.add_get('/v1/{query_name}/', resultset)
 app.router.add_get('/v1/{query_name}', resultset)
 app.router.add_get('/', base_route)
