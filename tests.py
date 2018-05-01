@@ -4,12 +4,15 @@ import unittest
 # from collections import OrderedDict
 from tempfile import NamedTemporaryFile
 
-import app
-from nerium import Query
+import aiohttp
+from aiohttp.test_utils import AioHTTPTestCase
+from app import app
+from nerium import Query, ResultFormat
 
-# TODO: test moar methods
+# TODO: tests for contrib modules
 
 os.environ['DATABASE_URL'] = 'sqlite:///'
+
 # Fixtures
 EXPECTED = [{
     'foo': 1.25,
@@ -52,25 +55,29 @@ def tearDownModule():
     os.remove(sql_file.name)
 
 
-class TestQuery(unittest.TestCase):
+class TestResults(unittest.TestCase):
     def test_results_expected(self):
         loader = Query(query_name)
         result = loader.result_set()
         self.assertEqual(result, EXPECTED)
+        formatter = ResultFormat(result, format_='default')
+        formatted_results = formatter.formatted_results()
+        self.assertEqual(formatted_results, EXPECTED)
 
 
-class TestAPI(unittest.TestCase):
-    def setUp(self):
-        self.app = app.app.test_client()
+class TestAPI(AioHTTPTestCase):
+    async def get_application(self):
+        return app
 
     def test_response(self):
-        endpoint = '/v1/{}/'.format(query_name)
-        response = self.app.get(endpoint)  # noqa F841
+        async def test_get_query():
+            url = "/v1/{}".format(query_name)
+            resp = await self.client.request("GET", url)
+            assert resp.status == 200
+            text = await resp.text()
+            self.assertEqual(EXPECTED, json.loads(text))
 
-    def test_response_expected(self):
-        endpoint = '/v1/{}/'.format(query_name)
-        response = self.app.get(endpoint)
-        self.assertEqual(EXPECTED, json.loads(response.get_data()))
+        self.loop.run_until_complete(test_get_query())
 
 
 if __name__ == '__main__':

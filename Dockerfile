@@ -3,7 +3,7 @@ FROM alpine
 # Not using python:3-alpine to avoid installing separarate python3
 #   for psycopg2 install
 # Symlinking python3 to /bin/python helps pipenv find it below
-RUN apk add --no-cache python3 py3-psycopg2 py3-gevent\
+RUN apk add --no-cache python3 py3-psycopg2\
     && ln -s /usr/bin/python3 /bin/python
 RUN set -ex && pip3 install pipenv --upgrade
 
@@ -14,6 +14,6 @@ COPY Pipfile* /app/
 WORKDIR /app
 RUN pipenv install --system
 VOLUME /app/query_files
-# Install requirements (includes local setup.py)
+EXPOSE 8080
 
-CMD gunicorn -c gunicorn-conf.py app:app 
+CMD python app.py

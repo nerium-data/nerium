@@ -120,9 +120,10 @@ class ResultSet(ABC):
 
 
 class ResultFormat(ABC):
-    def __init__(self, result, format_):
+    def __init__(self, result, format_, **kwargs):
         self.result = result
         self.format_ = format_
+        self.kwargs = kwargs
 
     def formatted_results(self):
         format_lookup = {
@@ -131,18 +132,16 @@ class ResultFormat(ABC):
             'csv': 'CsvFormatter',
             'default': 'DefaultFormatter',
         }
-        if 'error' in self.result[0].keys():
-            return self.result, 400
-        else:
-            format_cls_name = format_lookup[self.format_]
-            format_mods = import_module('nerium.contrib.formatter')
-            format_cls = getattr(format_mods, format_cls_name)
-            return format_cls(self.result).format_results()
+        format_cls_name = format_lookup[self.format_]
+        format_mods = import_module('nerium.contrib.formatter')
+        format_cls = getattr(format_mods, format_cls_name)
+        return format_cls(self.result, **self.kwargs).format_results()
 
 
 class ResultFormatter(ABC):
-    def __init__(self, result):
+    def __init__(self, result, **kwargs):
         self.result = result
+        self.kwargs = kwargs
 
     @abc.abstractmethod
     def format_results(self):
