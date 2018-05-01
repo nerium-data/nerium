@@ -16,5 +16,5 @@ dist
 *.egg-info
 
 .env
-sqls/*.sql
+query_files/*.sql
 *.sql

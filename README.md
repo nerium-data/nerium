@@ -2,7 +2,7 @@
 
 ![small bicycle](https://dl.dropboxusercontent.com/s/7kba2cgrcvuj0hy/nerium-bicycle-sm.jpg)
 
-A simple [Flask](http://flask.pocoo.org/) service that submits queries to a database and returns machine-readable serialized results. By analogy with static site generators, Nerium reads its queries from local files, stored in a configurable directory on the filesystem.
+A simple [aiohttp](https://docs.aiohttp.org/) service that submits queries to a database and returns machine-readable serialized results. By analogy with static site generators, Nerium reads its queries from local files, stored in a configurable directory on the filesystem.
 
 Nerium features an extendable architecture, allowing support for multiple query types and output formats by registering subclasses of `ResultSet` and `ResultFormatter` template classes.
 
