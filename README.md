@@ -17,12 +17,10 @@ Nerium is inspired in roughly equal measure by [SQueaLy](https://hashedin.com/20
 ## Install/Run
 
 ```bash
-$ docker build --rm -t nerium .
-
-$ docker run -d --name=nerium_svc \
+docker run -d --name=nerium \
 --envfile=.env \
 -v /local/path/to/query_files:/app/query_files \
--p 8081:8081 nerium
+-p 8081:8081 oaodev/nerium
 
 $ curl http://localhost:8081/v1/<query_name>?<params>
 ```
