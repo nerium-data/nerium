@@ -70,7 +70,7 @@ async def result_status(request, handler):
         return web.json_response(result)
     # empty result set
     except IndexError:
-        raise web.HTTPNoContent
+        raise web.HTTPOk(text=resp.text)
 
 
 app = web.Application(middlewares=[formatter, result_status])
