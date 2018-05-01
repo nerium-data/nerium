@@ -9,7 +9,7 @@ COPY *.py /app/
 COPY nerium/ /app/nerium/
 
 WORKDIR /app
-RUN pip3 install -e .
+RUN python3 setup.py install
 VOLUME /app/query_files
 EXPOSE 8080
 

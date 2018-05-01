@@ -12,8 +12,7 @@ class SQLResultSet(ResultSet):
 
     def backend_lookup(self, backend_path):
         env_location = backend_path / '.env'
-        if env_location.is_file():
-            load_dotenv(env_location, override=True)
+        load_dotenv(env_location, override=True)
         return os.getenv('DATABASE_URL', 'NOT_CONFIGURED')
 
     def result(self):
