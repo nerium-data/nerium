@@ -7,6 +7,7 @@ setup(
     description='The little business intelligence engine that could',
     author='Thomas Yager-Madden',
     author_email='thomas.yager-madden@adops.com',
+    license='Apache License, Version 2.0',
     install_requires=[
         'aiohttp',
         'python-dotenv',
@@ -16,6 +17,12 @@ setup(
         'mysql': ['PyMySQL'],
         'pg': ['psycopg2'],
         # TODO: Add the rest.
+    },
+    # TODO: A more sophisticated runserver CLI
+    entry_points={
+        'console_scripts': [
+            'nerium = nerium.app:main',
+        ]
     },
     include_package_data=True,
     classifiers=[

@@ -1,19 +1,16 @@
 FROM alpine
-# Install python3 & pipenv
-# Not using python:3-alpine to avoid installing separarate python3
-#   for psycopg2 install
-# Symlinking python3 to /bin/python helps pipenv find it below
-RUN apk add --no-cache python3 py3-psycopg2\
-    && ln -s /usr/bin/python3 /bin/python
-RUN set -ex && pip3 install pipenv --upgrade
+# Install python3
+# Not using python:3-alpine to avoid
+#   psycopg2 starting a separate python3 install
+RUN apk add --no-cache python3 py3-psycopg2
 
 # Copy in the code
 COPY *.py /app/
 COPY nerium/ /app/nerium/
-COPY Pipfile* /app/
+
 WORKDIR /app
-RUN pipenv install --system
+RUN pip3 install -e .
 VOLUME /app/query_files
 EXPOSE 8080
 
-CMD python app.py
+CMD nerium
