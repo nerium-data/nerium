@@ -70,6 +70,7 @@ async def result_status(request, handler):
         return web.json_response(result)
     # empty result set
     except IndexError:
+        # TODO: pass info once formatters better handle empty column sets
         raise web.HTTPOk(text=resp.text)
 
 
