@@ -80,5 +80,9 @@ app.router.add_get('/v1/{query_name}', resultset)
 app.router.add_get('/', base_route)
 app.router.add_get('/v1/', base_route)
 
-if __name__ == '__main__':
+
+def main():
     web.run_app(app)
+
+if __name__ == '__main__':
+    main()    

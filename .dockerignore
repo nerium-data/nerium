@@ -1,6 +1,4 @@
 .env
 .gitignore
-.pgpass
-_junk_drawer/
-sqls/
+.junk_drawer/
 query_files/

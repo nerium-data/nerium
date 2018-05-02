@@ -6,13 +6,13 @@ from abc import ABC
 from importlib import import_module
 from pathlib import Path
 
-from dotenv import find_dotenv, load_dotenv
+from dotenv import load_dotenv
 
 # Provision environment as needed
-if find_dotenv():
-    load_dotenv(find_dotenv())
-else:
-    load_dotenv('/dotenv/.env')
+# Load local .env first
+load_dotenv(Path.cwd() / '.env')
+# Load this one for use w/ Kubernetes secret mount
+load_dotenv('/dotenv/.env')
 
 # BASE CLASSES
 

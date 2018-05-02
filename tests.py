@@ -6,7 +6,7 @@ from tempfile import NamedTemporaryFile
 
 import aiohttp
 from aiohttp.test_utils import AioHTTPTestCase
-from app import app
+from nerium.app import app
 from nerium import Query, ResultFormat
 
 # TODO: tests for contrib modules
