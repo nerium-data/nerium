@@ -20,8 +20,10 @@ Nerium is inspired in roughly equal measure by [SQueaLy](https://hashedin.com/20
 
 ## Install/Run
 
+### Using Docker
+
 ```bash
-docker run -d --name=nerium \
+$ docker run -d --name=nerium \
 --envfile=.env \
 -v /local/path/to/query_files:/app/query_files \
 -p 8081:8081 oaodev/nerium
@@ -29,9 +31,17 @@ docker run -d --name=nerium \
 $ curl http://localhost:8081/v1/<query_name>?<params>
 ```
 
+### Local install
+
+```bash
+pipenv install nerium
+```
+
+Then add a `query_files` directory to your project, write your queries, and configure the app as described in the next section. The command `nerium` starts a local `aiohttp` server running the app, listening on port 8080.
+
 ## Configuration
 
-`DATABASE_URL` and `QUERY_PATH` (directory where query files reside) may be set in the environment, or in a local `.env` file.
+`DATABASE_URL` and optional `QUERY_PATH` (directory where query files reside, defaults to `query_files` in the working direcory) may be set in the environment, or in a local `.env` file.
 
 In order to query multiple databases with a single instance of Nerium, create a subdirectory for each database under the `$QUERY_PATH`, place the related files under their respective directory, and include a separate `.env` file per subdirectory setting its `DATABASE_URL` value.
 
