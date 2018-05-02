@@ -10,7 +10,7 @@ Nerium features an extendable architecture, allowing support for multiple query 
 
 Currently supports SQL queries using the excellent [Records](https://github.com/kennethreitz/records) library. In keeping with Records usage, query parameters can be specified in `key=value` format, and (_safely_!) injected into your query in `:key` format. 
 
-In theory, `ResultSet` subclasses can be added (under `contrib/resultset` for non-SQL query languages. This is a promising area for future development.
+In theory, `ResultSet` subclasses can be added (under `contrib/resultset`) for non-SQL query languages. This is a promising area for future development.
 
 Default JSON output is an array of objects, one per result row, with database column names as keys. A `compact` JSON output format may also be requested, with separate `column` (array of column names) and `data` (array of row value arrays) nodes for compactness. Additional formats (not necessarily JSON) can be added by subclassing `ResultFormatter`.
 
