@@ -5,6 +5,10 @@ name = "pypi"
 
 [dev-packages]
 isort = "*"
+"flake8" = "*"
+wheel = "*"
+twine = "*"
+setuptools = "*"
 
 [packages]
 aiohttp = "*"

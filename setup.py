@@ -1,10 +1,18 @@
 from setuptools import setup, find_packages
 
+from pathlib import Path
+
+
+with open(Path(__file__).parent / 'README.md') as f:
+    long_description = f.read()
+
 setup(
     name='nerium',
     version='0.1.0',
     packages=find_packages(),
     description='The little business intelligence engine that could',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     author='Thomas Yager-Madden',
     author_email='thomas.yager-madden@adops.com',
     license='Apache License, Version 2.0',
@@ -24,7 +32,6 @@ setup(
             'nerium = nerium.app:main',
         ]
     },
-    include_package_data=True,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
