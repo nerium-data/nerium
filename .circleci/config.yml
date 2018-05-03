@@ -27,14 +27,12 @@ jobs:
             pipenv install
       - save_cache:
           paths:
-            - ./venv
-            - "/usr/local/bin"
-            - "/usr/local/lib/python3.6/site-packages"
+            - ./. venv
           key: v1-deps-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           name: run tests
           command: |
-            pipenv run coverage run tests.py
+            pipenv run ./.venv/bin/coverage run tests.py
 
       - store_artifacts:
           path: test-reports
