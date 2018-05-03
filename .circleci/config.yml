@@ -32,7 +32,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            pipenv run ./.venv/bin/coverage run tests.py
+            pipenv run -d coverage run tests.py
 
       - store_artifacts:
           path: test-reports
