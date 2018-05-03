@@ -24,7 +24,7 @@ jobs:
           name: install dependencies
           command: |
             sudo pip3 install pipenv
-            pipenv install
+            pipenv -d install
       - save_cache:
           paths:
             - ./. venv
@@ -32,8 +32,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            pipenv run -d coverage run tests.py
-
+            pipenv run coverage run tests.py
       - store_artifacts:
           path: test-reports
           destination: test-reports
