@@ -18,3 +18,4 @@ dist
 .env
 query_files/*.sql
 *.sql
+.coverage
