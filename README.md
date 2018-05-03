@@ -1,8 +1,8 @@
 # Nerium
 
-![small bicycle](https://dl.dropboxusercontent.com/s/7kba2cgrcvuj0hy/nerium-bicycle-sm.jpg)
+![small bicycle](https://dl.dropboxusercontent.com/s/7kba2cgrcvuj0hy/nerium-bicycle-sm.jpg "Keeping the 'micro' in microservices")
 
-A simple [aiohttp](https://docs.aiohttp.org/) service that submits queries to a database and returns machine-readable serialized results. By analogy with static site generators, Nerium reads its queries from local files, stored in a (configurable) directory on the filesystem. The idea is that report analysts should be able to author queries in their preferred local editor, and upload them where Nerium can use them.
+A simple [aiohttp](https://docs.aiohttp.org/) microservice that submits queries to a database and returns machine-readable serialized results (typically JSON). By analogy with static site generators, Nerium reads its queries from local files, stored in a (configurable) directory on the filesystem. The idea is that report analysts should be able to author queries in their preferred local editor, and upload them where Nerium can use them.
 
 OAO uses Nerium to easily and quickly provide JSON APIs with report results from our PostgreSQL data warehouse.
 
@@ -26,7 +26,7 @@ Nerium is inspired in roughly equal measure by [SQueaLy](https://hashedin.com/20
 $ docker run -d --name=nerium \
 --envfile=.env \
 -v /local/path/to/query_files:/app/query_files \
--p 8081:8081 oaodev/nerium
+-p 8080:8080 oaodev/nerium
 
 $ curl http://localhost:8081/v1/<query_name>?<params>
 ```
@@ -34,7 +34,7 @@ $ curl http://localhost:8081/v1/<query_name>?<params>
 ### Local install
 
 ```bash
-pipenv install nerium
+pipenv install nerium[pg]
 ```
 
 Then add a `query_files` directory to your project, write your queries, and configure the app as described in the next section. The command `nerium` starts a local `aiohttp` server running the app, listening on port 8080.

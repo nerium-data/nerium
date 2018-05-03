@@ -9,6 +9,7 @@ isort = "*"
 wheel = "*"
 twine = "*"
 setuptools = "*"
+coverage = "*"
 
 [packages]
 aiohttp = "*"
