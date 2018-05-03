@@ -24,7 +24,7 @@ jobs:
           name: install dependencies
           command: |
             sudo pip3 install pipenv
-            pipenv -d install
+            pipenv install -d
       - save_cache:
           paths:
             - ./. venv
