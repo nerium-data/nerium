@@ -37,7 +37,7 @@ jobs:
           name: Send to Codecov
           command: |
             pipenv install codecov
-            codecov 
+            pipenv run codecov 
       - store_artifacts:
           path: .coverage
           
