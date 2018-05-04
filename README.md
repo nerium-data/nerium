@@ -2,6 +2,11 @@
 
 ![small bicycle](https://dl.dropboxusercontent.com/s/7kba2cgrcvuj0hy/nerium-bicycle-sm.jpg "Keeping the 'micro' in microservices")
 
+[![CircleCI](https://img.shields.io/circleci/project/github/OAODEV/nerium.svg)](https://circleci.com/gh/OAODEV/nerium)
+[![Codecov](https://img.shields.io/codecov/c/github/OAODEV/nerium/circle.svg)](https://codecov.io/gh/OAODEV/nerium)
+[![PyPI - Version](https://img.shields.io/pypi/v/nerium.svg)](https://pypi.org/project/nerium/)
+[![PyPI - License](https://img.shields.io/pypi/l/nerium.svg)](https://pypi.org/project/nerium/)
+
 A simple [aiohttp](https://docs.aiohttp.org/) microservice that submits queries to a database and returns machine-readable serialized results (typically JSON). By analogy with static site generators, Nerium reads its queries from local files, stored in a (configurable) directory on the filesystem. The idea is that report analysts should be able to author queries in their preferred local editor, and upload them where Nerium can use them.
 
 OAO uses Nerium to easily and quickly provide JSON APIs with report results from our PostgreSQL data warehouse.
