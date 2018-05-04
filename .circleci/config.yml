@@ -35,7 +35,9 @@ jobs:
             pipenv run coverage run tests.py
       - run:
           name: Send to Codecov
-          command: bash <(curl -s https://codecov.com/bash)
+          command: |
+            pipenv install codecov
+            codecov 
       - store_artifacts:
           path: .coverage
           
