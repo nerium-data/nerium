@@ -33,6 +33,9 @@ jobs:
           name: run tests
           command: |
             pipenv run coverage run tests.py
+      - run:
+          name: Send to Codecov
+          command: bash <(curl -s https://codecov.com/bash)
       - store_artifacts:
           path: test-reports
           destination: test-reports
