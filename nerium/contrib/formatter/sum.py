@@ -2,6 +2,7 @@ import datetime
 
 from nerium import ResultFormatter
 
+
 class SumFormatter(ResultFormatter):
 
     def transform_grouping_sets(self, result):
