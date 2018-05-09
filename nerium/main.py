@@ -131,6 +131,7 @@ class ResultFormat(ABC):
             'compact': 'CompactFormatter',
             'csv': 'CsvFormatter',
             'default': 'DefaultFormatter',
+            'sum': 'SumFormatter',
         }
         format_cls_name = format_lookup[self.format_]
         format_mods = import_module('nerium.contrib.formatter')
