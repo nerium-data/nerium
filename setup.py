@@ -24,6 +24,7 @@ setup(
     extras_require={
         'mysql': ['PyMySQL'],
         'pg': ['psycopg2'],
+        'jinjasql': ['jinjasql']
         # TODO: Add the rest.
     },
     # TODO: A more sophisticated runserver CLI
