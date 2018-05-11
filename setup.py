@@ -8,7 +8,7 @@ with open(Path(__file__).parent / 'README.md') as f:
 
 setup(
     name='nerium',
-    version='0.1.2',
+    version='0.1.3',
     packages=find_packages(),
     description='The little business intelligence engine that could',
     long_description=long_description,
