@@ -2,8 +2,12 @@ import os
 
 import records
 from dotenv import load_dotenv
-from jinjasql import JinjaSql
 from nerium import ResultSet
+try:
+    from jinjasql import JinjaSql
+except ImportError:
+    print("jinjasql >= 0.1.7 must be installed to use this.")
+
 
 
 class JinjaSQLResultSet(ResultSet):
