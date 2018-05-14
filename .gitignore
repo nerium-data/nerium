@@ -16,6 +16,6 @@ dist
 *.egg-info
 
 .env
-*.jinja
-*.sql
+query_files/*
+!query_files/README.md
 .coverage
