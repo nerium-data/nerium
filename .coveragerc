@@ -1,2 +1,3 @@
 [run]
 source=nerium
+omit = nerium/contrib/resultset/jinja.py
