@@ -6,8 +6,8 @@ from nerium import ResultSet
 try:
     from jinjasql import JinjaSql
 except ImportError:
-    print("jinjasql >= 0.1.7 must be installed to use this.")
-
+    # jinjasql > 0.1.6 required for use with repeat param def in template
+    pass
 
 
 class JinjaSQLResultSet(ResultSet):
