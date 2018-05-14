@@ -31,8 +31,8 @@ jobs:
           key: v2-deps-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           name: run tests
-          command: |
-            pipenv run coverage run tests.py
+          command: 
+            pipenv run coverage run setup.py test
       - run:
           name: Send to Codecov
           command: |
