@@ -16,6 +16,7 @@ setup(
     author='Thomas Yager-Madden',
     author_email='thomas.yager-madden@adops.com',
     license='Apache License, Version 2.0',
+    test_suite='tests',
     install_requires=[
         'aiohttp',
         'python-dotenv',
