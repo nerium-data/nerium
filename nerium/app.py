@@ -15,12 +15,19 @@ async def base_route(request):
     data = {"status": "ok"}
     return web.json_response(data)
 
+def mdict_to_dict(mdict):
+    """Convert multidict to dict with list on key collision"""
+    new_dict = {key: (mdict.getall(key) if len(mdict.getall(key)) > 1
+                                             else mdict.get(key))
+                for key
+                in mdict.keys()}
+    return new_dict
 
 async def resultset(request):
     """ Calls nerium.Query() to fetch results from ResultSet()
     """
     query = Query(request.match_info['query_name'],
-                  **dict(request.rel_url.query))
+                  **mdict_to_dict(request.rel_url.query))
     query_result = query.result_set()
     # Using json.dumps instead of json_response for serialized datetimes
     return web.Response(
@@ -43,7 +50,7 @@ async def formatter(request, handler):
 
     # Remaining query string params are for the database query
     # Take out 'ne_format' and pass the rest along to the formatter
-    params = dict(request.rel_url.query)
+    params = mdict_to_dict(request.rel_url.query)
     params.pop('ne_format', None)
     formatter = ResultFormat(result, format_, **params)
 

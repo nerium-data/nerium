@@ -37,7 +37,8 @@ class QueryRegistry():
     def lookup_extension(self, _key):
         # TODO: Define in external config file
         query_extension_lookup = {
-            'sql': 'SQLResultSet',
+            '.sql': 'SQLResultSet',
+            '.jinja': 'JinjaSQLResultSet'
         }
         try:
             return query_extension_lookup[_key]

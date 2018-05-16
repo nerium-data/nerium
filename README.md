@@ -44,6 +44,15 @@ pipenv install nerium[pg]
 
 Then add a `query_files` directory to your project, write your queries, and configure the app as described in the next section. The command `nerium` starts a local `aiohttp` server running the app, listening on port 8080.
 
+#### Local install with jinjasql support
+
+```bash
+pipenv install 'nerium[jinjasql, $DESIRED_BACKEND]'
+```
+Current options for DESIRED_BACKEND are `pg` or `mysql`.
+
+Follow the instructions above, but when adding the query to `query_files`, make sure the file ends in `.jinja`.
+
 ## Configuration
 
 `DATABASE_URL` and optional `QUERY_PATH` (directory where query files reside, defaults to `query_files` in the working direcory) may be set in the environment, or in a local `.env` file.
@@ -74,6 +83,8 @@ Unknown values passed to `query_extension` or `format` will silently fall back t
 'default': `[{<column_name>:<row_value>, etc..., }, {etc...}, ]`  
 'compact': `{"columns": [<list of column names>], "data": [<array of row value arrays>]}`  
 'affix': `{"error": false, "response": {<'default' array of result objects>}, "metadata":{"executed": <timestamp>, "params": {<array of name-value pairs submitted to query with request>}}}`
+'csv': `<csv formatted string (w \r\n newline)>`
+'sum': `{"error": false, "response": {"summary": <array of row dicts having grouping > 0>, "result": <array of row dicts having grouping = 0>}, "metadata":{"executed": <timestamp>, "params": {<array of name-value pairs submitted to query with request>}}}`
 
 Of course, it is possible that a database query might return no results. In this case, Nerium will respond with and empty JSON array `[]` regardless of specified format. This is not considered an error, and clients should be prepared to handle it appropriately.
 
