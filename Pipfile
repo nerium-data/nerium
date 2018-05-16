@@ -4,11 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [dev-packages]
-isort = "*"
-"flake8" = "*"
-wheel = "*"
-twine = "*"
-setuptools = "*"
 coverage = "*"
 
 [packages]
@@ -16,6 +11,8 @@ aiohttp = "*"
 records = "*"
 python-dotenv = "*"
 "e1839a8" = {path = ".", editable = true}
+python-frontmatter = "*"
+webargs = "*"
 
 [requires]
 python_version = "3.6"
