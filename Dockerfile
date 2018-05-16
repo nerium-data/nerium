@@ -9,7 +9,12 @@ COPY *.py /app/
 COPY nerium/ /app/nerium/
 
 WORKDIR /app
-RUN pip3 install nerium
+# Avoid breaking setup.py by adding this readme
+RUN touch /app/README.md
+# install from code currently in repo
+RUN pip3 install -e .
+# add jinjasql as a separate dependency instead
+RUN pip3 install jinjasql>=0.1.7
 VOLUME /app/query_files
 EXPOSE 8080
 
