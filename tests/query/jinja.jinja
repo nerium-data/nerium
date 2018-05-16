@@ -1,0 +1,18 @@
+select cast(1.25 as float) as foo  -- float check
+        -- timestamp check
+        {% raw %}
+        , strftime('%Y-%m-%d', '2017-09-09') as bar
+        {% endraw %}
+        {% if hello %}
+        , {{hello}} as quux  -- ascii string check
+        {% endif %}
+        , 'Björk Guðmundsdóttir' as quuux  -- unicode check
+    union
+    select 42 as foo
+        {% raw %}
+        , strftime('%Y-%m-%d','2031-05-25') as bar
+        {% endraw %}
+        {% if hello %} 
+        , 'yo' as quux
+        {% endif %}
+        , 'ƺƺƺƺ' as quuux;

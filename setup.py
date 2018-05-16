@@ -16,6 +16,7 @@ setup(
     author='Thomas Yager-Madden',
     author_email='thomas.yager-madden@adops.com',
     license='Apache License, Version 2.0',
+    test_suite='tests',
     install_requires=[
         'aiohttp',
         'python-dotenv',
@@ -24,6 +25,7 @@ setup(
     extras_require={
         'mysql': ['PyMySQL'],
         'pg': ['psycopg2'],
+        'jinjasql': ['jinjasql>=0.1.7']
         # TODO: Add the rest.
     },
     # TODO: A more sophisticated runserver CLI
