@@ -1,0 +1,14 @@
+query_extensions:
+  sql: SQLResultSet
+  jinja: JinjaResultSet
+formats:
+  affix: AffixFormatter
+  compact: CompactFormatter
+  csv: CsvFormatter
+  default: DefaultFormatter
+  sum: SumFormatter
+databases:
+- name: sqlite
+  url: sqlite:///
+- name: default
+  url: postgres://postgres@localhost:5432/postgres

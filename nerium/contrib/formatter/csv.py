@@ -7,7 +7,7 @@ class CsvFormatter(ResultFormatter):
     """
     # TODO: some graceful error handling, in case of bad input format, etc.
     def format_results(self):
-        raw = self.result
+        raw = self.result['data']
         columns = list(raw[0].keys())
         data = [tuple(row.values()) for row in raw]
         frame = tablib.Dataset()

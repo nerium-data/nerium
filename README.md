@@ -49,6 +49,7 @@ Then add a `query_files` directory to your project, write your queries, and conf
 ```bash
 pipenv install 'nerium[jinjasql, $DESIRED_BACKEND]'
 ```
+
 Current options for DESIRED_BACKEND are `pg` or `mysql`.
 
 Follow the instructions above, but when adding the query to `query_files`, make sure the file ends in `.jinja`.
@@ -57,7 +58,7 @@ Follow the instructions above, but when adding the query to `query_files`, make 
 
 `DATABASE_URL` and optional `QUERY_PATH` (directory where query files reside, defaults to `query_files` in the working direcory) may be set in the environment, or in a local `.env` file.
 
-In order to query multiple databases with a single instance of Nerium, create a subdirectory for each database under the `$QUERY_PATH`, place the related files under their respective directory, and include a separate `.env` file per subdirectory setting its `DATABASE_URL` value.
+In order to query multiple databases with a single instance of Nerium, create a subdirectory for each database under the `$QUERY_PATH`, place the related files under their respective directory, and include a separate `db.yaml` file per subdirectory, which may define a `database` or `database_url` key.
 
 ## API
 

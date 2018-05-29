@@ -9,7 +9,7 @@ class AffixFormatter(ResultFormatter):
     def format_results(self):
         formatted = {}
         formatted['error'] = False
-        formatted['response'] = self.result
+        formatted['response'] = self.result['data']
         formatted['metadata'] = {}
         formatted['metadata']['executed'] = datetime.datetime.now().isoformat()
         formatted['metadata']['params'] = self.kwargs

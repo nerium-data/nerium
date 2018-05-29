@@ -1,9 +1,10 @@
 import unittest
-from nerium import Query, ResultFormat
+from nerium import QueryBroker, ResultFormat
 from tests.test_setup import jinja_query_name
 try:
     # See tests/query/jinja.jinja for template format
-    import jinjasql
+    import jinjasql  # noqa401
+
     class TestJinjaTemplateResult(unittest.TestCase):
         EXPECTED = [{
             'foo': 1.25,
@@ -27,20 +28,18 @@ try:
         }]
 
         def test_jinja_results(self):
-            loader = Query(jinja_query_name, hello="Hello")
+            loader = QueryBroker(jinja_query_name, hello="Hello")
             result = loader.result_set()
             formatter = ResultFormat(result, format_='default')
             formatted_results = formatter.formatted_results()
             self.assertEqual(formatted_results, self.EXPECTED)
-        
+
         def test_jinja_default(self):
-            loader = Query(jinja_query_name)
+            loader = QueryBroker(jinja_query_name)
             result = loader.result_set()
             formatter = ResultFormat(result, format_='default')
             formatted_results = formatter.formatted_results()
-            self.assertEqual(formatted_results, self.DIFFERS)  
+            self.assertEqual(formatted_results, self.DIFFERS)
 except ImportError:
     # can't test this module without jinjasql
     pass
-
-

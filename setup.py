@@ -19,8 +19,12 @@ setup(
     test_suite='tests',
     install_requires=[
         'aiohttp',
+        'munch',
         'python-dotenv',
+        'python-frontmatter',
+        'pyyaml',
         'records',
+        'webargs',
     ],
     extras_require={
         'mysql': ['PyMySQL'],
@@ -29,16 +33,15 @@ setup(
         # TODO: Add the rest.
     },
     # TODO: A more sophisticated runserver CLI
-    entry_points={
-        'console_scripts': [
-            'nerium = nerium.app:main',
-        ]
-    },
+    entry_points={'console_scripts': [
+        'nerium = nerium.app:main',
+    ]},
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Environment :: Web Environment',
         'Framework :: AsyncIO',
+        'Framework :: aiohttp',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',

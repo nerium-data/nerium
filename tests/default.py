@@ -1,10 +1,8 @@
 import json
 import unittest
-# from collections import OrderedDict
 
-import aiohttp
 from aiohttp.test_utils import AioHTTPTestCase
-from nerium import Query, ResultFormat
+from nerium import QueryBroker, ResultFormat
 from nerium.app import app
 from tests.test_setup import query_name
 
@@ -22,11 +20,10 @@ EXPECTED = [{
 }]
 
 
-
 class TestResults(unittest.TestCase):
     def test_results_expected(self):
-        loader = Query(query_name)
-        result = loader.result_set()
+        loader = QueryBroker(query_name)
+        result = loader.result_set()['data']
         self.assertEqual(result, EXPECTED)
         formatter = ResultFormat(result, format_='default')
         formatted_results = formatter.formatted_results()
@@ -43,7 +40,7 @@ class TestAPI(AioHTTPTestCase):
             resp = await self.client.request("GET", url)
             assert resp.status == 200
             text = await resp.text()
-            self.assertEqual(EXPECTED, json.loads(text))
+            self.assertEqual(EXPECTED, json.loads(text)['data'])
 
         self.loop.run_until_complete(test_get_query())
 
