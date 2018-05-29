@@ -19,7 +19,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v3-deps-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          - v4-deps-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           name: install dependencies
           command: |
@@ -28,7 +28,7 @@ jobs:
       - save_cache:
           paths:
             - ./. venv
-          key: v3-deps-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          key: v4-deps-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           name: run tests
           command: 
