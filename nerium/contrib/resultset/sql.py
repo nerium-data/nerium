@@ -8,7 +8,6 @@ class SQLResultSet(ResultSet):
     """
     def connection(self):
         db_url = self.data_source()['url']
-        print(db_url)
         db = records.Database(db_url)
         return db
 

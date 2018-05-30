@@ -28,7 +28,6 @@ class JinjaSQLResultSet(SQLResultSet):
             qs, bind_params = jinja.prepare_query(self.query.body, self.kwargs)
             result = self.connection().query(qs, **bind_params)
             result = result.as_dict()
-            print(result)
         except Exception as e:
             result = [{'error': repr(e)}, ]
         return result

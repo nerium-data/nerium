@@ -27,7 +27,6 @@ class TestResults(unittest.TestCase):
         self.assertEqual(result, EXPECTED)
         formatter = ResultFormat(result, format_='default')
         formatted_results = formatter.formatted_results()
-        print(formatted_results)
         self.assertEqual(formatted_results, EXPECTED)
 
 
