@@ -29,14 +29,14 @@ try:
 
         def test_jinja_results(self):
             loader = QueryBroker(jinja_query_name, hello="Hello")
-            result = loader.result_set()
+            result = loader.result_set()['data']
             formatter = ResultFormat(result, format_='default')
             formatted_results = formatter.formatted_results()
             self.assertEqual(formatted_results, self.EXPECTED)
 
         def test_jinja_default(self):
             loader = QueryBroker(jinja_query_name)
-            result = loader.result_set()
+            result = loader.result_set()['data']
             formatter = ResultFormat(result, format_='default')
             formatted_results = formatter.formatted_results()
             self.assertEqual(formatted_results, self.DIFFERS)
