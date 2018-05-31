@@ -1,4 +1,5 @@
-FROM alpine
+FROM alpine:latest
+LABEL maintainer='thomas.yager-madden@adops.com'
 # Install python3
 # Not using python:3-alpine to avoid
 #   psycopg2 starting a separate python3 install

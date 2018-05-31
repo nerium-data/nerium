@@ -27,7 +27,7 @@ def config():
             usr_cfg = yaml.load(cfgfile)
     except FileNotFoundError:
         usr_cfg = {}
-    cfg = {**DEFAULTS, **usr_cfg} 
+    cfg = {**DEFAULTS, **usr_cfg}
     return munchify(cfg)
 
 

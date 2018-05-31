@@ -1,7 +1,3 @@
-import os
-
-import records
-from dotenv import load_dotenv
 from nerium.contrib.resultset.sql import SQLResultSet
 
 try:
@@ -29,5 +25,9 @@ class JinjaSQLResultSet(SQLResultSet):
             result = self.connection().query(qs, **bind_params)
             result = result.as_dict()
         except Exception as e:
-            result = [{'error': repr(e)}, ]
+            result = [
+                {
+                    'error': repr(e)
+                },
+            ]
         return result
