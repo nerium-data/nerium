@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:3.7
 LABEL maintainer='thomas.yager-madden@adops.com'
 # Install python3
 # Not using python:3-alpine to avoid
