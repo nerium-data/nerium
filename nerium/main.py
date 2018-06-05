@@ -1,15 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import abc
 import os
-from abc import ABC
+from abc import ABC, abstractmethod
 from importlib import import_module
 from pathlib import Path
 
 # from . import config
 import frontmatter
 import yaml
-from nerium import config, utils
+from nerium import config
 
 # BASE CLASSES
 
@@ -31,65 +30,52 @@ class Query():
         return 'nerium.Query ({})'.format(self.name)
 
 
-class QueryRegistry():
-    """ Creates a list of dictionaries, mapping query_name to file_system path,
-    file extension, and ResultSet subclass that should be used for query
-    submission.
-
-    Holds Context invoked by Query class to choose a concrete ResultSet
-    subclass to get results from.
-
-    Provides a get_query method to retrieve Query object with path, metadata,
-    and result_cls attributes from a query_name
-    """
-
-    # TODO: Provide for registration from frontmatter or direct config
-
-    def __init__(self):
-        pass
-
-    def get_query(self, query_name):
-        try:
-            query = next(i for i in utils.register_paths()
-                         if query_name == i['query_name'])
-        except StopIteration:
-            return None
-        with open(query['query_path']) as f:
-            metadata, query_body = frontmatter.parse(f.read())
-        parsed_query = Query(
-            name=query_name,
-            metadata=metadata,
-            path=query['query_path'],
-            result_cls=query['result_cls'],
-            body=query_body,
-        )
-        return parsed_query
-
-
 class QueryBroker():
-    """ Finds Query in registry by name, and looks up ResultSet subclass from
+    """ Finds Query in QUERY_PATH by name, and looks up ResultSet subclass from
     path file extension. Submits Query to ResultSet and returns results
     """
-    registry = QueryRegistry()
 
     def __init__(self, query_name, **kwargs):
         self.query_name = query_name
         self.kwargs = kwargs
 
+    def get_query(self):
+        flat_directory = list(
+            Path(os.getenv('QUERY_PATH', 'query_files')).glob('**/*'))
+        try:
+            query_file = next(
+                i for i in flat_directory if self.query_name == i.stem)
+        except StopIteration:
+            return None
+        with open(query_file) as f:
+            metadata, query_body = frontmatter.parse(f.read())
+        query_ext = query_file.suffix.strip('.')
+        try:
+            result_cls = config.query_extensions[query_ext]
+        except KeyError:
+            result_cls = 'SQLResultSet'
+        parsed_query = Query(
+            name=self.query_name,
+            metadata=metadata,
+            path=query_file,
+            result_cls=result_cls,
+            body=query_body,
+        )
+        return parsed_query
+
     def result_set(self):
-        query = self.registry.get_query(self.query_name)
+        query = self.get_query()
         if not query:
             return [{
                 'error':
                 "No query found matching {}".format(self.query_name)
             }]
-        else:
-            result_mods = import_module('nerium.contrib.resultset')
-            cls_name = query.result_cls
-            result_cls = getattr(result_mods, cls_name)
-            loader = result_cls(query, **self.kwargs)
-            query_result = loader.result()
-            return dict(metadata=query.metadata, data=query_result)
+        result_mods = import_module('nerium.contrib.resultset')
+        cls_name = query.result_cls
+        result_cls = getattr(result_mods, cls_name)
+        loader = result_cls(query, **self.kwargs)
+        query_result = loader.result()
+        return dict(metadata=query.metadata, data=query_result)
 
 
 class ResultSet(ABC):
@@ -159,16 +145,16 @@ class ResultSet(ABC):
 
         # Use env['DATABASE_URL'] if nothing else is configured
         return dict(
-                url=os.getenv('DATABASE_URL', '***No database configured***'))
+            url=os.getenv('DATABASE_URL', '***No database configured***'))
 
     @property
-    @abc.abstractmethod
+    @abstractmethod
     def connection(self):
         """ Return data source connection object, typically from data_source() method
         """
         return
 
-    @abc.abstractmethod
+    @abstractmethod
     def result(self):
         """ Given a Query object and connection, return results as a
         serializable Python structure (generally a list of dictionaries)
@@ -197,7 +183,7 @@ class ResultFormatter(ABC):
         self.result = result
         self.kwargs = kwargs
 
-    @abc.abstractmethod
+    @abstractmethod
     def format_results(self):
         """ Transform result set structure and return new structure
         """
