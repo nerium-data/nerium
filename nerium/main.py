@@ -48,6 +48,7 @@ class QueryRegistry():
     def __init__(self):
         pass
 
+    @classmethod
     def extension_lookup(self, _key):
         try:
             return config.query_extensions[_key]
