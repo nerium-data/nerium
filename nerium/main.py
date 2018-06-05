@@ -9,8 +9,7 @@ from pathlib import Path
 # from . import config
 import frontmatter
 import yaml
-from nerium import config
-from nerium.utils import extension_lookup
+from nerium import config, utils
 
 # BASE CLASSES
 
@@ -49,24 +48,9 @@ class QueryRegistry():
     def __init__(self):
         pass
 
-    def register_paths(self):
-        query_directory = Path(os.getenv('QUERY_PATH', 'query_files'))
-        flat_directory = list(query_directory.glob('**/*'))
-        registry = [
-            dict(
-                query_name=i.stem,
-                query_path=i,
-                result_cls=extension_lookup(i.suffix.strip('.')))
-            for i in flat_directory if i.is_file()
-        ]
-        # TODO: Don't return the whole registry here. We're doing this on
-        #     : every call, so build the registry and filter to query_name
-        #     : in a single step. (Or cache the registry on app start.)
-        return registry
-
     def get_query(self, query_name):
         try:
-            query = next(i for i in self.register_paths()
+            query = next(i for i in utils.register_paths()
                          if query_name == i['query_name'])
         except StopIteration:
             return None
