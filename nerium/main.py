@@ -10,6 +10,7 @@ from pathlib import Path
 import frontmatter
 import yaml
 from nerium import config
+from nerium.utils import extension_lookup
 
 # BASE CLASSES
 
@@ -48,13 +49,6 @@ class QueryRegistry():
     def __init__(self):
         pass
 
-    @classmethod
-    def extension_lookup(self, _key):
-        try:
-            return config.query_extensions[_key]
-        except KeyError:
-            return 'SQLResultSet'
-
     def register_paths(self):
         query_directory = Path(os.getenv('QUERY_PATH', 'query_files'))
         flat_directory = list(query_directory.glob('**/*'))
@@ -62,7 +56,7 @@ class QueryRegistry():
             dict(
                 query_name=i.stem,
                 query_path=i,
-                result_cls=self.extension_lookup(i.suffix.strip('.')))
+                result_cls=extension_lookup(i.suffix.strip('.')))
             for i in flat_directory if i.is_file()
         ]
         # TODO: Don't return the whole registry here. We're doing this on

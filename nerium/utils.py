@@ -1,4 +1,5 @@
 """Helper functions for app"""
+from nerium import config
 
 
 def serial_date(obj):
@@ -22,3 +23,10 @@ def multi_to_dict(obj):
         return new_dict
     else:
         return dict(obj)
+
+
+def extension_lookup(_key):
+    try:
+        return config.query_extensions[_key]
+    except KeyError:
+        return 'SQLResultSet'
