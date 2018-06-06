@@ -43,7 +43,10 @@ async def formatter(request, handler, ne_format):
 
     # Remaining query string params are for the database query
     # Take out 'ne_format' and pass the rest along to the formatter
-    params = request['querystring']
+    try:
+        params = request['querystring']
+    except KeyError:
+        params = {}
     params.pop('ne_format', None)
     formatter = ResultFormat(result, ne_format, **params)
 
