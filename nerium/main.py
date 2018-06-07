@@ -140,7 +140,7 @@ class ResultSet(ABC):
             for db in config.databases:
                 if db.name == self.query.path.parent.name:
                     return db
-        except KeyError:
+        except (KeyError, AttributeError):
             pass
 
         # Use env['DATABASE_URL'] if nothing else is configured

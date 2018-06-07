@@ -19,6 +19,7 @@ setup(
     test_suite='tests',
     install_requires=[
         'aiohttp',
+        'aiohttp_cors',
         'munch',
         'python-dotenv',
         'python-frontmatter',

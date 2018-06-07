@@ -8,6 +8,7 @@ coverage = "*"
 
 [packages]
 aiohttp = "*"
+aiohttp-cors = "*"
 munch = "*"
 python-dotenv = "*"
 python-frontmatter = "*"
