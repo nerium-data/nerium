@@ -4,7 +4,7 @@ from pathlib import Path
 import aiohttp_cors
 from aiohttp import web
 from dotenv import load_dotenv
-from nerium import QueryBroker, ResultFormat
+from nerium import query
 from nerium.utils import multi_to_dict, serial_date
 from webargs import fields
 from webargs.aiohttpparser import use_kwargs
@@ -22,12 +22,11 @@ async def base_route(request):
 
 
 async def resultset(request):
-    """ Calls nerium.QueryBroker() to fetch results from ResultSet()
+    """ Calls nerium.query.result_set() to fetch results from ResultSet()
     """
     request['querystring'] = multi_to_dict(request.rel_url.query)
-    query = QueryBroker(request.match_info['query_name'],
-                        **request['querystring'])
-    query_result = query.result_set()
+    query_result = query.result_set(request.match_info['query_name'],
+                                    **request['querystring'])
     # Using json.dumps instead of json_response for serialized datetimes
     return web.Response(
         text=json.dumps(query_result, default=serial_date),
@@ -49,12 +48,11 @@ async def formatter(request, handler, ne_format):
     except KeyError:
         params = {}
     params.pop('ne_format', None)
-    formatter = ResultFormat(result, ne_format, **params)
-
-    payload = formatter.formatted_results()
+    payload = query.formatted_results(result, ne_format, **params)
     if isinstance(payload, str):
         return web.Response(text=payload, content_type='text/csv')
     else:
+        # we can use json_response here because dates are already serialized
         return web.json_response(payload)
 
 
@@ -84,7 +82,6 @@ app.router.add_get('/v1/{query_name}', resultset)
 app.router.add_get('/', base_route)
 app.router.add_get('/v1/', base_route)
 
-
 # Configure default CORS settings.
 cors = aiohttp_cors.setup(
     app,
@@ -103,9 +100,5 @@ for route in list(app.router.routes()):
     cors.add(route)
 
 
-def main():
-    web.run_app(app)
-
-
 if __name__ == '__main__':
-    main()
+    web.run_app(app)

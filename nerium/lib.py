@@ -2,81 +2,13 @@
 # -*- coding: utf-8 -*-
 import os
 from abc import ABC, abstractmethod
-from importlib import import_module
-from pathlib import Path
 
 # from . import config
-import frontmatter
 import yaml
 from nerium import config
 
+
 # BASE CLASSES
-
-
-# TODO: Refactor Query, Registry and Broker classes to a single Query class
-#     : supporting all methods (or a more function-based module).
-class Query():
-    def __init__(self, name, metadata, path, result_cls, body):
-        self.name = name
-        self.metadata = metadata
-        self.path = path
-        self.result_cls = result_cls
-        self.body = body
-
-    def __str__(self):
-        return self.body
-
-    def __repr__(self):
-        return 'nerium.Query ({})'.format(self.name)
-
-
-class QueryBroker():
-    """ Finds Query in QUERY_PATH by name, and looks up ResultSet subclass from
-    path file extension. Submits Query to ResultSet and returns results
-    """
-
-    def __init__(self, query_name, **kwargs):
-        self.query_name = query_name
-        self.kwargs = kwargs
-
-    def get_query(self):
-        flat_directory = list(
-            Path(os.getenv('QUERY_PATH', 'query_files')).glob('**/*'))
-        try:
-            query_file = next(
-                i for i in flat_directory if self.query_name == i.stem)
-        except StopIteration:
-            return None
-        with open(query_file) as f:
-            metadata, query_body = frontmatter.parse(f.read())
-        query_ext = query_file.suffix.strip('.')
-        try:
-            result_cls = config.query_extensions[query_ext]
-        except KeyError:
-            result_cls = 'SQLResultSet'
-        parsed_query = Query(
-            name=self.query_name,
-            metadata=metadata,
-            path=query_file,
-            result_cls=result_cls,
-            body=query_body,
-        )
-        return parsed_query
-
-    def result_set(self):
-        query = self.get_query()
-        if not query:
-            return [{
-                'error':
-                "No query found matching {}".format(self.query_name)
-            }]
-        result_mods = import_module('nerium.contrib.resultset')
-        cls_name = query.result_cls
-        result_cls = getattr(result_mods, cls_name)
-        loader = result_cls(query, **self.kwargs)
-        query_result = loader.result()
-        return dict(metadata=query.metadata, data=query_result)
-
 
 class ResultSet(ABC):
     """Generic result set class template.
@@ -126,7 +58,7 @@ class ResultSet(ABC):
         db_file = self.query.path.parent / 'db.yaml'
         if db_file.is_file():
             with open(db_file, 'r') as dbf:
-                db_meta = yaml.load(dbf.read())
+                db_meta = yaml.safe_load(dbf.read())
                 try:
                     return db_meta['database']
                 except KeyError:
@@ -160,22 +92,6 @@ class ResultSet(ABC):
         serializable Python structure (generally a list of dictionaries)
         """
         return
-
-
-class ResultFormat(ABC):
-    def __init__(self, result, format_, **kwargs):
-        self.result = result
-        self.format_ = format_
-        self.kwargs = kwargs
-
-    def formatted_results(self):
-        try:
-            format_cls_name = config.formats[self.format_]
-        except KeyError:
-            format_cls_name = 'DefaultFormatter'
-        format_mods = import_module('nerium.contrib.formatter')
-        format_cls = getattr(format_mods, format_cls_name)
-        return format_cls(self.result, **self.kwargs).format_results()
 
 
 class ResultFormatter(ABC):

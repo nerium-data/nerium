@@ -1,5 +1,5 @@
 import unittest
-from nerium import QueryBroker, ResultFormat
+from nerium import query
 from tests.test_setup import jinja_query_name
 try:
     # See tests/query/jinja.jinja for template format
@@ -28,17 +28,15 @@ try:
         }]
 
         def test_jinja_results(self):
-            loader = QueryBroker(jinja_query_name, hello="Hello")
-            result = loader.result_set()['data']
-            formatter = ResultFormat(result, format_='default')
-            formatted_results = formatter.formatted_results()
+            result = query.result_set(jinja_query_name, hello="Hello")['data']
+            formatted_results = query.formatted_results(
+                result, format_='default')
             self.assertEqual(formatted_results, self.EXPECTED)
 
         def test_jinja_default(self):
-            loader = QueryBroker(jinja_query_name)
-            result = loader.result_set()['data']
-            formatter = ResultFormat(result, format_='default')
-            formatted_results = formatter.formatted_results()
+            result = query.result_set(jinja_query_name)['data']
+            formatted_results = query.formatted_results(
+                result, format_='default')
             self.assertEqual(formatted_results, self.DIFFERS)
 except ImportError:
     # can't test this module without jinjasql

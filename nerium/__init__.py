@@ -24,7 +24,7 @@ def config():
     configfile = os.getenv('CONFIG_PATH', Path.cwd() / 'nerium-config.yaml')
     try:
         with open(configfile, 'r') as cfgfile:
-            usr_cfg = yaml.load(cfgfile)
+            usr_cfg = yaml.safe_load(cfgfile)
     except FileNotFoundError:
         usr_cfg = {}
     cfg = {**DEFAULTS, **usr_cfg}
@@ -34,5 +34,5 @@ def config():
 config = config()
 
 # yapf: disable
-from nerium.main import *  # noqa F401
+from nerium.lib import *  # noqa F401
 # yapf: enable

@@ -1,5 +1,5 @@
 import unittest
-from nerium import QueryBroker, ResultFormat
+from nerium import query
 from tests.test_setup import query_name, sum_query_name
 
 SUM_EXPECTED = {
@@ -57,20 +57,16 @@ NO_SUM_EXPECTED = {
 
 class TestContribSumFormatter(unittest.TestCase):
     def test_results_no_sum(self):
-        loader = QueryBroker(query_name)
-        result = loader.result_set()
-        formatter = ResultFormat(result, format_='sum')
-        formatted_results = formatter.formatted_results()
+        result = query.result_set(query_name)
+        formatted_results = query.formatted_results(result, format_='sum')
         self.assertEqual(formatted_results['response']['summary'],
                          NO_SUM_EXPECTED['response']['summary'])
         self.assertEqual(formatted_results['response']['result'],
                          NO_SUM_EXPECTED['response']['result'])
 
     def test_results_w_sum(self):
-        loader = QueryBroker(sum_query_name)
-        result = loader.result_set()
-        formatter = ResultFormat(result, format_='sum')
-        formatted_results = formatter.formatted_results()
+        result = query.result_set(sum_query_name)
+        formatted_results = query.formatted_results(result, format_='sum')
         self.assertEqual(formatted_results['response']['summary'],
                          SUM_EXPECTED['response']['summary'])
         self.assertEqual(formatted_results['response']['result'],

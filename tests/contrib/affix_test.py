@@ -1,5 +1,5 @@
 import unittest
-from nerium import QueryBroker, ResultFormat
+from nerium import query
 from tests.test_setup import query_name
 
 
@@ -25,10 +25,9 @@ class TestContribAffixFormatter(unittest.TestCase):
     }
 
     def test_results_affix(self):
-        loader = QueryBroker(query_name)
-        result = loader.result_set()
-        formatter = ResultFormat(result, format_='affix')
-        formatted_results = formatter.formatted_results()
+        result = query.result_set(query_name)
+        formatted_results = query.formatted_results(
+            result, format_='affix')
         # match shape
         self.assertEqual(formatted_results.keys(), self.AFFIX_EXPECTED.keys())
         self.assertEqual(formatted_results['response'],

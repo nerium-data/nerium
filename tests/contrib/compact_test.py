@@ -1,5 +1,5 @@
 import unittest
-from nerium import QueryBroker, ResultFormat
+from nerium import query
 from tests.test_setup import query_name
 
 
@@ -11,8 +11,6 @@ class TestContribCompactFormatter(unittest.TestCase):
     }
 
     def test_results_compact(self):
-        loader = QueryBroker(query_name)
-        result = loader.result_set()
-        formatter = ResultFormat(result, format_='compact')
-        formatted_results = formatter.formatted_results()
+        result = query.result_set(query_name)
+        formatted_results = query.formatted_results(result, format_='compact')
         self.assertEqual(formatted_results, self.COMPACT_EXPECTED)
