@@ -49,7 +49,7 @@ class TestAPI(AioHTTPTestCase):
             resp = await self.client.request("GET", "/")
             assert resp.status == 200
             text = await resp.text()
-            assert "ok" in text
+            self.assertIn("ok", text)
 
         async def test_get_query():
             await test_health_check()
