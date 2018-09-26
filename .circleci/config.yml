@@ -8,7 +8,7 @@ jobs:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/python:3.6.5
+      - image: circleci/python:3.7
         environment:
           PIPENV_VENV_IN_PROJECT: true
 
@@ -19,7 +19,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v5-deps-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          - v7-deps-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           name: install dependencies
           command: |
@@ -28,7 +28,7 @@ jobs:
       - save_cache:
           paths:
             - ./. venv
-          key: v5-deps-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+          key: v7-deps-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           name: run tests
           command: 
