@@ -1,4 +1,5 @@
 import json
+import os
 import unittest
 from datetime import datetime
 
@@ -29,6 +30,8 @@ class TestResults(unittest.TestCase):
         self.assertEqual(result, EXPECTED)
         formatted_results = query.formatted_results(result, format_='default')
         self.assertEqual(formatted_results, EXPECTED)
+        print(query_name)
+        print(os.getenv('QUERY_PATH', 'no path'))
 
 
 class TestSerialDate(unittest.TestCase):

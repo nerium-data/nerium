@@ -6,9 +6,9 @@ LABEL maintainer='thomas.yager-madden@adops.com'
 RUN apk add --no-cache python3 py3-psycopg2
 
 # Copy in the code
-COPY *.py /app/
-COPY nerium/ /app/nerium/
-COPY tests/ app/tests/
+COPY . /app/
+# COPY nerium/ /app/nerium/
+# COPY tests/ app/tests/
 
 WORKDIR /app
 # Avoid breaking setup.py by adding this readme

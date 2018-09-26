@@ -6,11 +6,10 @@ from importlib import import_module
 from munch import munchify
 from nerium import config
 
-FLAT_DIRECTORY = list(
-    Path(os.getenv('QUERY_PATH', 'query_files')).glob('**/*'))
-
 
 def get_query(query_name):
+    FLAT_DIRECTORY = list(
+        Path(os.getenv('QUERY_PATH', 'query_files')).glob('**/*'))
     try:
         query_file = next(
             i for i in FLAT_DIRECTORY if query_name == i.stem)
