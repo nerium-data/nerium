@@ -1,12 +1,14 @@
-FROM alpine
+FROM alpine:3.7
+LABEL maintainer='thomas.yager-madden@adops.com'
 # Install python3
 # Not using python:3-alpine to avoid
 #   psycopg2 starting a separate python3 install
 RUN apk add --no-cache python3 py3-psycopg2
 
 # Copy in the code
-COPY *.py /app/
-COPY nerium/ /app/nerium/
+COPY . /app/
+# COPY nerium/ /app/nerium/
+# COPY tests/ app/tests/
 
 WORKDIR /app
 # Avoid breaking setup.py by adding this readme

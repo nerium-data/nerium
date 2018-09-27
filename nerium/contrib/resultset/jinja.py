@@ -1,7 +1,3 @@
-import os
-
-import records
-from dotenv import load_dotenv
 from nerium.contrib.resultset.sql import SQLResultSet
 
 try:
@@ -21,19 +17,17 @@ class JinjaSQLResultSet(SQLResultSet):
 
     def result(self):
         try:
-            backend_path = self.query_path.parent
-            backend = self.backend_lookup(backend_path)
-            db = records.Database(backend)
             try:
                 jinja = JinjaSql(param_style='named')
             except NameError:
                 raise Exception("jinjasql >= 0.1.7 required for use")
-            with open(self.query_path, 'r') as query_file:
-                query = query_file.readlines()
-                query_text = ''.join(query)
-            qs, bind_params = jinja.prepare_query(query_text, self.kwargs)
-            result = db.query(qs, **bind_params)
+            qs, bind_params = jinja.prepare_query(self.query.body, self.kwargs)
+            result = self.connection().query(qs, **bind_params)
             result = result.as_dict()
         except Exception as e:
-            result = [{'error': repr(e)}, ]
+            result = [
+                {
+                    'error': repr(e)
+                },
+            ]
         return result

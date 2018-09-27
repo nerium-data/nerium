@@ -16,6 +16,7 @@ dist
 *.egg-info
 
 .env
+nerium-config.yaml
 query_files/*
 !query_files/README.md
 .coverage

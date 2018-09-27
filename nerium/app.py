@@ -1,34 +1,32 @@
 import json
+from pathlib import Path
 
+import aiohttp_cors
 from aiohttp import web
-from nerium import Query, ResultFormat
+from dotenv import load_dotenv
+from nerium import query, __version__
+from nerium.utils import multi_to_dict, serial_date
+from webargs import fields
+from webargs.aiohttpparser import use_kwargs
 
-
-def serial_date(obj):
-    if hasattr(obj, 'isoformat'):
-        return obj.isoformat()
-    else:
-        return str(obj)
+# Provision environment as needed
+# Load local .env first
+load_dotenv(Path.cwd() / '.env')
+# Load this one for use w/ Kubernetes secret mount
+load_dotenv('/dotenv/.env')
 
 
 async def base_route(request):
-    data = {"status": "ok"}
+    data = {"status": "ok", "nerium-version": __version__}
     return web.json_response(data)
 
-def mdict_to_dict(mdict):
-    """Convert multidict to dict with list on key collision"""
-    new_dict = {key: (mdict.getall(key) if len(mdict.getall(key)) > 1
-                                             else mdict.get(key))
-                for key
-                in mdict.keys()}
-    return new_dict
 
 async def resultset(request):
-    """ Calls nerium.Query() to fetch results from ResultSet()
+    """ Calls nerium.query.result_set() to fetch results from ResultSet()
     """
-    query = Query(request.match_info['query_name'],
-                  **mdict_to_dict(request.rel_url.query))
-    query_result = query.result_set()
+    request['querystring'] = multi_to_dict(request.rel_url.query)
+    query_result = query.result_set(request.match_info['query_name'],
+                                    **request['querystring'])
     # Using json.dumps instead of json_response for serialized datetimes
     return web.Response(
         text=json.dumps(query_result, default=serial_date),
@@ -36,28 +34,25 @@ async def resultset(request):
 
 
 @web.middleware
-async def formatter(request, handler):
+@use_kwargs({'ne_format': fields.Str(missing='default')})
+async def formatter(request, handler, ne_format):
     """ Pass resultset through formatter
     """
     resp = await handler(request)
-
-    # Get format from request query string or use default
-    try:
-        format_ = request.rel_url.query['ne_format']
-    except KeyError:
-        format_ = 'default'
     result = json.loads(resp.text)
 
     # Remaining query string params are for the database query
     # Take out 'ne_format' and pass the rest along to the formatter
-    params = mdict_to_dict(request.rel_url.query)
+    try:
+        params = request['querystring']
+    except KeyError:
+        params = {}
     params.pop('ne_format', None)
-    formatter = ResultFormat(result, format_, **params)
-
-    payload = formatter.formatted_results()
+    payload = query.formatted_results(result, ne_format, **params)
     if isinstance(payload, str):
         return web.Response(text=payload, content_type='text/csv')
     else:
+        # we can use json_response here because dates are already serialized
         return web.json_response(payload)
 
 
@@ -87,9 +82,27 @@ app.router.add_get('/v1/{query_name}', resultset)
 app.router.add_get('/', base_route)
 app.router.add_get('/v1/', base_route)
 
+# Configure default CORS settings.
+cors = aiohttp_cors.setup(
+    app,
+    defaults={
+        "*":
+        aiohttp_cors.ResourceOptions(
+            allow_credentials=True,
+            expose_headers="*",
+            allow_headers="*",
+            allow_methods="*",
+        )
+    })
+
+# Configure CORS on all routes.
+for route in list(app.router.routes()):
+    cors.add(route)
+
 
 def main():
     web.run_app(app)
 
+
 if __name__ == '__main__':
-    main()    
+    main()

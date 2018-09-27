@@ -9,7 +9,7 @@
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/OAODEV/nerium)
 
 
-A simple [aiohttp](https://docs.aiohttp.org/) microservice that submits queries to a database and returns machine-readable serialized results (typically JSON). By analogy with static site generators, Nerium reads its queries from local files, stored in a (configurable) directory on the filesystem. The idea is that report analysts should be able to author queries in their preferred local editor, and upload them where Nerium can use them.
+A simple [aiohttp](https://docs.aiohttp.org/) microservice that submits queries to a database and returns machine-readable serialized results (typically JSON). By analogy with static site generators, Nerium reads its queries from local files, stored in a (configurable) directory on the filesystem. The idea is that report analysts should be able to author queries in their preferred local editor, and upload or mount them where Nerium can use them.
 
 OAO uses Nerium to easily and quickly provide JSON APIs with report results from our PostgreSQL data warehouse.
 
@@ -51,15 +51,35 @@ Then add a `query_files` directory to your project, write your queries, and conf
 ```bash
 pipenv install 'nerium[jinjasql, $DESIRED_BACKEND]'
 ```
+
 Current options for DESIRED_BACKEND are `pg` or `mysql`.
 
 Follow the instructions above, but when adding the query to `query_files`, make sure the file ends in `.jinja`.
 
 ## Configuration
 
-`DATABASE_URL` and optional `QUERY_PATH` (directory where query files reside, defaults to `query_files` in the working direcory) may be set in the environment, or in a local `.env` file.
+`DATABASE_URL` and optional `QUERY_PATH` (directory where query files reside, defaults to `query_files` in the working direcory) may be set in the environment, or in a local `.env` file. This is the simplest configuration option.
 
-In order to query multiple databases with a single instance of Nerium, create a subdirectory for each database under the `$QUERY_PATH`, place the related files under their respective directory, and include a separate `.env` file per subdirectory setting its `DATABASE_URL` value.
+Mapping query file extensions to result set subclasses and formatter names to formatter classes is handled in `nerium-config.yaml` (see [example](nerium-config.yaml.example)), with `sql` and `default` provisioned by default. If the default classes
+
+In order to query multiple databases with a single instance of Nerium, create a subdirectory for each database under the `$QUERY_PATH`, place the related files under their respective directory, and include a separate `db.yaml` file per subdirectory, which may define a `database` or `database_url` key. (The method of naming the subdirectories to match database names still works for now, but should be considered deprecated.)
+
+Seperate database connections can also be specified directly in individual query files, by defining a `database` or `database_url` key in the YAML front matter (see below).
+
+## Query files and front matter
+
+As indicated above, queries are simply text files placed in local `query_files` directory, or an other arbitrary file system location specified by `QUERY_PATH` in the environment.
+
+Query files can optionally include a [YAML](http://yaml.org/) front matter block. The front matter goes at the top of the file, set off by triple-dashed lines, as in this example:
+
+```yaml
+---
+Author: Joelle van Dyne
+Description: Returns all active usernames in the system
+---
+```
+
+At present, the Nerium service doesn't do much with the front matter. As noted, it can be used to specify a database connection for the query. For other keys, the default response format simply passes the keys and values along in a `metadata` object. (All other contrib formatters simply ignore the metadata.) This mechanism can theoretically be used to pass relevant information about the query along to any clients of the service: for example, the data types of the columns in the results or what have you. Possibilies include whatever a reporting service and front end developer want to coordinate on. Front matter could also be used in more detailed ways in formatters yest to be devised.
 
 ## API
 
@@ -82,7 +102,7 @@ Unknown values passed to `query_extension` or `format` will silently fall back t
 **Code**: 200
 
 **Content**:  
-'default': `[{<column_name>:<row_value>, etc..., }, {etc...}, ]`  
+'default': `{"query_name": "<query_name>", "data": [{<column_name>:<row_value>, etc..., }, {etc...}, ], "metadata": {<key>: <value>, etc..., }}`  
 'compact': `{"columns": [<list of column names>], "data": [<array of row value arrays>]}`  
 'affix': `{"error": false, "response": {<'default' array of result objects>}, "metadata":{"executed": <timestamp>, "params": {<array of name-value pairs submitted to query with request>}}}`
 'csv': `<csv formatted string (w \r\n newline)>`
@@ -99,13 +119,15 @@ Of course, it is possible that a database query might return no results. In this
 
 (in no particular order)
 
+- More detailed documentation, especially about usage
 - Parameter discovery endpoint
 - Report listing endpoint
 - ~~Plugin architecture~~
+- Dynamic filtering without 
 - Improve/mature plugin architecture
-    - ~~Separate base classes to a library~~
-    - ~~Implementation subclasses in `contrib` package~~
-    - Subclass registration mechanism
+  - ~~Separate base classes to a library~~
+  - ~~Implementation subclasses in `contrib` package~~
+  - Subclass registration mechanism
 - Configurable/flexible JSON output formatters (`AffixFormatter` could do with less hard-coding)
 - Static output file generator (and other caching)
 - Swagger docs

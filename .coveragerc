@@ -1,3 +1,13 @@
 [run]
 source=nerium
-omit = nerium/contrib/resultset/jinja.py
+omit = 
+    nerium/contrib/resultset/jinja.py
+    nerium/lib.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:
+    except.
+    raise.
+    return.

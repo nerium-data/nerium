@@ -2,13 +2,15 @@ from setuptools import setup, find_packages
 
 from pathlib import Path
 
-
 with open(Path(__file__).parent / 'README.md') as f:
     long_description = f.read()
 
+with open('nerium/version.py') as version:
+    exec(version.read())
+
 setup(
     name='nerium',
-    version='0.1.3',
+    version=__version__,
     packages=find_packages(),
     description='The little business intelligence engine that could',
     long_description=long_description,
@@ -19,8 +21,13 @@ setup(
     test_suite='tests',
     install_requires=[
         'aiohttp',
+        'aiohttp_cors',
+        'munch',
         'python-dotenv',
+        'python-frontmatter',
+        'pyyaml',
         'records',
+        'webargs',
     ],
     extras_require={
         'mysql': ['PyMySQL'],
@@ -29,16 +36,15 @@ setup(
         # TODO: Add the rest.
     },
     # TODO: A more sophisticated runserver CLI
-    entry_points={
-        'console_scripts': [
-            'nerium = nerium.app:main',
-        ]
-    },
+    entry_points={'console_scripts': [
+        'nerium = nerium.app:main',
+    ]},
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Environment :: Web Environment',
         'Framework :: AsyncIO',
+        'Framework :: aiohttp',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
