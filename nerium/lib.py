@@ -75,9 +75,9 @@ class ResultSet(ABC):
         except (KeyError, AttributeError):
             pass
 
-        # Use env['DATABASE_URL'] if nothing else is configured
+        # Use env['DATABASE_URL']/sqlite if nothing else is configured
         return dict(
-            url=os.getenv('DATABASE_URL', '***No database configured***'))
+            url=os.getenv('DATABASE_URL', 'sqlite:///'))
 
     @property
     @abstractmethod

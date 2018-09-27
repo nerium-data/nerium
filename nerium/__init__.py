@@ -7,6 +7,9 @@ import yaml
 from munch import munchify
 
 
+from nerium.version import __version__  # noqa F401
+
+
 # Load Nerium config file
 def config():
     DEFAULTS = {

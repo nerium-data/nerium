@@ -4,7 +4,7 @@ from pathlib import Path
 import aiohttp_cors
 from aiohttp import web
 from dotenv import load_dotenv
-from nerium import query
+from nerium import query, __version__
 from nerium.utils import multi_to_dict, serial_date
 from webargs import fields
 from webargs.aiohttpparser import use_kwargs
@@ -17,7 +17,7 @@ load_dotenv('/dotenv/.env')
 
 
 async def base_route(request):
-    data = {"status": "ok"}
+    data = {"status": "ok", "nerium-version": __version__}
     return web.json_response(data)
 
 

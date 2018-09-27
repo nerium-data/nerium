@@ -2,13 +2,15 @@ from setuptools import setup, find_packages
 
 from pathlib import Path
 
-
 with open(Path(__file__).parent / 'README.md') as f:
     long_description = f.read()
 
+with open('nerium/version.py') as version:
+    exec(version.read())
+
 setup(
     name='nerium',
-    version='0.1.3',
+    version=__version__,
     packages=find_packages(),
     description='The little business intelligence engine that could',
     long_description=long_description,

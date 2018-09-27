@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "33088a7b36b4494d881fa7a1f69063a2dabdfe004284e71c79c50ceb40445928"
+            "sha256": "22b257b03fbc4adc06831fad803c1434c9b5c0f376c04447e51599f03d8fd3fd"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -152,6 +152,10 @@
             ],
             "index": "pypi",
             "version": "==2.3.2"
+        },
+        "nerium": {
+            "editable": true,
+            "path": "."
         },
         "odfpy": {
             "hashes": [
