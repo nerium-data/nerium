@@ -3,7 +3,6 @@
 import os
 from abc import ABC, abstractmethod
 
-# from . import config
 import yaml
 from nerium import config
 
