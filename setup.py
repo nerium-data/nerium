@@ -32,8 +32,6 @@ setup(
     extras_require={
         'mysql': ['PyMySQL'],
         'pg': ['psycopg2'],
-        'jinjasql': ['jinjasql>=0.1.7']
-        # TODO: Add the rest.
     },
     # TODO: A more sophisticated runserver CLI
     entry_points={'console_scripts': [

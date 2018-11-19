@@ -1,6 +1,5 @@
 query_extensions:
   sql: SQLResultSet
-  jinja: JinjaResultSet
 formats:
   affix: AffixFormatter
   compact: CompactFormatter

@@ -123,12 +123,14 @@ Of course, it is possible that a database query might return no results. In this
 - Parameter discovery endpoint
 - Report listing endpoint
 - ~~Plugin architecture~~
-- Dynamic filtering without 
+- Dynamic filtering without jinja-sql
 - Improve/mature plugin architecture
   - ~~Separate base classes to a library~~
   - ~~Implementation subclasses in `contrib` package~~
   - Subclass registration mechanism
-- Configurable/flexible JSON output formatters (`AffixFormatter` could do with less hard-coding)
+  - Refactor plugin approach to use modules with an interface standard, instead of abstract class inheritance
+- ~~Configurable/flexible JSON output formatters (`AffixFormatter` could do with less hard-coding)~~
 - Static output file generator (and other caching)
 - Swagger docs
 - ~~Health check/default query endpoint~~ (Own git commit hash report(?))
+- Convert app.py to [Responder](https://python-responder.org)

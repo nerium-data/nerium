@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from pathlib import Path
 
 import frontmatter
@@ -17,6 +18,7 @@ def get_query(query_name):
         filter(lambda i: query_name == i.stem, FLAT_QUERIES))
     if not query_file_match:
         return None
+    # TODO: Log warning if more than one match
     query_file = query_file_match[0]
     with open(query_file) as f:
         metadata, query_body = frontmatter.parse(f.read())
@@ -31,6 +33,8 @@ def get_query(query_name):
         path=query_file,
         result_cls=result_cls,
         body=query_body,
+        error=False,
+        executed=datetime.now()
     )
     return munchify(parsed_query)
 

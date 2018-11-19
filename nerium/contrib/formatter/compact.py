@@ -3,7 +3,8 @@ from nerium import ResultFormatter
 
 class CompactFormatter(ResultFormatter):
     """ Returns dict in format
-    {"columns": [<list of column names>], "data": [<array of row value arrays>]}
+    {"columns": [<list of column names>],
+    "data": [<list of row value lists>]}
     """
     # TODO: some graceful error handling, in case of bad input format, etc.
     def format_results(self):
