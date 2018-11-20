@@ -5,7 +5,6 @@ from pathlib import Path
 import frontmatter
 from importlib import import_module
 from munch import munchify
-from nerium import config
 
 # Walking the query_files dir to get all the queries in a single list
 # NOTE: this means query names should be unique across subdirectories,
