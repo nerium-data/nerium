@@ -25,7 +25,6 @@ EXPECTED = [{
 
 class TestResults(unittest.TestCase):
     def test_results_expected(self):
-        # loader = query.get_query(query_name)
         result = query.result_set(query_name)['data']
         self.assertEqual(result, EXPECTED)
         formatted_results = query.formatted_results(result, format_='default')

@@ -22,6 +22,7 @@ setup(
     install_requires=[
         'aiohttp',
         'aiohttp_cors',
+        'idna-ssl',
         'munch',
         'python-dotenv',
         'python-frontmatter',

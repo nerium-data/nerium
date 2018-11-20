@@ -11,6 +11,7 @@ jobs:
       - image: circleci/python:3.7
         environment:
           PIPENV_VENV_IN_PROJECT: true
+          QUERY_PATH: /app/tests/query
 
     working_directory: ~/nerium
 
