@@ -1,4 +1,5 @@
-""" No-op default
+# -*- coding: utf-8 -*-
+"""No-op default
 """
 
 

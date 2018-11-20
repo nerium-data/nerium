@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 import datetime
+
 
 def transform_grouping_sets(result):
     raw_data = []

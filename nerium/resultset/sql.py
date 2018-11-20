@@ -1,8 +1,9 @@
-import records
-from nerium import data_source
-""" SQL database query implementation of resultset, using Records library
+# -*- coding: utf-8 -*-
+"""SQL database query implementation of resultset, using Records library
 to fetch a dataset from configured query_name
 """
+import records
+from nerium import data_source
 
 
 def connection(query):

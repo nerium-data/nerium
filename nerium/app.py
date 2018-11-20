@@ -22,7 +22,7 @@ async def base_route(request):
 
 
 async def resultset(request):
-    """ Calls nerium.query.result_set() to fetch results from ResultSet()
+    """Calls nerium.query.result_set() to fetch results from ResultSet()
     """
     request['querystring'] = multi_to_dict(request.rel_url.query)
     query_result = query.result_set(request.match_info['query_name'],
@@ -36,8 +36,10 @@ async def resultset(request):
 @web.middleware
 @use_kwargs({'ne_format': fields.Str(missing='default')})
 async def formatter(request, handler, ne_format):
-    """ Pass resultset through formatter
+    """Pass resultset through formatter
     """
+    # TODO: Following functional refactor, we can probably go to the formatter
+    # directly, and have it call the resultset
     resp = await handler(request)
     result = json.loads(resp.text)
 
@@ -58,7 +60,7 @@ async def formatter(request, handler, ne_format):
 
 @web.middleware
 async def result_status(request, handler):
-    """ Check if result_set returned an error
+    """Check if result_set returned an error
     """
     resp = await handler(request)
     result = json.loads(resp.text)

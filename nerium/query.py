@@ -13,6 +13,8 @@ FLAT_QUERIES = list(Path(os.getenv('QUERY_PATH', 'query_files')).glob('**/*'))
 
 
 def get_query(query_name):
+    """Find file matching query_name, read and return query object
+    """
     query_file_match = list(
         filter(lambda i: query_name == i.stem, FLAT_QUERIES))
     if not query_file_match:
@@ -34,6 +36,8 @@ def get_query(query_name):
 
 
 def result_set(query_name, **kwargs):
+    """Call get_query, then submit query from file to resultset module
+    """
     query = get_query(query_name)
     if not query:
         return [{'error': f"No query found matching '{query_name}'"}]

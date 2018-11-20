@@ -8,7 +8,7 @@ def serial_date(obj):
 
 def multi_to_dict(obj):
     """Convert multidict to dict, consolidating values
-       into list for repeated keys
+    into list for repeated keys
     """
     if hasattr(obj, 'getall'):
         new_dict = {

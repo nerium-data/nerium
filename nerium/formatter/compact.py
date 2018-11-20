@@ -1,4 +1,5 @@
-""" Returns dict in format
+# -*- coding: utf-8 -*-
+"""Returns dict in format
 {"columns": [<list of column names>],
 "data": [<list of row value lists>]}
 """

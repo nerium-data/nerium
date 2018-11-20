@@ -1,7 +1,7 @@
-import datetime
-
-""" Wrap default object array with error and metadata details
+# -*- coding: utf-8 -*-
+"""Wrap default object array with error and metadata details
 """
+import datetime
 
 
 def format_results(result, **kwargs):
