@@ -16,7 +16,6 @@ pyyaml = "*"
 records = "*"
 webargs = "*"
 "e1839a8" = {path = ".", editable = true}
-"jinja2" = "*"
 
 [requires]
 python_version = "3.7"

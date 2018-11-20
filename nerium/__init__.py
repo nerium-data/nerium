@@ -13,15 +13,9 @@ from nerium.version import __version__  # noqa F401
 # Load Nerium config file
 def config():
     DEFAULTS = {
-        'query_extensions': {
-            'sql': 'SQLResultSet'
-        },
-        'formats': {
-            'default': 'DefaultFormatter'
-        },
-        'databases': [{
-            'default':
-            os.getenv('DATABASE_URL', 'sqlite:///')
+        'data_sources': [{
+            'name': 'default',
+            'url': "os.getenv('DATABASE_URL', 'sqlite:///')"
         }]
     }
     configfile = os.getenv('CONFIG_PATH', Path.cwd() / 'nerium-config.yaml')
@@ -37,5 +31,5 @@ def config():
 config = config()
 
 # yapf: disable
-from nerium.lib import *  # noqa F401
+# from nerium.lib import *  # noqa F401
 # yapf: enable

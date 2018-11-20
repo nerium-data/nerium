@@ -10,7 +10,7 @@ with open('nerium/version.py') as version:
 
 setup(
     name='nerium',
-    version=__version__,
+    version=__version__,  # noqa F821
     packages=find_packages(),
     description='The little business intelligence engine that could',
     long_description=long_description,
@@ -47,7 +47,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Database :: Front-Ends',
         'Topic :: Software Development :: Libraries',
         'Topic :: Utilities',

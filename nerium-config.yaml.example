@@ -1,12 +1,4 @@
-query_extensions:
-  sql: SQLResultSet
-formats:
-  affix: AffixFormatter
-  compact: CompactFormatter
-  csv: CsvFormatter
-  default: DefaultFormatter
-  sum: SumFormatter
-databases:
+data_sources:
 - name: sqlite
   url: sqlite:///
 - name: default
