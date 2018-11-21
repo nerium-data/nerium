@@ -11,7 +11,7 @@ jobs:
       - image: circleci/python:3.7
         environment:
           PIPENV_VENV_IN_PROJECT: true
-          QUERY_PATH: /app/tests/query
+          QUERY_PATH: tests/query
 
     working_directory: ~/nerium
 
@@ -25,8 +25,7 @@ jobs:
             pipenv install -d
       - run:
           name: run tests
-          command: |
-            export QUERY_PATH=tests/query
+          command:
             pipenv run coverage run setup.py test
       - run:
           name: Send to Codecov
