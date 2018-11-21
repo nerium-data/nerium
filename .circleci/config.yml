@@ -26,7 +26,7 @@ jobs:
       - run:
           name: run tests
           command: |
-            export QUERY_PATH=/app/tests/query
+            export QUERY_PATH=tests/query
             pipenv run coverage run setup.py test
       - run:
           name: Send to Codecov
