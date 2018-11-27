@@ -43,7 +43,6 @@ setup(
         'Environment :: Console',
         'Environment :: Web Environment',
         'Framework :: AsyncIO',
-        'Framework :: aiohttp',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
