@@ -1,21 +1,13 @@
 [[source]]
-url = "https://pypi.python.org/simple"
+url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[packages]
+nerium = {editable = true,path = "."}
+
 [dev-packages]
 coverage = "*"
-
-[packages]
-aiohttp = "*"
-aiohttp-cors = "*"
-munch = "*"
-python-dotenv = "*"
-python-frontmatter = "*"
-pyyaml = "*"
-records = "*"
-webargs = "*"
-"e1839a8" = {path = ".", editable = true}
 
 [requires]
 python_version = "3.7"

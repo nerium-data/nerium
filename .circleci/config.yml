@@ -11,27 +11,21 @@ jobs:
       - image: circleci/python:3.7
         environment:
           PIPENV_VENV_IN_PROJECT: true
+          QUERY_PATH: tests/query
 
     working_directory: ~/nerium
 
     steps:
       - checkout
       # Download and cache dependencies
-      - restore_cache:
-          keys:
-          - v7-deps-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           name: install dependencies
           command: |
             sudo pip3 install pipenv
             pipenv install -d
-      - save_cache:
-          paths:
-            - ./. venv
-          key: v7-deps-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
       - run:
           name: run tests
-          command: 
+          command:
             pipenv run coverage run setup.py test
       - run:
           name: Send to Codecov
