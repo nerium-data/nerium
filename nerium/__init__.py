@@ -6,7 +6,7 @@ from pathlib import Path
 import yaml
 from munch import munchify
 
-
+from nerium.commit import get_commit_for_version
 from nerium.version import __version__  # noqa F401
 
 
@@ -29,7 +29,4 @@ def config():
 
 
 config = config()
-
-# yapf: disable
-# from nerium.lib import *  # noqa F401
-# yapf: enable
+commit = get_commit_for_version(__version__)

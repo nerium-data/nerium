@@ -18,6 +18,4 @@ def result(query, **kwargs):
         rows = rows.as_dict()
     except Exception as e:
         rows = [{'error': repr(e)}, ]  # yapf: disable
-    # result = dict(
-    #     title=self.query.name, metadata=self.query.metadata, data=rows)
     return rows

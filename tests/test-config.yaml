@@ -1,12 +1,3 @@
-query_extensions:
-  sql: SQLResultSet
-  jinja: JinjaSQLResultSet
-formats:
-  affix: AffixFormatter
-  compact: CompactFormatter
-  csv: CsvFormatter
-  default: DefaultFormatter
-  sum: SumFormatter
 databases:
 - name: default
   url: sqlite:///
