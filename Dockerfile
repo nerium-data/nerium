@@ -19,6 +19,7 @@ RUN pip3 install --upgrade pip \
 RUN pip3 uninstall -y starlette && pip3 install 'starlette<0.9'
 
 VOLUME /app/query_files
+VOLUME /app/format_files
 EXPOSE 5000 
 
 CMD nerium

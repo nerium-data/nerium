@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from marshmallow import Schema, fields, pre_dump
+from marshmallow import Schema, fields
 
 
 class ResultSchema(Schema):
@@ -7,8 +7,3 @@ class ResultSchema(Schema):
     data = fields.List(fields.Dict(), attribute='result')
     metadata = fields.Dict()
     params = fields.Dict()
-
-    @pre_dump
-    def unwrap_metadata(self, obj):
-        obj.metadata = dict(obj.metadata)
-        return obj

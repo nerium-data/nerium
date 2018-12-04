@@ -299,10 +299,10 @@
         },
         "rfc3986": {
             "hashes": [
-                "sha256:632b8fcd2ac37f24334316227f909be4f9d0738cbf409404cff6fa5f69a24093",
-                "sha256:8458571c4c57e1cf23593ad860bb601b6a604df6217f829c2bc70dc4b5af941b"
+                "sha256:5ad82677b02b88c8d24f6511b4ee9baa5e7da675599b479fbbc5c9c578b5b737",
+                "sha256:bc3ae4b7cd88a99eff2d3900fcb858d44562fd7f273fc07aeef568b9bb6fc4e1"
             ],
-            "version": "==1.1.0"
+            "version": "==1.2.0"
         },
         "rx": {
             "hashes": [
