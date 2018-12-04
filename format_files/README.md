@@ -1,0 +1,1 @@
+Add format schema files here (or choose your own path and configure `FORMAT_PATH`). All formats should provide a `marshmallow` Schema named ResultSchema.
