@@ -102,11 +102,9 @@ Unknown values passed to `query_extension` or `format` will silently fall back t
 **Code**: 200
 
 **Content**:  
-'default': `{"query_name": "<query_name>", "data": [{<column_name>:<row_value>, etc..., }, {etc...}, ], "metadata": {<key>: <value>, etc..., }}`  
+'default': `{"name": "<query_name>", "data": [{<column_name>:<row_value>, etc..., }, {etc...}, ], "metadata": {<key>: <value>, etc..., }, "params": {<array of name-value pairs submitted to query with request>}}`  
 'compact': `{"columns": [<list of column names>], "data": [<array of row value arrays>]}`  
-'affix': `{"error": false, "response": {<'default' array of result objects>}, "metadata":{"executed": <timestamp>, "params": {<array of name-value pairs submitted to query with request>}}}`
 'csv': `<csv formatted string (w \r\n newline)>`  
-'sum': `{"error": false, "response": {"summary": <array of row dicts having grouping > 0>, "result": <array of row dicts having grouping = 0>}, "metadata":{"executed": <timestamp>, "params": {<array of name-value pairs submitted to query with request>}}}`
 
 Of course, it is possible that a database query might return no results. In this case, Nerium will respond with an empty JSON array `[]` regardless of specified format. This is not considered an error, and clients should be prepared to handle it appropriately.
 
@@ -122,14 +120,13 @@ Of course, it is possible that a database query might return no results. In this
 - More detailed documentation, especially about usage
 - Parameter discovery endpoint
 - Report listing endpoint
-- ~~Plugin architecture~~
-- Dynamic filtering without jinja-sql
+- Dynamic filtering
 - ~~Improve/mature plugin architecture~~
   - ~~Separate base classes to a library~~
   - ~~Implementation subclasses in `contrib` package~~
   - ~~Refactor plugin approach to use modules with an interface standard, instead of abstract class inheritance~~
-- ~~Configurable/flexible JSON output formatters (`AffixFormatter` could do with less hard-coding)~~ [WONTFIX]
+- ~~Configurable/flexible JSON output formatters (`AffixFormatter` could do with less hard-coding)~~ [Implemented via marshmallow schemas]
 - Static output file generator (and other caching)
 - Swagger docs
-- ~~Health check/default query endpoint~~ (Own git commit hash report(?))
-- Convert app.py to [Responder](https://python-responder.org)
+- ~~Health check/default query endpoint~~ ~~(Own git commit hash report(?))~~
+- ~~Convert app.py to [Responder](https://python-responder.org)~~
