@@ -1,8 +1,8 @@
+import os
 import unittest
+from pathlib import Path
 
 from nerium import app, query
-# from nerium.app import api
-from tests.test_setup import query_name
 
 # Fixtures
 EXPECTED = [{
@@ -25,8 +25,13 @@ COMPACT_EXPECTED = {
              [42, '2031-05-25', 'yo', 'ƺƺƺƺ']]
 }
 
+query_name = 'test'
+
 
 class TestResults(unittest.TestCase):
+    query_path = Path(__file__).resolve().parent / 'query'
+    os.environ['QUERY_PATH'] = str(query_path)
+
     def test_results_expected(self):
         result = query.get_result_set(query_name, format_='default')
         self.assertEqual(result['data'], EXPECTED)
