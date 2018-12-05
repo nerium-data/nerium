@@ -26,6 +26,12 @@ COMPACT_EXPECTED = {
              [42, '2031-05-25', 'yo', 'ƺƺƺƺ']]
 }
 
+ERROR_EXPECTED = {
+    "error":
+    "OperationalError('(sqlite3.OperationalError) no such table: not_a_table')"
+}
+
+
 query_name = 'test'
 
 
@@ -34,8 +40,8 @@ class TestResults(unittest.TestCase):
     os.environ['QUERY_PATH'] = str(query_path)
 
     def test_results_expected(self):
-        result = query.get_result_set(query_name, format_='default')
-        self.assertEqual(result['data'], EXPECTED)
+        result = query.get_result_set(query_name)
+        self.assertEqual(result['result'], EXPECTED)
 
 
 class TestAPI(unittest.TestCase):
@@ -44,10 +50,11 @@ class TestAPI(unittest.TestCase):
 
     # def test_response(self):
     def test_health_check(self):
-        resp = self.api().requests.get(url='/')
+        resp = self.api().requests.get(url='/v1')
         assert resp.status_code == 200
         text = resp.text
         self.assertIn("ok", text)
+        self.assertIn("commit", text)
 
     def test_get_query(self):
         url = f"/v1/{query_name}"
@@ -68,6 +75,12 @@ class TestAPI(unittest.TestCase):
         assert resp.status_code == 200
         self.assertEqual(
             COMPACT_EXPECTED, resp.json())
+
+    def test_error_response(self):
+        url = f"/v1/error_test"
+        resp = self.api().requests.get(url=url)
+        assert resp.status_code == 400
+        self.assertEqual(ERROR_EXPECTED, resp.json())
 
 
 if __name__ == '__main__':

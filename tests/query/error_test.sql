@@ -1,0 +1,1 @@
+select * from not_a_table;

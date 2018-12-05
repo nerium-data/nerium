@@ -33,37 +33,12 @@ def get_query(query_name):
         result_mod=result_mod,
         body=query_body,
         error=False,
-        executed=datetime.utcnow())
+        executed=datetime.utcnow().isoformat())
     # TODO: when formatter uses marshmallow (see below) maybe this could, too
     return munchify(query_obj)
 
 
-def get_format(format_):
-    """ Find format schema in $FORMAT_PATH or nerium/schema
-    """
-    format_path = os.getenv('FORMAT_PATH', 'format_files')
-    try:
-        spec = importlib.util.spec_from_file_location(
-            "format_mod", f"{format_path}/{format_}.py")
-        format_mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(format_mod)
-    except FileNotFoundError:
-        try:
-            format_mod = import_module(f'nerium.schema.{format_}')
-        except ModuleNotFoundError:
-            format_mod = import_module('nerium.schema.default')
-    schema = format_mod.ResultSchema()
-    return schema
-
-
-def format_results(query, format_):
-    """ Pass results through formatter module per config match to `format_` param
-    """
-    schema = get_format(format_)
-    return schema.dump(query)
-
-
-def get_result_set(query_name, format_, **kwargs):
+def get_result_set(query_name, **kwargs):
     """ Call get_query, then submit query from file to resultset module,
     (and handoff to formatter before returning)
     """
@@ -77,15 +52,16 @@ def get_result_set(query_name, format_, **kwargs):
         result_mod = import_module('nerium.resultset.sql')
     query.result = result_mod.result(query, **kwargs)
     query.params = {**kwargs}
-    formatted_result = format_results(query, format_)
-    return formatted_result
+    if 'error' in query.result[0].keys():
+        query.error = query.result[0]['error']
+    return query
 
 
 def results_to_csv(query_name, **kwargs):
     """ Generate CSV from result data
     """
-    query = get_result_set(query_name, 'default', **kwargs)
-    result = query['data']
+    query = get_result_set(query_name, **kwargs)
+    result = query.result
     columns = list(result[0].keys())
     data = [tuple(row.values()) for row in result]
     frame = tablib.Dataset()
