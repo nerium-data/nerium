@@ -20,4 +20,6 @@ dist
 nerium-config.yaml
 query_files/*
 !query_files/README.md
+format_files/*
+!format_files/README.md
 .coverage

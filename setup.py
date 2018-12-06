@@ -20,15 +20,12 @@ setup(
     license='Apache License, Version 2.0',
     test_suite='tests',
     install_requires=[
-        'aiohttp',
-        'aiohttp_cors',
-        'idna-ssl',
         'munch',
         'python-dotenv',
         'python-frontmatter',
         'pyyaml',
         'records',
-        'webargs',
+        'responder'
     ],
     extras_require={
         'mysql': ['PyMySQL'],

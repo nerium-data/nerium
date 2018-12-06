@@ -2,7 +2,7 @@
 
 Thank you very kindly for your interest in Nerium! We would love to get pull requests from everyone to help this project along. 🙂
 
-Areas of special interest include expanding test coverage, adding more [query types](https://github.com/OAODEV/nerium/tree/master/nerium/resultset) and [formatters](https://github.com/OAODEV/nerium/tree/master/nerium/formatter), improving the configuration mechanisms, and reports or fixes for any [issues](https://github.com/OAODEV/nerium/issues) you may come across.
+Areas of special interest include expanding test coverage, adding more [query types](https://github.com/OAODEV/nerium/tree/master/nerium/resultset), improving the configuration mechanisms, and reports or fixes for any [issues](https://github.com/OAODEV/nerium/issues) you may come across.
 
 ## Guidelines
 
