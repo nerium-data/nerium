@@ -44,7 +44,9 @@ def get_result_set(query_name, **kwargs):
     """
     query = get_query(query_name)
     if not query:
-        return [{'error': f"No query found matching '{query_name}'"}]
+        query = munchify({})
+        query.error = f"No query found matching '{query_name}'"
+        return query
     try:
         result_mod = import_module(
             f'nerium.contrib.resultset.{query.result_mod}')

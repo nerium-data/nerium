@@ -8,7 +8,7 @@
 [![PyPI - License](https://img.shields.io/pypi/l/nerium.svg)](https://pypi.org/project/nerium/)
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/OAODEV/nerium)
 
-A simple [responder](https://python-responder.org/) microservice that submits queries to a database and returns machine-readable serialized results (typically JSON). By analogy with static site generators, Nerium reads its queries and serialization formats from local files, stored  on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them.
+A lightweight [responder](https://python-responder.org/)-based microservice that submits queries to a database and returns machine-readable serialized results (typically JSON). By analogy with static site generators, Nerium reads its queries and serialization formats from local files, stored  on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them.
 
 OAO uses Nerium to easily and quickly provide JSON APIs with report results from our PostgreSQL data warehouse.
 
@@ -69,6 +69,8 @@ _NOTE_: A `database_url` setting in front matter of a particular will override s
 ## Query files and front matter
 
 As indicated above, queries are simply text files placed in local `query_files` directory, or another arbitrary filesystem location specified by `QUERY_PATH` in the environment. The base name of the file (`stem` in Python `pathlib` parlance) will determine the `{query_name}` portion of the matching API endpoint; the file extension (or `suffix`) maps to the query type (literally the name of the `nerium.resultset` module that will handle the query).
+
+Note that Nerium loads the query files on server start; while adding additional query scripts does not require any code or config changes, the server needs to be restarted in order to use them.
 
 Query files can optionally include a [YAML](http://yaml.org/) front matter block. The front matter goes at the top of the file, set off by triple-dashed lines, as in this example:
 
