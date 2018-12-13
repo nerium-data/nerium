@@ -1,11 +1,7 @@
 {
     "_meta": {
         "hash": {
-<<<<<<< HEAD
             "sha256": "c757e42afeccc40257392b6051b1feb416440d11d1f7ea22da3212bdb04b3b1d"
-=======
-            "sha256": "e29833f3a91d634580d0458b76402abea89c820c494d4ce123a6180d785f1599"
->>>>>>> support jinja template syntax in SQL files
         },
         "pipfile-spec": 6,
         "requires": {
@@ -245,17 +241,10 @@
         },
         "python-dotenv": {
             "hashes": [
-<<<<<<< HEAD
                 "sha256:a84569d0e00d178bc5b957f7ff208bf49287cbf61857c31c258c4a91f571527b",
                 "sha256:c9b1ddd3cdbe75c7d462cb84674d87130f4b948f090f02c7d7144779afb99ae0"
             ],
             "version": "==0.10.1"
-=======
-                "sha256:4f3582904d08dac5ab4c9aa44cb17ce056c9a35e585cfda6183d80054d247307",
-                "sha256:cb8cd327109898c7725f76c5256a081e8a9efe72ebbf127f8d1221ceb7f38bf2"
-            ],
-            "version": "==0.10.0"
->>>>>>> support jinja template syntax in SQL files
         },
         "python-frontmatter": {
             "hashes": [
@@ -335,15 +324,9 @@
         },
         "starlette": {
             "hashes": [
-<<<<<<< HEAD
                 "sha256:01f04283b49a8cb0c8921baa90dbafe47e953f0a265f6ebb38176038e4bd9bf8"
             ],
             "version": "==0.9.9"
-=======
-                "sha256:a7b24496638b9e755bc31a72b0596939f3dd0e6eb1878ff55da5647be026a9e3"
-            ],
-            "version": "==0.9.8"
->>>>>>> support jinja template syntax in SQL files
         },
         "tablib": {
             "hashes": [
