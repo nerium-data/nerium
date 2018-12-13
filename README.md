@@ -66,11 +66,13 @@ _NOTE_: A `database_url` setting in front matter of a particular will override s
 
 ## Usage
 
-## Query files and front matter
+## Query files
 
 As indicated above, queries are simply text files placed in local `query_files` directory, or another arbitrary filesystem location specified by `QUERY_PATH` in the environment. The base name of the file (`stem` in Python `pathlib` parlance) will determine the `{query_name}` portion of the matching API endpoint; the file extension (or `suffix`) maps to the query type (literally the name of the `nerium.resultset` module that will handle the query).
 
 Note that Nerium loads the query files on server start; while adding additional query scripts does not require any code or config changes, the server needs to be restarted in order to use them.
+
+### Front matter
 
 Query files can optionally include a [YAML](http://yaml.org/) front matter block. The front matter goes at the top of the file, set off by triple-dashed lines, as in this example:
 
@@ -84,6 +86,31 @@ select username from user;
 ```
 
 At present, the Nerium service doesn't do much with the front matter. As noted above, it can be used to specify a database connection for the query. For other keys, the default response format simply passes the keys and values along in a `metadata` object. (The `compact` formatter simply ignores the metadata.) This mechanism can theoretically be used to pass relevant information about the query along to any clients of the service: for example, the data types of the columns in the results or what have you. Possibilities include whatever a reporting service and front end developer want to coordinate on. Front matter could also be used in more detailed ways in formatters yet to be devised.
+
+### Jinja templating
+
+Nerium supports [Jinja](http://jinja.pocoo.org/docs/dev/templates/) templating syntax in queries. The most typical use case would be for adding optional filter clauses to a query so that the same `SELECT` statement can be reused without having to be repeated in multiple files, for example:
+
+```sql
+select username
+     , user_id
+     , display_name
+  from user
+{% if group %}
+ where user.group = :group
+{% endif %}
+```
+
+Jinja filters and other logic can be applied to inputs, as well.
+
+---
+***WARNING!***
+
+The Jinja template is rendered in a `SandboxedEnvironment`, which should protect against [server-side template injection](https://portswigger.net/blog/server-side-template-injection) and most [SQL injection](https://en.wikipedia.org/wiki/SQL_injection) tactics. It should not be considered perfectly safe, however. Use this feature sparingly, stick with SQLAlchemy-style `:key` named parameters for bind substitutions, and test your specific queries carefully. It should almost go without saying that database permission grants to the user Nerium connects as should be well-restricted, whether one is using Jinja syntax or not.
+
+One known dangerous case is if your entire query file just does a Jinja variable expansion and nothing else: `{{ my_whole_query }}`. *This will allow execution of arbitrary SQL and you should **never** make a template like this available.*
+
+o---
 
 ## Custom format files
 
