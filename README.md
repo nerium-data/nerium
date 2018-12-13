@@ -8,7 +8,7 @@
 [![PyPI - License](https://img.shields.io/pypi/l/nerium.svg)](https://pypi.org/project/nerium/)
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/OAODEV/nerium)
 
-A lightweight [responder](https://python-responder.org/)-based microservice that submits queries to a database and returns machine-readable serialized results (typically JSON). By analogy with static site generators, Nerium reads its queries and serialization formats from local files, stored  on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them.
+A lightweight [Responder](https://python-responder.org/)-based microservice that submits queries to a database and returns machine-readable serialized results (typically JSON). By analogy with static site generators, Nerium reads its queries and serialization formats from local files, stored  on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them.
 
 OAO uses Nerium to easily and quickly provide JSON APIs with report results from our PostgreSQL data warehouse.
 
