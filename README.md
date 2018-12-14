@@ -116,7 +116,7 @@ For serialization formats besides the built-in default and `compact`, schema def
 
 ## Query type extensions
 
-A `resultset` module is expected to have a `result` method that takes a `query` object and optional keyword argument (`kwargs`) dictionary, connects to a data source, and returns tabular results as a serializable Python structure (most typically a list of dictionaries). 
+A `resultset` module is expected to have a `result` method that takes a `query` object and optional keyword argument (`kwargs`) dictionary, connects to a data source, and returns tabular results as a serializable Python structure (most typically a list of dictionaries).
 
 A Nerium `query` object is a [munchified](https://github.com/Infinidat/munch) dictionary, with elements found in [`get_query()`](nerium/query.py#L29).
 
@@ -177,7 +177,7 @@ Of course, it is possible that a database query might return no results. In this
 - More detailed documentation, especially about usage
 - Parameter discovery endpoint
 - Report listing endpoint
-- Dynamic filtering
+- ~~Dynamic filtering~~
 - ~~Improve/mature plugin architecture~~
   - ~~Separate base classes to a library~~
   - ~~Implementation subclasses in `contrib` package~~
