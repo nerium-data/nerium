@@ -48,7 +48,7 @@ Then add a `query_files` (and, optionally, `format_files`) directory to your pro
 
 `DATABASE_URL` for query connections must be set in the environment (or in a local `.env` file). This is the simplest configuration option.
 
-Because the service uses `responder`, it will also respect `PORT` if set in the environment.
+Because the web service uses Responder, it will also respect `PORT` if set in the environment.
 
 ### Script file paths
 
@@ -60,7 +60,7 @@ If you want to query multiple databases from a single Nerium installation, any i
 
 Alternatively, to handle multiple files with the same connection, create a subdirectory for each database under the `$QUERY_PATH`, place the related files under their respective directory, and include a separate `db.yaml` file per subdirectory, which defines the `database_url` key.
 
-_NOTE_: A `database_url` setting in front matter of a particular will override subdirectory-level `db.yaml` setting as well as `DATABASE_URL` in the environment.
+_NOTE_: A `database_url` setting in front matter of a particular file will override subdirectory-level `db.yaml` setting as well as `DATABASE_URL` in the environment.
 
 ## Usage
 
