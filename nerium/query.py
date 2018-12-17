@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import datetime
 from importlib import import_module
@@ -7,6 +8,7 @@ import frontmatter
 import tablib
 from jinja2.sandbox import SandboxedEnvironment
 from munch import munchify
+from tablib.formats._json import date_handler
 
 # Walking the query_files dir to get all the queries in a single list
 # NOTE: this means query names should be unique across subdirectories,
@@ -58,7 +60,10 @@ def get_result_set(query_name, **kwargs):
         result_mod = import_module('nerium.resultset.sql')
     query.params = {**kwargs}
     query.body = process_template(sql=query.body, **query.params)
-    query.result = result_mod.result(query, **query.params)
+    result = result_mod.result(query, **query.params)
+    # Dumping and reloading via json here gets us datetime and decimal
+    # serialization handling courtesy of `tablib`
+    query.result = json.loads(json.dumps(result, default=date_handler))
     try:
         if 'error' in query.result[0].keys():
             query.error = query.result[0]['error']
