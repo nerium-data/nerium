@@ -4,20 +4,15 @@ LABEL maintainer='thomas.yager-madden@adops.com'
 # Not using python:3-alpine to avoid
 #   psycopg2 starting a separate python3 install
 ENV PORT 5000
-RUN apk add --no-cache python3 py3-psycopg2 python3-dev build-base
+RUN apk add --no-cache python3 py3-psycopg2 python3-dev build-base git
 # Copy in the code
 COPY . /app
 
 WORKDIR /app
 
 # install from code currently in repo
-RUN pip3 install --upgrade pip \
-    && pip3 install --pre -e .
-
-# responder is installing the wrong starlette
-# TODO: Take this out when responder deps are sorted
-RUN pip3 uninstall -y starlette && pip3 install 'starlette<0.9'
-
+RUN pip3 install --upgrade pip pipenv \
+    && pipenv install --system
 VOLUME /app/query_files
 VOLUME /app/format_files
 EXPOSE 5000 

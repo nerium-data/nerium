@@ -1,4 +1,3 @@
-import importlib.util
 import os
 from datetime import datetime
 from importlib import import_module
@@ -6,6 +5,7 @@ from pathlib import Path
 
 import frontmatter
 import tablib
+from jinja2.sandbox import SandboxedEnvironment
 from munch import munchify
 
 # Walking the query_files dir to get all the queries in a single list
@@ -34,13 +34,17 @@ def get_query(query_name):
         body=query_body,
         error=False,
         executed=datetime.utcnow().isoformat())
-    # TODO: when formatter uses marshmallow (see below) maybe this could, too
     return munchify(query_obj)
 
 
+def process_template(sql, **kwargs):
+    env = SandboxedEnvironment()
+    template = env.from_string(sql)
+    return template.render(kwargs)
+
+
 def get_result_set(query_name, **kwargs):
-    """ Call get_query, then submit query from file to resultset module,
-    (and handoff to formatter before returning)
+    """ Call get_query, then submit query from file to resultset module
     """
     query = get_query(query_name)
     if not query:
@@ -52,10 +56,14 @@ def get_result_set(query_name, **kwargs):
             f'nerium.contrib.resultset.{query.result_mod}')
     except ModuleNotFoundError:
         result_mod = import_module('nerium.resultset.sql')
-    query.result = result_mod.result(query, **kwargs)
     query.params = {**kwargs}
-    if 'error' in query.result[0].keys():
-        query.error = query.result[0]['error']
+    query.body = process_template(sql=query.body, **query.params)
+    query.result = result_mod.result(query, **query.params)
+    try:
+        if 'error' in query.result[0].keys():
+            query.error = query.result[0]['error']
+    except IndexError:
+        pass
     return query
 
 

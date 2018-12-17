@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "55179b6b17e7ad193c323c4f7098f78e9b802e198870ecd2f8bbb4fe1f63f5a1"
+            "sha256": "c757e42afeccc40257392b6051b1feb416440d11d1f7ea22da3212bdb04b3b1d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -138,10 +138,10 @@
         },
         "idna": {
             "hashes": [
-                "sha256:156a6814fb5ac1fc6850fb002e0852d56c0c8d2531923a51032d1b70760e186e",
-                "sha256:684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16"
+                "sha256:c357b3f628cf53ae2c4c05627ecc484553142ca23264e593d327bcde5e9c3407",
+                "sha256:ea8b7f6188e6fa117537c3df7da9fc686d485087abf6ac197f9c46432f7e4a3c"
             ],
-            "version": "==2.7"
+            "version": "==2.8"
         },
         "itsdangerous": {
             "hashes": [
@@ -241,10 +241,10 @@
         },
         "python-dotenv": {
             "hashes": [
-                "sha256:122290a38ece9fe4f162dc7c95cae3357b983505830a154d3c98ef7f6c6cea77",
-                "sha256:4a205787bc829233de2a823aa328e44fd9996fedb954989a21f1fc67c13d7a77"
+                "sha256:a84569d0e00d178bc5b957f7ff208bf49287cbf61857c31c258c4a91f571527b",
+                "sha256:c9b1ddd3cdbe75c7d462cb84674d87130f4b948f090f02c7d7144779afb99ae0"
             ],
-            "version": "==0.9.1"
+            "version": "==0.10.1"
         },
         "python-frontmatter": {
             "hashes": [
@@ -278,10 +278,10 @@
         },
         "requests": {
             "hashes": [
-                "sha256:65b3a120e4329e33c9889db89c80976c5272f56ea92d3e74da8a463992e3ff54",
-                "sha256:ea881206e59f41dbd0bd445437d792e43906703fff75ca8ff43ccdb11f33f263"
+                "sha256:502a824f31acdacb3a35b6690b5fbf0bc41d63a24a45c4004352b0242707598e",
+                "sha256:7bf2a778576d825600030a110f3c0e3e8edc51dfaafe1c146e39a2027784957b"
             ],
-            "version": "==2.20.1"
+            "version": "==2.21.0"
         },
         "requests-toolbelt": {
             "hashes": [
@@ -291,11 +291,9 @@
             "version": "==0.8.0"
         },
         "responder": {
-            "hashes": [
-                "sha256:1a16be3bd2f457ba09f8e17c7cca098f18e13963a160489f5cce5459eaef5b94",
-                "sha256:a02d4329d691e0d8d4ec1a9a7d7857b93ae9c835fd56faf550ec0ee5df72d950"
-            ],
-            "version": "==1.1.2"
+            "editable": true,
+            "git": "https://github.com/kennethreitz/responder",
+            "ref": "1a28d528d02e51b481cbe13ebdcf5c1b1942f60b"
         },
         "rfc3986": {
             "hashes": [
@@ -313,10 +311,10 @@
         },
         "six": {
             "hashes": [
-                "sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9",
-                "sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb"
+                "sha256:3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c",
+                "sha256:d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73"
             ],
-            "version": "==1.11.0"
+            "version": "==1.12.0"
         },
         "sqlalchemy": {
             "hashes": [
@@ -326,10 +324,9 @@
         },
         "starlette": {
             "hashes": [
-                "sha256:7069286d87d6f63eb1b13f4ed5127c2cb8905aacd68b4abc55e987b3b3f7868c"
+                "sha256:01f04283b49a8cb0c8921baa90dbafe47e953f0a265f6ebb38176038e4bd9bf8"
             ],
-            "index": "pypi",
-            "version": "==0.8.8"
+            "version": "==0.9.9"
         },
         "tablib": {
             "hashes": [
@@ -352,9 +349,9 @@
         },
         "uvicorn": {
             "hashes": [
-                "sha256:94a150fbb6ab7ef07063c1a767127058420b061634ae78c29c53c215446f4b38"
+                "sha256:db73ec548563d572154a069b9af9fa512184ef06f926fd26d60f6c5e0c3b6af3"
             ],
-            "version": "==0.3.21"
+            "version": "==0.3.22"
         },
         "uvloop": {
             "hashes": [
@@ -369,7 +366,6 @@
                 "sha256:dfe83e6bb90892b0c2440b8e425f83b31c9f23195dd189bd59b2fb3fb12a7080",
                 "sha256:ea97302d8fa9d7b6fb1dd079774edcc581ebd8561e5ea71e1fd95c803904d38a"
             ],
-            "markers": "sys_platform != 'win32'",
             "version": "==0.12.0rc1"
         },
         "websockets": {

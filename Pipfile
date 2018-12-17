@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 nerium = {editable = true,path = "."}
-starlette = "<0.9"
+responder = {editable = true,git = "https://github.com/kennethreitz/responder"}
 
 [dev-packages]
 coverage = "*"

@@ -23,8 +23,6 @@ jobs:
           command: |
             sudo pip3 install pipenv
             pipenv install -d --pre
-            pipenv uninstall starlette
-            pipenv install 'starlette<0.9'
       - run:
           name: run tests
           command:

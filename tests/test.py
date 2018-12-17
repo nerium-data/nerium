@@ -26,12 +26,6 @@ COMPACT_EXPECTED = {
              [42, '2031-05-25', 'yo', 'ƺƺƺƺ']]
 }
 
-ERROR_EXPECTED = {
-    "error":
-    "OperationalError('(sqlite3.OperationalError) no such table: not_a_table')"
-}
-
-
 query_name = 'test'
 
 
@@ -80,7 +74,7 @@ class TestAPI(unittest.TestCase):
         url = f"/v1/error_test"
         resp = self.api().requests.get(url=url)
         assert resp.status_code == 400
-        self.assertEqual(ERROR_EXPECTED, resp.json())
+        self.assertIn('error', resp.json().keys())
 
 
 if __name__ == '__main__':
