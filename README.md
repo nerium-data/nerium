@@ -39,7 +39,7 @@ $ curl http://localhost:5000/v1/<query_name>?<params>
 ### Local install
 
 ```bash
-pipenv install nerium[pg]
+pipenv install nerium[pg] --pre
 ```
 
 Then add a `query_files` (and, optionally, `format_files`) directory to your project, write your queries, and configure the app as described in the next section. The command `nerium` starts a local `uvicorn` server running the app, listening on port 5042.

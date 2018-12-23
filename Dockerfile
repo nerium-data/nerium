@@ -13,7 +13,8 @@ WORKDIR /app
 
 # install from code currently in repo
 RUN pip3 install --upgrade pip pipenv \
-    && pipenv install --system
+    && pipenv install --pre --system
+
 VOLUME /app/query_files
 VOLUME /app/format_files
 EXPOSE 5000 
