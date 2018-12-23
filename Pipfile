@@ -4,11 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-nerium = {editable = true,path = "."}
-responder = {editable = true,git = "https://github.com/kennethreitz/responder"}
+nerium = {editable = true, path = "."}
 
 [dev-packages]
 coverage = "*"
+"psycopg2-binary" = "*"
 
 [requires]
 python_version = "3.7"
