@@ -25,8 +25,7 @@ setup(
         'python-frontmatter',
         'pyyaml',
         'records',
-        'responder',
-        'starlette<0.9'
+        'responder'
     ],
     extras_require={
         'mysql': ['PyMySQL'],

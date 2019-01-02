@@ -8,7 +8,7 @@ nerium = {editable = true, path = "."}
 
 [dev-packages]
 coverage = "*"
-"psycopg2-binary" = "*"
+psycopg2-binary = "*"
 
 [requires]
 python_version = "3.7"

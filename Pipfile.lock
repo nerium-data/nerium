@@ -292,10 +292,10 @@
         },
         "responder": {
             "hashes": [
-                "sha256:1a16be3bd2f457ba09f8e17c7cca098f18e13963a160489f5cce5459eaef5b94",
-                "sha256:a02d4329d691e0d8d4ec1a9a7d7857b93ae9c835fd56faf550ec0ee5df72d950"
+                "sha256:54ba618219c3b9a323ff3cac5ea8564e1f82b3c9199b943f871230cdd9715fb4",
+                "sha256:b37f068370da27d25b5e442302e361ce3530fdc002a3d0e4b75cd2f5c5e6c9fa"
             ],
-            "version": "==1.1.2"
+            "version": "==1.2.0"
         },
         "rfc3986": {
             "hashes": [
@@ -351,9 +351,9 @@
         },
         "uvicorn": {
             "hashes": [
-                "sha256:9c7b384046305982c658d812de862d31c95e7e1c19dc4f0f432d060d921c968a"
+                "sha256:ab570ef3b088ddf30a8a2bb97f624c4eabe246301c2f21e38a48c82bfa3d8f52"
             ],
-            "version": "==0.3.23"
+            "version": "==0.3.24"
         },
         "uvloop": {
             "hashes": [
