@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-nerium = {editable = true, path = "."}
+nerium = {editable = true,path = "."}
 
 [dev-packages]
 coverage = "*"
