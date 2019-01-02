@@ -326,9 +326,9 @@
         },
         "starlette": {
             "hashes": [
-                "sha256:7069286d87d6f63eb1b13f4ed5127c2cb8905aacd68b4abc55e987b3b3f7868c"
+                "sha256:01f04283b49a8cb0c8921baa90dbafe47e953f0a265f6ebb38176038e4bd9bf8"
             ],
-            "version": "==0.8.8"
+            "version": "==0.9.9"
         },
         "tablib": {
             "hashes": [
