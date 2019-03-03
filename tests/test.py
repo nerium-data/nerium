@@ -64,15 +64,21 @@ class TestAPI(unittest.TestCase):
         # formatted_results = query.formatted_results(result, format_='csv')
         self.assertEqual(resp.text, CSV_EXPECTED)
 
-    def test_get_compact(self):
+    def test_results_compact(self):
         url = f"/v1/{query_name}/compact"
         resp = self.api().requests.get(url=url)
         assert resp.status_code == 200
         self.assertEqual(
             COMPACT_EXPECTED, resp.json())
 
-    def test_error_response(self):
+    def test_sql_error(self):
         url = "/v1/error_test"
+        resp = self.api().requests.get(url=url)
+        assert resp.status_code == 400
+        self.assertIn('error', resp.json())
+
+    def test_missing_query_error(self):
+        url = '/v1/not_a_query'
         resp = self.api().requests.get(url=url)
         assert resp.status_code == 400
         self.assertIn('error', resp.json())

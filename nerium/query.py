@@ -51,7 +51,7 @@ def get_result_set(query_name, **kwargs):
     """
     query = get_query(query_name)
     if not query:
-        query = object()
+        query = SimpleNamespace()
         query.error = f"No query found matching '{query_name}'"
         return query
     try:
