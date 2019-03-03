@@ -17,12 +17,12 @@ jobs:
 
     steps:
       - checkout
-      # Download and cache dependencies
+      # Download dependencies
       - run:
           name: install dependencies
           command: |
             pipenv install -d --pre
-            pipenv install starlette
+            # pipenv install starlette
       - run:
           name: run tests
           command:

@@ -55,7 +55,6 @@ class TestAPI(unittest.TestCase):
         resp = self.api().requests.get(url=url)
         assert resp.status_code == 200
         self.assertEqual(EXPECTED, resp.json()['data'])
-        # print(url, resp.json())
 
     def test_results_csv(self):
         url = f"/v1/{query_name}/csv"
