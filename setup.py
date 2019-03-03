@@ -125,8 +125,6 @@ setup(
         'Topic :: Database :: Front-Ends',
         'Topic :: Software Development :: Libraries',
         'Topic :: Utilities'
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Programming Language :: Python :: Implementation :: PyPy'
     ],
     # $ setup.py publish support.
     cmdclass={
