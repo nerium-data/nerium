@@ -6,7 +6,6 @@
 [![Codecov](https://img.shields.io/codecov/c/github/OAODEV/nerium.svg)](https://codecov.io/gh/OAODEV/nerium)
 [![PyPI - Version](https://img.shields.io/pypi/v/nerium.svg)](https://pypi.org/project/nerium/)
 [![PyPI - License](https://img.shields.io/pypi/l/nerium.svg)](https://pypi.org/project/nerium/)
-[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/OAODEV/nerium)
 
 A lightweight [Responder](https://python-responder.org/)-based microservice that submits queries to a database and returns machine-readable serialized results (typically JSON). By analogy with static site generators, Nerium reads its queries and serialization formats from local files, stored  on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them.
 
@@ -31,7 +30,7 @@ $ docker run -d --name=nerium \
 --envfile=.env \
 -v /local/path/to/query_files:/app/query_files \
 -v /local/path/to/format_files:/app/format_files \
--p 5000:5000 oaodev/nerium
+-p 5000:5000 tymxqo/nerium
 
 $ curl http://localhost:5000/v1/<query_name>?<params>
 ```
