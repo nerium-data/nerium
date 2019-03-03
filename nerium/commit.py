@@ -1,7 +1,7 @@
 import requests
 from requests.exceptions import ConnectionError
 
-from .version import __version__
+from nerium import __version__
 
 
 def get_commit_for_version(version=__version__):

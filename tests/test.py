@@ -35,7 +35,7 @@ class TestResults(unittest.TestCase):
 
     def test_results_expected(self):
         result = query.get_result_set(query_name)
-        self.assertEqual(result['result'], EXPECTED)
+        self.assertEqual(result.result, EXPECTED)
 
 
 class TestAPI(unittest.TestCase):
@@ -51,10 +51,11 @@ class TestAPI(unittest.TestCase):
         self.assertIn("commit", text)
 
     def test_get_query(self):
-        url = f"/v1/{query_name}"
+        url = "/v1/test"
         resp = self.api().requests.get(url=url)
         assert resp.status_code == 200
         self.assertEqual(EXPECTED, resp.json()['data'])
+        # print(url, resp.json())
 
     def test_results_csv(self):
         url = f"/v1/{query_name}/csv"
@@ -71,10 +72,10 @@ class TestAPI(unittest.TestCase):
             COMPACT_EXPECTED, resp.json())
 
     def test_error_response(self):
-        url = f"/v1/error_test"
+        url = "/v1/error_test"
         resp = self.api().requests.get(url=url)
         assert resp.status_code == 400
-        self.assertIn('error', resp.json().keys())
+        self.assertIn('error', resp.json())
 
 
 if __name__ == '__main__':

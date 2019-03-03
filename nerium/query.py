@@ -3,11 +3,11 @@ import os
 from datetime import datetime
 from importlib import import_module
 from pathlib import Path
+from types import SimpleNamespace
 
 import frontmatter
 import tablib
 from jinja2.sandbox import SandboxedEnvironment
-from munch import munchify
 from tablib.formats._json import date_handler
 
 # Walking the query_files dir to get all the queries in a single list
@@ -28,7 +28,7 @@ def get_query(query_name):
     with open(query_file) as f:
         metadata, query_body = frontmatter.parse(f.read())
     result_mod = query_file.suffix.strip('.')
-    query_obj = dict(
+    query_obj = SimpleNamespace(
         name=query_name,
         metadata=metadata,
         path=query_file,
@@ -36,7 +36,7 @@ def get_query(query_name):
         body=query_body,
         error=False,
         executed=datetime.utcnow().isoformat())
-    return munchify(query_obj)
+    return query_obj
 
 
 def process_template(sql, **kwargs):
@@ -45,12 +45,13 @@ def process_template(sql, **kwargs):
     return template.render(kwargs)
 
 
+# TODO: try this in python console
 def get_result_set(query_name, **kwargs):
     """ Call get_query, then submit query from file to resultset module
     """
     query = get_query(query_name)
     if not query:
-        query = munchify({})
+        query = object()
         query.error = f"No query found matching '{query_name}'"
         return query
     try:

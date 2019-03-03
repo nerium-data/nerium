@@ -1,8 +1,6 @@
 [run]
 source=nerium
-omit = 
-    nerium/contrib/resultset/jinja.py
-    nerium/lib.py
+omit=nerium/__version__.py
 
 [report]
 exclude_lines =
