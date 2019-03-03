@@ -36,9 +36,9 @@ async def base_route(req, resp):
 async def serve_query_result(req, resp, *, query_name, format_='default'):
     params = unwrap_querystring_lists(req.params)
     query_results = query.get_result_set(query_name, **params)
-    if query_results['error']:
+    if query_results.error:
         resp.status_code = 400
-        resp.media = dict(error=query_results['error'])
+        resp.media = dict(error=query_results.error)
     else:
         format_schema = formatter.get_format(format_)
         resp.media = format_schema.dump(query_results)
@@ -49,7 +49,7 @@ async def serve_csv_result(req, resp, *, query_name):
     params = unwrap_querystring_lists(req.params)
     query_results = query.results_to_csv(query_name, **params)
     resp.headers = {'content_type': 'text/csv'}
-    resp.text = query_results
+    resp.content = query_results
 
 
 def main():
