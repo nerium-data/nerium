@@ -56,7 +56,7 @@ class TestQueryResults(unittest.TestCase):
 class TestEndpointMessages(unittest.TestCase):
     def test_health_check(self):
         resp = api().requests.get(url='/v1')
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
         text = resp.text
         self.assertIn("ok", text)
         self.assertIn("commit", text)
@@ -64,19 +64,19 @@ class TestEndpointMessages(unittest.TestCase):
     def test_sql_error(self):
         url = "/v1/results/error_test"
         resp = api().requests.get(url=url)
-        assert resp.status_code == 400
+        self.assertEqual(resp.status_code, 400)
         self.assertIn('error', resp.json())
 
     def test_missing_query_error(self):
         url = '/v1/results/not_a_query'
         resp = api().requests.get(url=url)
-        assert resp.status_code == 404
+        self.assertEqual(resp.status_code, 404)
         self.assertIn('error', resp.json())
 
     def test_missing_report_error(self):
         url = '/v1/reports/not_a_query'
         resp = api().requests.get(url=url)
-        assert resp.status_code == 404
+        self.assertEqual(resp.status_code, 404)
         self.assertIn('error', resp.json())
 
 
@@ -84,7 +84,7 @@ class TestResultsEndpoint(unittest.TestCase):
     def test_get_query(self):
         url = f"/v1/results/{query_name}"
         resp = api().requests.get(url=url)
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
         self.assertEqual(EXPECTED, resp.json()['data'])
 
     def test_results_csv(self):
@@ -96,7 +96,7 @@ class TestResultsEndpoint(unittest.TestCase):
     def test_results_compact(self):
         url = f"/v1/results/{query_name}/compact"
         resp = api().requests.get(url=url)
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
         self.assertEqual(
             COMPACT_EXPECTED, resp.json())
 
@@ -105,13 +105,13 @@ class TestReportsEndpoint(unittest.TestCase):
     def test_reports_list(self):
         url = "/v1/reports/list"
         resp = api().requests.get(url=url)
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json(), {'reports': ['error_test', 'test']})
 
     def test_report_descr(self):
         url = f"/v1/reports/{query_name}"
         resp = api().requests.get(url=url)
-        assert resp.status_code == 200
+        self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json(), DESCR_EXPECTED)
 
 
