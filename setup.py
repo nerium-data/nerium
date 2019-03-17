@@ -19,7 +19,8 @@ VERSION = None
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'python-dotenv', 'python-frontmatter', 'pyyaml', 'records', 'responder'
+    'python-dotenv', 'python-frontmatter', 'pyyaml', 'records', 'responder',
+    'sqlparse'
 ]
 
 # What packages are optional?

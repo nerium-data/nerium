@@ -1,5 +1,5 @@
 FROM alpine:3.8
-LABEL maintainer='thomas.yager-madden@adops.com'
+LABEL maintainer='yagermadden@gmail.com'
 
 ENV PORT 5000
 # Install python3
