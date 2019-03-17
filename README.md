@@ -9,7 +9,7 @@
 
 A lightweight [Responder](https://python-responder.org/)-based microservice that submits queries to a database and returns machine-readable serialized results (typically JSON). By analogy with static site generators, Nerium reads its queries and serialization formats from local files, stored  on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them.
 
-OAO uses Nerium to easily and quickly provide JSON APIs with report results from our PostgreSQL data warehouse.
+Nerium provides a quick, simple, and easy way to develop JSON APIs for use in reporting and analytic applications.
 
 Nerium features an extendable architecture, allowing support for multiple query types and output formats.
 
@@ -19,7 +19,7 @@ In theory, other query types can be added (under `nerium/resultset`) for non-SQL
 
 Default JSON output represents `data` as an array of objects, one per result row, with database column names as keys. The default schema also provides top-level nodes for `name`, `metadata`, and `params` (details below). A `compact` JSON output format may also be requested, with separate `column` (array of column names) and `data` (array of row value arrays) nodes for compactness. Additional formats can be added by adding [marshmallow](https://marshmallow.readthedocs.io) schema definitions to `format_files`.
 
-Nerium supports any backend that SQLAlchemy can, but since none of these are hard dependencies, drivers aren't included in Pipfile, and the Dockerfile only supports PostgreSQL. If you want Nerium to work with other databases, you can install Python connectors with `pip`, either in a virtualenv or by creating your own Dockerfile using `FROM oaodev/nerium`. (To ease installation, options for `nerium[mysql]` and `nerium[pg]` are provided in `setup.py`)
+Nerium supports any backend that SQLAlchemy can, but since none of these are hard dependencies, drivers aren't included in Pipfile, and the Dockerfile only supports PostgreSQL. If you want Nerium to work with other databases, you can install Python connectors with `pip`, either in a virtualenv or by creating your own Dockerfile using `FROM tymxqo/nerium`. (To ease installation, options for `nerium[mysql]` and `nerium[pg]` are provided in `setup.py`)
 
 ## Install/Run
 
@@ -28,7 +28,7 @@ Nerium supports any backend that SQLAlchemy can, but since none of these are har
 ```bash
 $ docker run -d --name=nerium \
 --envfile=.env \
--v /local/path/to/query_files:/app/query_files \
+-v /local/path/to/query_files:/app/query_files 
 -v /local/path/to/format_files:/app/format_files \
 -p 5000:5000 tymxqo/nerium
 
@@ -69,6 +69,10 @@ As indicated above, queries are simply text files placed in local `query_files` 
 
 Note that Nerium loads the query files on server start; while adding additional query scripts does not require any code or config changes, the server needs to be restarted in order to use them.
 
+### Query parameters
+
+Use `:<param>` to specify bind parameters in your query text. These are given specific values in the URL query string by the results request.
+
 ### Front matter
 
 Query files can optionally include a [YAML](http://yaml.org/) front matter block. The front matter goes at the top of the file, set off by triple-dashed lines, as in this example:
@@ -82,7 +86,15 @@ select username from user;
 
 ```
 
-At present, the Nerium service doesn't do much with the front matter. As noted above, it can be used to specify a database connection for the query. For other keys, the default response format simply passes the keys and values along in a `metadata` object. (The `compact` formatter simply ignores the metadata.) This mechanism can theoretically be used to pass relevant information about the query along to any clients of the service: for example, the data types of the columns in the results or what have you. Possibilities include whatever a reporting service and front end developer want to coordinate on. Front matter could also be used in more detailed ways in formatters yet to be devised.
+Front matter can generally be thought of as a way to pass arbitrary key-value pairs to a front-end client; in the default format, the contents of front matter are returned under as a `metadata` object in the results response. (The `compact` formatter simply drops the metadata.) Possibilities include whatever a reporting service and front end developer want to coordinate on.
+
+There are a couple of special-case front matter items:
+
+1. As noted above, it can be used to specify a database connection for the query, overriding the main `DATABASE_URL` in the environment
+2. If the front matter includes a `params` block, its contents are returned as the `params` object in the `v1/reports/` discovery response.
+3. Similarly, front matter describing `columns` will populate that section of the `/reports/` response.
+
+In the absence of front matter, Nerium attempts to find column specifications and named parameters by inspecting the query text itself. Although it is more manual, front matter can provide greater detail in these sections — a report developer might specify the data type of a column or parameter, for example, in addition to its name.
 
 ### Jinja templating
 
@@ -117,53 +129,73 @@ For serialization formats besides the built-in default and `compact`, schema def
 
 A `resultset` module is expected to have a `result` method that takes a `query` object and optional keyword argument (`kwargs`) dictionary, connects to a data source, and returns tabular results as a serializable Python structure (most typically a list of dictionaries).
 
-A Nerium `query` object is a [munchified](https://github.com/Infinidat/munch) dictionary, with elements found in [`get_query()`](nerium/query.py#L29).
+A Nerium `query` object is a [`SimpleNamespace`](https://docs.python.org/3/library/types.html?highlight=types#types.SimpleNamespace), with elements found in [`get_query()`](nerium/query.py#L29).
 
 Query files to be passed to this module should be named with a file extension that matches the module name (for example, `foo.sql` will be handed to the `resultset/sql.py` module).
 
 ## API
 
-### URLs
+### Report listing endpoint
 
-- `/v1/<string:query_name>?<query_params>`  
-- `/v1/<string:query_name>/<string:format>?<query_params>`
+#### URLs
 
-`query_name` should match the name of a given query script file, minus the file extension. URL querystring parameters are passed to the invoked data source query, matched to any keys specified in the query file. If any parameters expected by the query are missing, an error will be returned. Extra/unrecognized parameters are silently ignored (this might seem surprising, but it's standard SQLAlchemy behavior for parameter substitution).
+- `/v1/reports`
+- `/v1/reports/list` - these are both equivalent; the `list` is optional
 
-`format` path may be included as an optional formatter name, and defaults to 'default'. Other supported `formatter` options are described in Content section below.
-
-Unknown values passed to `query_extension` or `format` will silently fall back to defaults.
-
-### Method
+#### Method
 
 `GET`
 
-### Success Response
+#### Success Response
+
+**Code**: 200
+
+**Content**: `{"reports": [<an array of report names>]}`
+
+### Report description endpoints
+
+#### URLs
+
+- `/v1/reports/{string:query_name}`
+
+#### Method
+
+`GET`
+
+#### Success Response
+
+`{"columns":[<list of columns from report>],"error":false,"metadata":{<report: metadata object>},"name":"<query_name>","params":[<array of parameterized keys in query>],"type":"sql"}`
+
+### Results endpoints
+
+#### URLs
+
+- `/v1/results/<string:query_name>?<query_params>`  
+- `/v1/results/<string:query_name>/<string:format>?<query_params>`
+
+`query_name` should match the name of a given query script file, minus the file extension. URL querystring parameters are passed to the invoked data source query, matched to any parameter keys specified in the query file. If any parameters expected by the query are missing, an error will be returned. Extra/unrecognized parameters are silently ignored (this might seem surprising, but it's standard SQLAlchemy behavior for parameter substitution).
+
+`format` path may be included as an optional formatter name, and defaults to 'default'. Other supported `formatter` options are described in Content section below.
+
+Unknown values of `format` will silently fall back to default.
+
+#### Method
+
+`GET`
+
+#### Success Response
 
 **Code**: 200
 
 **Content**:  
 
 'default': `{"name": "<query_name>", "data": [{<column_name>:<row_value>, etc..., }, {etc...}, ], "metadata": {<key>: <value>, etc..., }, "params": {<array of name-value pairs submitted to query with request>}}`  
-'compact': `{"columns": [<list of column names>], "data": [<array of row value arrays>]}`  
+'compact': `{"columns": [<list of column names>], "data": [<array of row value arrays>]}`
+'csv': `<csv formatted string (with \r\n newline)>`
   
 Of course, it is possible that a database query might return no results. In this case, Nerium will respond with an empty JSON array `[]` regardless of specified format. This is not considered an error, and clients should be prepared to handle it appropriately.
 
-- `/v1/<string:query_name>/csv`
-
-### Method
-
-`GET`
-
-### Success Response
-
-**Code**: 200  
-
-**Content**:
-
-`<csv formatted string (with \r\n newline)>`
-
-### Error Responses
+#### Error Responses
 
 **Code**: 400
 
@@ -173,9 +205,9 @@ Of course, it is possible that a database query might return no results. In this
 
 (in no particular order)
 
-- More detailed documentation, especially about usage
-- Parameter discovery endpoint
-- Report listing endpoint
+- ~~More detailed documentation, especially about usage~~
+- ~~Parameter discovery endpoint~~
+- ~~Report listing endpoint~~
 - ~~Dynamic filtering~~
 - ~~Improve/mature plugin architecture~~
   - ~~Separate base classes to a library~~

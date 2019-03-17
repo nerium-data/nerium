@@ -8,7 +8,7 @@ from types import SimpleNamespace
 import frontmatter
 import tablib
 from jinja2.sandbox import SandboxedEnvironment
-from tablib.formats._json import date_handler
+from tablib.formats._json import serialize_objects_handler as handler
 
 # Walking the query_files dir to get all the queries in a single list
 # NOTE: this means query names should be unique across subdirectories,
@@ -53,6 +53,7 @@ def get_result_set(query_name, **kwargs):
     if not query:
         query = SimpleNamespace()
         query.error = f"No query found matching '{query_name}'"
+        query.status_code = 404
         return query
     try:
         result_mod = import_module(
@@ -64,10 +65,11 @@ def get_result_set(query_name, **kwargs):
     result = result_mod.result(query, **query.params)
     # Dumping and reloading via json here gets us datetime and decimal
     # serialization handling courtesy of `tablib`
-    query.result = json.loads(json.dumps(result, default=date_handler))
+    query.result = json.loads(json.dumps(result, default=handler))
     try:
         if 'error' in query.result[0].keys():
             query.error = query.result[0]['error']
+            query.status_code = 400
     except IndexError:
         pass
     return query

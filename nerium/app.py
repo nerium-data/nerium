@@ -2,7 +2,7 @@ from pathlib import Path
 
 import responder
 from dotenv import load_dotenv
-from nerium import __version__, commit, formatter, query
+from nerium import __version__, commit, discovery, formatter, query
 from nerium.utils import unwrap_querystring_lists
 
 # Provision environment as needed
@@ -31,20 +31,36 @@ async def base_route(req, resp):
     resp.media = {"status": "ok", "version": __version__, "commit": commit}
 
 
-@api.route("/v1/{query_name}")
-@api.route("/v1/{query_name}/{format_}")
+@api.route("/v1/reports")
+@api.route("/v1/reports/list")
+async def serve_report_list(req, resp):
+    resp.media = discovery.list_reports()
+
+
+@api.route("/v1/reports/{query_name}")
+async def serve_report_description(req, resp, query_name):
+    report_descr = discovery.describe_report(query_name)
+    if report_descr.error:
+        resp.status_code = report_descr.status_code or 400
+        resp.media = dict(error=report_descr.error)
+    else:
+        resp.media = vars(report_descr)
+
+
+@api.route("/v1/results/{query_name}")
+@api.route("/v1/results/{query_name}/{format_}")
 async def serve_query_result(req, resp, *, query_name, format_='default'):
     params = unwrap_querystring_lists(req.params)
     query_results = query.get_result_set(query_name, **params)
     if query_results.error:
-        resp.status_code = 400
+        resp.status_code = query_results.status_code or 400
         resp.media = dict(error=query_results.error)
     else:
         format_schema = formatter.get_format(format_)
         resp.media = format_schema.dump(query_results)
 
 
-@api.route("/v1/{query_name}/csv")
+@api.route("/v1/results/{query_name}/csv")
 async def serve_csv_result(req, resp, *, query_name):
     params = unwrap_querystring_lists(req.params)
     query_results = query.results_to_csv(query_name, **params)
