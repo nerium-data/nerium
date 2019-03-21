@@ -19,15 +19,18 @@ FLAT_QUERIES = list(Path(os.getenv('QUERY_PATH', 'query_files')).glob('**/*'))
 def get_query(query_name):
     """Find file matching query_name, read and return query object
     """
+    # TODO: Sort out the multiple functions here, refactor to smaller/purer
     query_file_match = list(
         filter(lambda i: query_name == i.stem, FLAT_QUERIES))
     if not query_file_match:
         return None
     # TODO: Log warning if more than one match
+    #       Maybe include warning in response error attr
     query_file = query_file_match[0]
     with open(query_file) as f:
         metadata, query_body = frontmatter.parse(f.read())
     result_mod = query_file.suffix.strip('.')
+    # TODO: Use @dataclass here instead
     query_obj = SimpleNamespace(
         name=query_name,
         metadata=metadata,
@@ -49,6 +52,7 @@ def process_template(sql, **kwargs):
 def get_result_set(query_name, **kwargs):
     """ Call get_query, then submit query from file to resultset module
     """
+    # TODO: Can this be broken up as well?
     query = get_query(query_name)
     if not query:
         query = SimpleNamespace()
