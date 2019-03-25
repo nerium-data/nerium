@@ -14,7 +14,9 @@ def connection(query):
 
 def result(query, **kwargs):
     try:
-        rows = connection(query).query(query.body, **kwargs)
+        db = connection(query)
+        sql = query.body
+        rows = db.query(sql, **kwargs)
         rows = rows.as_dict()
     except Exception as e:
         rows = [{'error': repr(e)}, ]  # yapf: disable

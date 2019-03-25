@@ -60,8 +60,9 @@ def get_result_set(query_name, **kwargs):
         query.status_code = 404
         return query
     try:
+        # TODO: Make this able to accept plugins from elsewhere
         result_mod = import_module(
-            f'nerium.contrib.resultset.{query.result_mod}')
+            f'nerium.resultset.{query.result_mod}')
     except ModuleNotFoundError:
         result_mod = import_module('nerium.resultset.sql')
     query.params = {**kwargs}
@@ -82,6 +83,7 @@ def get_result_set(query_name, **kwargs):
 def results_to_csv(query_name, **kwargs):
     """ Generate CSV from result data
     """
+    # TODO: separate module for this
     query = get_result_set(query_name, **kwargs)
     result = query.result
     columns = list(result[0].keys())

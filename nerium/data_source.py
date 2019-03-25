@@ -17,6 +17,8 @@ def get_data_source(query):
     """
     # *** GET CONNECTION PARAMS: ***
     # from frontmatter
+    # TODO: try `database_url` key first, return as string if present
+    # TODO: factor out try/except block
     try:
         return query.metadata['data_source']
     except KeyError:
