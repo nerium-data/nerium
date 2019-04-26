@@ -17,13 +17,11 @@ AUTHOR = 'Thomas Yager-Madden'
 REQUIRES_PYTHON = '>=3.6.0'
 VERSION = None
 
-# What packages are required for this module to be executed?
 REQUIRED = [
     'python-dotenv', 'python-frontmatter', 'pyyaml', 'records', 'responder',
     'sqlparse'
 ]
 
-# What packages are optional?
 EXTRAS = {
     'mysql': ['PyMySQL'],
     'pg': ['psycopg2'],
@@ -112,8 +110,6 @@ setup(
     include_package_data=True,
     license='Apache License, Version 2.0',
     classifiers=[
-        # Trove classifiers
-        # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Environment :: Web Environment',
