@@ -7,22 +7,23 @@ from nerium.utils import unwrap_querystring_lists
 
 # Provision environment as needed
 # Load local .env first
-load_dotenv(Path.cwd() / '.env')
+load_dotenv(Path.cwd() / ".env")
 # Load this one for use w/ Kubernetes secret mount
-load_dotenv('/dotenv/.env')
+load_dotenv("/dotenv/.env")
 
 api = responder.API(
     cors=True,
     cors_params={
-        'allow_credentials': True,
-        'expose_headers': ["*"],
-        'allow_headers': ["*"],
-        'allow_methods': ["*"]
+        "allow_credentials": True,
+        "expose_headers": ["*"],
+        "allow_headers": ["*"],
+        "allow_methods": ["*"],
     },
-    title='Nerium',
-    version='1.0',
-    openapi='3.0.0',
-    docs_route="/docs")
+    title="Nerium",
+    version="1.0",
+    openapi="3.0.0",
+    docs_route="/docs",
+)
 
 
 @api.route("/")
@@ -49,7 +50,7 @@ async def serve_report_description(req, resp, query_name):
 
 @api.route("/v1/results/{query_name}")
 @api.route("/v1/results/{query_name}/{format_}")
-async def serve_query_result(req, resp, *, query_name, format_='default'):
+async def serve_query_result(req, resp, *, query_name, format_="default"):
     params = unwrap_querystring_lists(req.params)
     query_results = query.get_result_set(query_name, **params)
     if query_results.error:
@@ -64,7 +65,7 @@ async def serve_query_result(req, resp, *, query_name, format_='default'):
 async def serve_csv_result(req, resp, *, query_name):
     params = unwrap_querystring_lists(req.params)
     query_results = query.results_to_csv(query_name, **params)
-    resp.headers = {'content_type': 'text/csv'}
+    resp.headers = {"content_type": "text/csv"}
     resp.content = query_results
 
 

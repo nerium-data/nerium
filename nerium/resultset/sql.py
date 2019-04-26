@@ -7,7 +7,7 @@ from nerium import data_source
 
 
 def connection(query):
-    db_url = data_source.get_data_source(query)['url']
+    db_url = data_source.get_data_source(query)["url"]
     db = records.Database(db_url)
     return db
 
@@ -19,5 +19,5 @@ def result(query, **kwargs):
         rows = db.query(sql, **kwargs)
         rows = rows.as_dict()
     except Exception as e:
-        rows = [{'error': repr(e)}, ]  # yapf: disable
+        rows = [{"error": repr(e)}]
     return rows
