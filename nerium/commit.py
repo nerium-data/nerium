@@ -1,22 +1,21 @@
 import requests
-from requests.exceptions import ConnectionError
-
 from nerium import __version__
+from requests.exceptions import ConnectionError
 
 
 def get_commit_for_version(version=__version__):
-    v = f'v{version}'
+    v = f"v{version}"
 
     try:
-        resp = requests.get('https://api.github.com/repos/OAODEV/nerium/tags')
+        resp = requests.get("https://api.github.com/repos/OAODEV/nerium/tags")
         tags = resp.json()
-        vtag = list(filter(lambda t: v == t['name'], tags))
+        vtag = list(filter(lambda t: v == t["name"], tags))
         vtag = vtag[0]
-        commit_url = vtag['commit']['url']
+        commit_url = vtag["commit"]["url"]
         resp = requests.get(commit_url)
-        commit = resp.json()['url']
+        commit = resp.json()["url"]
     except (IndexError, KeyError, TypeError, ConnectionError, ValueError):
-        commit = 'Not found'
+        commit = "Not found"
     return commit
 
 

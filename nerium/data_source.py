@@ -17,27 +17,28 @@ def get_data_source(query):
     """
     # *** GET CONNECTION PARAMS: ***
     # from frontmatter
+    # TODO: try `database_url` key first, return as string if present
+    # TODO: factor out try/except block
     try:
-        return query.metadata['data_source']
+        return query.metadata["data_source"]
     except KeyError:
         try:
-            return dict(url=query.metadata['database_url'])
+            return dict(url=query.metadata["database_url"])
         except KeyError:
             pass
 
     # from file in directory if present
-    db_file = query.path.parent / 'db.yaml'
+    db_file = query.path.parent / "db.yaml"
     if db_file.is_file():
-        with open(db_file, 'r') as dbf:
+        with open(db_file, "r") as dbf:
             db_meta = yaml.safe_load(dbf.read())
             try:
-                return db_meta['data_source']
+                return db_meta["data_source"]
             except KeyError:
                 try:
-                    return dict(url=db_meta['database_url'])
+                    return dict(url=db_meta["database_url"])
                 except KeyError:
                     pass
 
     # Use env['DATABASE_URL']/sqlite if nothing else is configured
-    return dict(
-        url=os.getenv('DATABASE_URL', 'sqlite:///'))
+    return dict(url=os.getenv("DATABASE_URL", "sqlite:///"))
