@@ -1,16 +1,19 @@
+import os
 import re
+from pathlib import Path
 from types import SimpleNamespace
 
-from nerium.query import FLAT_QUERIES, get_query
+from nerium.query import parse_query_file
 from sqlparse import parse
 from sqlparse.sql import IdentifierList, Identifier
 
 
 def list_reports():
+    flat_queries = list(Path(os.getenv("QUERY_PATH", "query_files")).glob("**/*"))
     """Return list of available report names from query dir
     """
     # Filter out docs and metadata
-    query_paths = list(filter(lambda i: i.suffix not in [".md", ".yaml"], FLAT_QUERIES))
+    query_paths = list(filter(lambda i: i.suffix not in [".md", ".yaml"], flat_queries))
     query_names = [i.stem for i in query_paths]
     query_names.sort()
     reports = dict(reports=query_names)
@@ -31,7 +34,7 @@ def columns_from_body(query):
     """Parse columns from SELECT statement
     """
     columns = []
-    if query.result_mod != "sql":
+    if query.result_module != "sql":
         columns = None
     parsed_query = parse(query.body)[0]
     for tkn in parsed_query.tokens:
@@ -58,7 +61,7 @@ def params_from_body(query):
 
 
 def get_report_query(query_name):
-    query = get_query(query_name)
+    query = parse_query_file(query_name)
     if not query:
         query = SimpleNamespace()
         query.error = f"No query found matching '{query_name}'"
@@ -75,7 +78,7 @@ def describe_report(query_name):
     report_description = SimpleNamespace(
         error=report_query.error,
         name=report_query.name,
-        type=report_query.result_mod,
+        type=report_query.result_module,
         columns=columns,
         params=params,
         metadata=report_query.metadata,

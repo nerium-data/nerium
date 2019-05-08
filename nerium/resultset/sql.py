@@ -3,11 +3,11 @@
 to fetch a dataset from configured query_name
 """
 import records
-from nerium import data_source
+from nerium.data_source import get_data_source
 
 
 def connection(query):
-    db_url = data_source.get_data_source(query)["url"]
+    db_url = get_data_source(query)["url"]
     db = records.Database(db_url)
     return db
 

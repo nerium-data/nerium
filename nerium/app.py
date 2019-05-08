@@ -5,7 +5,7 @@ from pathlib import Path
 
 import responder
 from dotenv import load_dotenv
-from nerium import __version__, commit, discovery, formatter, query
+from nerium import __version__, commit, csv, discovery, formatter, query
 from nerium.utils import unwrap_querystring_lists
 
 # Provision environment as needed
@@ -67,7 +67,7 @@ async def serve_query_result(req, resp, *, query_name, format_="default"):
 @api.route("/v1/results/{query_name}/csv")
 async def serve_csv_result(req, resp, *, query_name):
     params = unwrap_querystring_lists(req.params)
-    query_results = query.results_to_csv(query_name, **params)
+    query_results = csv.results_to_csv(query_name, **params)
     resp.headers = {"content_type": "text/csv"}
     resp.content = query_results
 
