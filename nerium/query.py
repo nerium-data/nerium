@@ -13,7 +13,7 @@ from tablib.formats._json import serialize_objects_handler as handler
 def query_file(query_name):
     """Find file matching query_name and return Path object
     """
-    flat_queries = list(Path(os.getenv("QUERY_PTH", "query_files")).glob("**/*"))
+    flat_queries = list(Path(os.getenv("QUERY_PATH", "query_files")).glob("**/*"))
     query_file = None
     query_file_match = list(filter(lambda i: query_name == i.stem, flat_queries))
     if query_file_match:
