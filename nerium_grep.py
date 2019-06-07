@@ -1,5 +1,6 @@
 import re
 from pathlib import Path
+
 # from types import SimpleNamespace
 
 from nerium import query
@@ -15,7 +16,7 @@ def result(query, **kwargs):
 
 
 if __name__ == "__main__":
-    query = query.parse_query_file('mock.grep')
+    query = query.parse_query_file("mock.grep")
     r = result(query)
     for i in r:
         print(i)

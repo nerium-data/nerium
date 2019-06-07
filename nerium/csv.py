@@ -15,6 +15,6 @@ def results_to_csv(query_name, **kwargs):
     else:
         data = [tuple(row.split(",")) for row in result]
     for row in data:
-        frame.append(row)    
+        frame.append(row)
     csv = frame.export("csv")
     return csv

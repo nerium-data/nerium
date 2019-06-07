@@ -106,10 +106,9 @@ def get_result_set(query_name, **kwargs):
     # TODO: tablib handler breaks on interval type; let's make our own handler
     query.result = json.loads(json.dumps(result, default=handler))
 
-    # Set query.error in case of query excecption
-    try:
+    # Set query.error in case result_module captures an excecption
+    if isinstance(query.result[0], dict) and "error" in query.result[0].keys():
         query.error = query.result[0]["error"]
-    except (IndexError, KeyError, TypeError):
-        pass
+        query.status_code = 400
 
     return query
