@@ -57,7 +57,7 @@ async def serve_query_result(req, resp, *, query_name, format_="default"):
     params = unwrap_querystring_lists(req.params)
     query_results = query.get_result_set(query_name, **params)
     if query_results.error:
-        resp.status_code = query_results.status_code or 400
+        resp.status_code = getattr(query_results, "status_code", 400)
         resp.media = dict(error=query_results.error)
     else:
         format_schema = formatter.get_format(format_)

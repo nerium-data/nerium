@@ -34,14 +34,13 @@ def columns_from_body(query):
     """Parse columns from SELECT statement
     """
     columns = []
-    if query.result_module != "sql":
-        columns = None
-    parsed_query = parse(query.body)[0]
-    for tkn in parsed_query.tokens:
-        if isinstance(tkn, IdentifierList):
-            for id_ in tkn:
-                if isinstance(id_, Identifier):
-                    columns.append(id_.get_name())
+    if query.result_module == "sql":
+        parsed_query = parse(query.body)[0]
+        for tkn in parsed_query.tokens:
+            if isinstance(tkn, IdentifierList):
+                for id_ in tkn:
+                    if isinstance(id_, Identifier):
+                        columns.append(id_.get_name())
     if not columns:
         columns = "unknown"
     return columns
