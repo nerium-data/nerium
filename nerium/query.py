@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 import frontmatter
 from jinja2.sandbox import SandboxedEnvironment
-from tablib.formats._json import serialize_objects_handler as handler
+from nerium.serialize import serialize
 
 
 def query_file(query_name):
@@ -99,12 +99,11 @@ def get_result_set(query_name, **kwargs):
 
     result_module = assign_module(query.result_module)
     query.body = process_template(body=query.body, **kwargs)
-    result = result_module.result(query, **kwargs)
+    _result = result_module.result(query, **kwargs)
 
-    # Dumping and reloading via json here gets us datetime and decimal
-    # serialization handling courtesy of `tablib`
-    # TODO: tablib handler breaks on interval type; let's make our own handler
-    query.result = json.loads(json.dumps(result, default=handler))
+    # coerce result values to serializable
+    # TODO: this should really be json.dumps encoder function for app
+    query.result = [{k: serialize(v) for (k, v) in i.items()} for i in _result]
 
     # Set query.error in case result_module captures an excecption
     if isinstance(query.result[0], dict) and "error" in query.result[0].keys():

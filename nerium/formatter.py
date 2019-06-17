@@ -20,3 +20,6 @@ def get_format(format_):
             format_mod = import_module("nerium.schema.default")
     schema = format_mod.ResultSchema()
     return schema
+
+
+# TODO: dump from format schema here(?)

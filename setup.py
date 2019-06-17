@@ -21,8 +21,8 @@ REQUIRED = [
     "python-dotenv",
     "python-frontmatter",
     "pyyaml",
-    "records",
     "responder",
+    "sqlalchemy",
     "sqlparse",
 ]
 
