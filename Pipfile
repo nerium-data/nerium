@@ -9,9 +9,9 @@ nerium = {editable = true,path = "."}
 [dev-packages]
 coverage = "*"
 psycopg2-binary = "*"
+pytest = "*"
+pytest-cov = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"
-
-[pipenv]
-allow_prereleases = true

@@ -21,8 +21,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            pipenv install -d --pre
-            # pipenv install starlette
+            pipenv install -d
       - run:
           name: run tests
           command:

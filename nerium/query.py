@@ -1,4 +1,3 @@
-import json
 import os
 from datetime import datetime
 from importlib import import_module
@@ -7,7 +6,6 @@ from types import SimpleNamespace
 
 import frontmatter
 from jinja2.sandbox import SandboxedEnvironment
-from nerium.serialize import serialize
 
 
 def query_file(query_name):
@@ -36,10 +34,10 @@ def parse_query_file(query_name):
             metadata, query_body = frontmatter.parse(f.read())
             result_module = query_path.suffix.strip(".")
 
-            query_obj.metadata = metadata
-            query_obj.path = query_path
-            query_obj.result_module = result_module
-            query_obj.body = query_body
+        query_obj.metadata = metadata
+        query_obj.path = query_path
+        query_obj.result_module = result_module
+        query_obj.body = query_body
 
     except (FileNotFoundError, TypeError):
         query_obj.error = f"No query found matching '{query_name}'"
@@ -101,10 +99,7 @@ def get_result_set(query_name, **kwargs):
     query.body = process_template(body=query.body, **kwargs)
     _result = result_module.result(query, **kwargs)
 
-    # coerce result values to serializable
-    # TODO: this should really be json.dumps encoder function for app
-    query.result = [{k: serialize(v) for (k, v) in i.items()} for i in _result]
-
+    query.result = _result
     # Set query.error in case result_module captures an excecption
     if isinstance(query.result[0], dict) and "error" in query.result[0].keys():
         query.error = query.result[0]["error"]

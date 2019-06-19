@@ -7,12 +7,8 @@ def get_data_source(query):
         - DATABASE_URL in environment
     """
     # from frontmatter
-    # TODO: try `database_url` key first, return as string if present
-    # TODO: factor out try/except block
-    try:
+    if "database_url" in query.metadata.keys():
         return query.metadata["database_url"]
-    except KeyError:
-        pass
 
-    # Use env['DATABASE_URL']/sqlite if not set in frontmatter
+    # Default to $DATABASE_URL with sqlite fallback if not set in frontmatter
     return os.getenv("DATABASE_URL", "sqlite:///")

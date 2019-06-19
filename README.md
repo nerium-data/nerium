@@ -7,15 +7,15 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/nerium.svg)](https://pypi.org/project/nerium/)
 [![PyPI - License](https://img.shields.io/pypi/l/nerium.svg)](https://pypi.org/project/nerium/)
 
-A lightweight [Responder](https://python-responder.org/)-based microservice that submits queries to a database and returns machine-readable serialized results (typically JSON). By analogy with static site generators, Nerium reads its queries and serialization formats from local files, stored  on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them.
+A lightweight [Flask](http://flask.pocoo.org/)-based microservice that submits queries to a database and returns machine-readable serialized results (typically JSON). By analogy with static site generators, Nerium reads its queries and serialization formats from local files, stored  on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them.
 
 Nerium provides a quick, simple, and easy way to develop JSON APIs for use in reporting and analytic applications.
 
 Nerium features an extendable architecture, allowing support for multiple query types and output formats.
 
-Currently supports SQL queries using the excellent [Records](https://github.com/kennethreitz/records) library. In keeping with Records usage, query parameters can be specified in `key=value` format, and (_safely_!) injected into your query in `:key` format.
+Currently supports SQL queries using the fine [SQLAlchemy](https://www.sqlalchemy.org/) library. In keeping with SQLAlchemy usage, query parameters can be specified in `key=value` format, and (_safely_!) injected into your query in `:key` format.
 
-In theory, other query types can be added (under `nerium/resultset`) for non-SQL query languages. This is a promising area for future development.
+Other query types can be added as plugins, for non-SQL query languages. (Documentation on plugins forthcoming. See [nerium.query.plugin_module](nerium/query.py#L60-L78) in the meantime.)
 
 Default JSON output represents `data` as an array of objects, one per result row, with database column names as keys. The default schema also provides top-level nodes for `name`, `metadata`, and `params` (details below). A `compact` JSON output format may also be requested, with separate `column` (array of column names) and `data` (array of row value arrays) nodes for compactness. Additional formats can be added by adding [marshmallow](https://marshmallow.readthedocs.io) schema definitions to `format_files`.
 
@@ -35,37 +35,33 @@ $ docker run -d --name=nerium \
 $ curl http://localhost:5000/v1/<query_name>?<params>
 ```
 
+You might also want to use `tymxqo/nerium` as a base image for your own custom container, in order to add different database drivers, etc. Or you can build locally from the included Dockerfile. The base image includes `psycopg2` PostgreSQL adapter, along with `gunicorn` WSGI server for a production-ready service.
+
 ### Local install
 
 ```bash
-pipenv install nerium[pg] --pre
+pipenv install nerium[pg]
 ```
 
-Then add a `query_files` (and, optionally, `format_files`) directory to your project, write your queries, and configure the app as described in the next section. The command `nerium` starts a local `uvicorn` server running the app, listening on port 5042.
+Then add a `query_files` (and, optionally, `format_files`) directory to your project, write your queries, and configure the app as described in the next section. The command `FLASK_APP=nerium/app.py` starts a local development server running the app, listening on port 5000. For production use, you will want to add a proper WSGI server (we like `gunicorn`).
 
 ## Configuration
 
 `DATABASE_URL` for query connections must be set in the environment (or in a local `.env` file). This is the simplest configuration option.
 
-Because the web service uses Responder, it will also respect `PORT` if set in the environment.
-
 ### Script file paths
 
-By default, Nerium looks for query and format schema files in `query_files` and `format_files` respectively, in the current working directory from which the service is launched. `QUERY_PATH` and `FORMAT_PATH` environment variables can optionally be set in order to use files from other locations on the filesystem.
+By default, Nerium looks for query and format schema files in `query_files` and `format_files` respectively, in the current working directory from which the service is launched. `QUERY_PATH` and `FORMAT_PATH` environment variables can optionally be set in order to use files from other locations on the filesystem, as desired.
 
-### Data Sources
+### Multiple Data Sources
 
-If you want to query multiple databases from a single Nerium installation, any individual query file can define its own `database_url` as a key in YAML front matter (see below).
-
-Alternatively, to handle multiple files with the same connection, create a subdirectory for each database under the `$QUERY_PATH`, place the related files under their respective directory, and include a separate `db.yaml` file per subdirectory, which defines the `database_url` key.
-
-_NOTE_: A `database_url` setting in front matter of a particular file will override subdirectory-level `db.yaml` setting as well as `DATABASE_URL` in the environment.
+If you want to query multiple databases from a single Nerium installation, any individual query file can define its own `database_url` as a key in YAML front matter (see below). This will override the `$DATABASE_URL` setting in the environment for that query only. If you have a large number of queries across several databases, keep in mind that running a separate Nerium instance for each database is always an option.
 
 ## Usage
 
 ## Query files
 
-As indicated above, queries are simply text files placed in local `query_files` directory, or another arbitrary filesystem location specified by `QUERY_PATH` in the environment. The base name of the file (`stem` in Python `pathlib` parlance) will determine the `{query_name}` portion of the matching API endpoint; the file extension (or `suffix`) maps to the query type (literally the name of the `nerium.resultset` module that will handle the query).
+As indicated above, queries are simply text files placed in a local `query_files` directory, or another arbitrary filesystem location specified by `QUERY_PATH` in the environment. The base name of the file (`stem` in Python `pathlib` parlance) will determine the `{query_name}` portion of the matching API endpoint; the file extension (or `suffix`) maps to the query type (literally the name of the `nerium.resultset` module that will handle the query).
 
 Note that Nerium loads the query files on server start; while adding additional query scripts does not require any code or config changes, the server needs to be restarted in order to use them.
 
@@ -115,7 +111,7 @@ Jinja filters and other logic can be applied to inputs, as well.
 ---
 ***WARNING!***
 
-The Jinja template is rendered in a `SandboxedEnvironment`, which should protect against [server-side template injection](https://portswigger.net/blog/server-side-template-injection) and most [SQL injection](https://en.wikipedia.org/wiki/SQL_injection) tactics. It should not be considered perfectly safe, however. Use this feature sparingly, stick with SQLAlchemy-style `:key` named parameters for bind value substitutions, and test your specific queries carefully. It should almost go without saying that database permission grants to the user Nerium connects as should be well-restricted, whether one is using Jinja syntax or not.
+The Jinja template is rendered in a `SandboxedEnvironment`, which should protect against [server-side template injection](https://portswigger.net/blog/server-side-template-injection) and most [SQL injection](https://en.wikipedia.org/wiki/SQL_injection) tactics. It should not be considered perfectly safe, however. Use this feature sparingly; stick with SQLAlchemy-style `:key` named parameters for bind value substitutions, and test your specific queries carefully. It should almost go without saying that database permission grants to the user Nerium connects as should be well-restricted, whether one is using Jinja syntax or not.
 
 One known dangerous case is if your entire query file just does a Jinja variable expansion and nothing else: `{{ my_whole_query }}`. *This will allow execution of arbitrary SQL and you should **never** make a template like this available.*
 
@@ -200,21 +196,3 @@ Of course, it is possible that a database query might return no results. In this
 **Code**: 400
 
 **Content**: `{"error": <exception.repr from Python>}`
-
-## Sketchy Roadmap/TODOs
-
-(in no particular order)
-
-- ~~More detailed documentation, especially about usage~~
-- ~~Parameter discovery endpoint~~
-- ~~Report listing endpoint~~
-- ~~Dynamic filtering~~
-- ~~Improve/mature plugin architecture~~
-  - ~~Separate base classes to a library~~
-  - ~~Implementation subclasses in `contrib` package~~
-  - ~~Refactor plugin approach to use modules with an interface standard, instead of abstract class inheritance~~
-- ~~Configurable/flexible JSON output formatters (`AffixFormatter` could do with less hard-coding)~~ [Implemented via marshmallow schemas]
-- Static output file generator (and other caching)
-- Swagger docs
-- ~~Health check/default query endpoint~~ ~~(Own git commit hash report(?))~~
-- ~~Convert app.py to [Responder](https://python-responder.org)~~

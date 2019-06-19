@@ -18,10 +18,12 @@ REQUIRES_PYTHON = ">=3.6.0"
 VERSION = None
 
 REQUIRED = [
+    "flask",
+    "marshmallow",
     "python-dotenv",
     "python-frontmatter",
     "pyyaml",
-    "responder",
+    "requests",
     "sqlalchemy",
     "sqlparse",
 ]
@@ -34,7 +36,6 @@ EXTRAS = {"mysql": ["PyMySQL"], "pg": ["psycopg2"]}
 here = os.path.abspath(os.path.dirname(__file__))
 
 # Import the README and use it as the long-description.
-# Note: this will only work if 'README.md' is present in your MANIFEST.in file!
 try:
     with io.open(os.path.join(here, "README.md"), encoding="utf-8") as f:
         long_description = "\n" + f.read()
@@ -88,7 +89,7 @@ class UploadCommand(Command):
         sys.exit()
 
 
-# Where the magic happens:
+# Apply above config values to actual setup
 setup(
     name=NAME,
     version=about["__version__"],
@@ -101,15 +102,13 @@ setup(
     url=URL,
     packages=find_packages(exclude=("tests",)),
     test_suite="tests",
-    # TODO: A more sophisticated runserver CLI
-    entry_points={"console_scripts": ["nerium = nerium.app:main"]},
     install_requires=REQUIRED,
     extras_require=EXTRAS,
+    setup_requires=["pytest-runner"],
+    tests_require=["pytest"],
     include_package_data=True,
     license="Apache License, Version 2.0",
     classifiers=[
-        # Trove classifiers
-        # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Environment :: Web Environment",

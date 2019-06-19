@@ -1,4 +1,4 @@
-def unwrap_querystring_lists(obj):
+def convert_multidict(obj):
     """Convert responder querystring params, pulling values out of list
     if there's only one.
     """

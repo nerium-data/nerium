@@ -16,3 +16,8 @@ def results_to_csv(query_name, **kwargs):
         dw.writerow(row)
     csv = stream.getvalue()
     return csv
+
+
+if __name__ == "__main__":
+    x = results_to_csv("test", greeting="yo")
+    print(x)
