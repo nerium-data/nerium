@@ -7,6 +7,8 @@ import pytest
 from nerium import query
 from nerium.app import app
 
+# from _pytest.fixtures import monkeypatch
+
 # Fixtures
 EXPECTED = [
     {
@@ -48,6 +50,12 @@ def client():
     app.config["TESTING"] = True
     client = app.test_client()
     yield client
+
+
+@pytest.fixture
+def test_dir(monkeypatch):
+    test_path = Path(__file__).resolve().parent
+    monkeypatch.syspath_prepend(test_path)
 
 
 def test_results_expected():
@@ -127,11 +135,11 @@ def test_report_descr_body(client):
     assert "columns" in resp.get_json().keys()
 
 
-def test_load_plugin(client):
+def test_load_plugin(client, test_dir):
     url = "/v1/results/mock?foo=bar&baz=quux"
     resp = client.get(url)
     assert resp.status_code == 200
-    assert "quux" in str(resp.data)
+    assert "plugin loaded" in str(resp.data)
 
 
 def test_report_descr_error(client):
