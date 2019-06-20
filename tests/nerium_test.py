@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 
 import pytest
+
+# import nerium_mock
 from nerium import query
 from nerium.app import app
 
@@ -31,7 +33,7 @@ DESCR_EXPECTED = {
     "error": False,
     "metadata": {"foo": "bar"},
     "name": "test",
-    "params": [],
+    "params": ["greeting"],
     "type": "sql",
 }
 
@@ -87,7 +89,7 @@ def test_get_query(client):
     url = f"/v1/results/{query_name}"
     resp = client.get(url)
     assert resp.status_code == 200
-    assert EXPECTED == resp.get_json()["data"]
+    assert EXPECTED == resp.get_json()[0]["data"]
 
 
 def test_results_csv(client):
@@ -101,14 +103,14 @@ def test_results_compact(client):
     url = f"/v1/results/{query_name}/compact"
     resp = client.get(url)
     assert resp.status_code == 200
-    assert COMPACT_EXPECTED == resp.get_json()
+    assert COMPACT_EXPECTED == resp.get_json()[0]
 
 
 def test_reports_list(client):
     url = "/v1/reports/list"
     resp = client.get(url)
     assert resp.status_code == 200
-    assert resp.get_json() == {"reports": ["error_test", "test"]}
+    assert resp.get_json() == {"reports": ["error_test", "mock", "test", "test_body"]}
 
 
 def test_report_descr(client):
@@ -116,3 +118,24 @@ def test_report_descr(client):
     resp = client.get(url)
     assert resp.status_code == 200
     assert resp.get_json() == DESCR_EXPECTED
+
+
+def test_report_descr_body(client):
+    url = "/v1/reports/test_body"
+    resp = client.get(url)
+    assert resp.status_code == 200
+    assert "columns" in resp.get_json().keys()
+
+
+def test_load_plugin(client):
+    url = "/v1/results/mock?foo=bar&baz=quux"
+    resp = client.get(url)
+    assert resp.status_code == 200
+    assert "quux" in str(resp.data)
+
+
+def test_report_descr_error(client):
+    url = "/v1/reports/goo"
+    resp = client.get(url)
+    assert resp.status_code == 404
+    assert ("error", "No query found matching 'goo'") in resp.get_json().items()

@@ -26,7 +26,7 @@ def columns_from_metadata(query):
     """
     columns = None
     if "columns" in query.metadata.keys():
-        columns = query.metadata["columns"]
+        columns = query.metadata.pop("columns")
     return columns
 
 
@@ -49,7 +49,7 @@ def columns_from_body(query):
 def params_from_metadata(query):
     params = None
     if "params" in query.metadata.keys():
-        params = query.metadata["params"]
+        params = query.metadata.pop("params")
     return params
 
 
@@ -59,17 +59,8 @@ def params_from_body(query):
     return param_list
 
 
-def get_report_query(query_name):
-    query = parse_query_file(query_name)
-    if not query:
-        query = SimpleNamespace()
-        query.error = f"No query found matching '{query_name}'"
-        query.status_code = 404
-    return query
-
-
 def describe_report(query_name):
-    report_query = get_report_query(query_name)
+    report_query = parse_query_file(query_name)
     if report_query.error:
         return report_query
     params = params_from_metadata(report_query) or params_from_body(report_query)
@@ -83,9 +74,3 @@ def describe_report(query_name):
         metadata=report_query.metadata,
     )
     return report_description
-
-
-if __name__ == "__main__":
-    q = describe_report("foo")
-    # h = params_from_body(q)
-    print(q)
