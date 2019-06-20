@@ -23,6 +23,7 @@ def query_file(query_name):
 def parse_query_file(query_name):
     """Parse query file and return query object
     """
+    # TODO: Create a proper class here
     query_obj = SimpleNamespace(
         name=query_name, executed=datetime.utcnow().isoformat(), error=False
     )
