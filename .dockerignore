@@ -1,3 +1,13 @@
 .env
 .gitignore
 .junk_drawer/
+.venv/
+.eggs/
+.circleci/
+.vscode/
+build/
+dist/
+format_files/
+query_files/
+*.egg-info
+.coverage*htmlcov/

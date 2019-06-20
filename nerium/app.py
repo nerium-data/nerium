@@ -33,10 +33,9 @@ def serve_report_list():
 def serve_report_description(query_name):
     report_descr = discovery.describe_report(query_name)
     if report_descr.error:
-        status_code = report_descr.status_code or 400
+        status_code = getattr(report_descr, "status_code", 400)
         return jsonify(dict(error=report_descr.error)), status_code
-    else:
-        return jsonify(vars(report_descr))
+    return jsonify(vars(report_descr))
 
 
 @app.route("/v1/results/<query_name>/")
@@ -47,9 +46,12 @@ def serve_query_result(query_name, format_="default"):
     if query_results.error:
         status_code = getattr(query_results, "status_code", 400)
         return jsonify(dict(error=query_results.error)), status_code
-    else:
-        format_schema = formatter.get_format(format_)
-        return jsonify(format_schema.dump(query_results)[0])
+
+    format_schema = formatter.get_format(format_)
+    formatted = format_schema.dump(query_results)
+    if isinstance(formatted, list):
+        formatted = formatted[0]
+    return jsonify(formatted)
 
 
 @app.route("/v1/results/<query_name>/csv")
