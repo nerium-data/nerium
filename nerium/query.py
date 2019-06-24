@@ -22,6 +22,7 @@ def query_file(query_name):
 
 def parse_query_file(query_name):
     """Parse query file and return query object
+    TODO: Use a proper class here instead of SimpleNamespace
     """
     query_obj = SimpleNamespace(
         name=query_name, executed=datetime.utcnow().isoformat(), error=False
@@ -91,15 +92,14 @@ def get_result_set(query_name, **kwargs):
     """
     query = parse_query_file(query_name)
 
-    # Bail on 404:
+    # Bail if parser doesn't find query file:
     if query.error:
         return query
 
     result_module = assign_module(query.result_module)
     query.body = process_template(body=query.body, **kwargs)
-    _result = result_module.result(query, **kwargs)
+    query.result = result_module.result(query, **kwargs)
 
-    query.result = _result
     # Set query.error in case result_module captures an excecption
     if isinstance(query.result[0], dict) and "error" in query.result[0].keys():
         query.error = query.result[0]["error"]
