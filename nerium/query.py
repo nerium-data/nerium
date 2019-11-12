@@ -22,9 +22,8 @@ def query_file(query_name):
 
 def parse_query_file(query_name):
     """Parse query file and return query object
-    TODO: Use a proper class here instead of SimpleNamespace
     """
-    # TODO: Create a proper class here
+    # TODO: Use named tuple instead of SimpleNamespace
     query_obj = SimpleNamespace(
         name=query_name, executed=datetime.utcnow().isoformat(), error=False
     )
@@ -48,15 +47,6 @@ def parse_query_file(query_name):
     return query_obj
 
 
-def process_template(body, **kwargs):
-    """Render query body using jinja2 sandbox
-    TODO: Prevent variable expansion
-    """
-    env = SandboxedEnvironment()
-    template = env.from_string(body)
-    return template.render(kwargs)
-
-
 def plugin_module(name):
     """Load all modules named like `nerium_*` as plugin registry and return
     module matching query file stem if available, or default to sql built-in
@@ -78,14 +68,23 @@ def plugin_module(name):
         return import_module("nerium.resultset.sql")
 
 
-def assign_module(name="sql"):
-    """Import resultset module matching query file stem from nerium.resultset or plugin
+def assign_module(module="sql"):
+    """Import resultset module matching query file suffix from nerium.resultset or plugin
     """
     try:
-        result_module = import_module(f"nerium.resultset.{name}")
+        result_module = import_module(f"nerium.resultset.{module}")
     except ModuleNotFoundError:
-        result_module = plugin_module(name)
+        result_module = plugin_module(module)
     return result_module
+
+
+def process_template(body, **kwargs):
+    """Render query body using jinja2 sandbox
+    TODO: Prevent variable expansion
+    """
+    env = SandboxedEnvironment()
+    template = env.from_string(body)
+    return template.render(kwargs)
 
 
 def get_result_set(query_name, **kwargs):
@@ -98,6 +97,8 @@ def get_result_set(query_name, **kwargs):
         return query
 
     result_module = assign_module(query.result_module)
+
+    # TODO: New resultset object here instead of mutating query object
     query.body = process_template(body=query.body, **kwargs)
     query.result = result_module.result(query, **kwargs)
 
