@@ -4,7 +4,7 @@ from importlib import import_module
 from pathlib import Path
 from types import SimpleNamespace
 
-import frontmatter
+# import frontmatter
 from jinja2.sandbox import SandboxedEnvironment
 
 
@@ -23,7 +23,7 @@ def query_file(query_name):
 def parse_query_file(query_name):
     """Parse query file and return query object
     """
-    # TODO: Use named tuple instead of SimpleNamespace
+    # TODO: immutable named tuple
     query_obj = SimpleNamespace(
         name=query_name, executed=datetime.utcnow().isoformat(), error=False
     )

@@ -21,7 +21,6 @@ REQUIRED = [
     "flask",
     "marshmallow",
     "python-dotenv",
-    "python-frontmatter",
     "pyyaml",
     "requests",
     "sqlalchemy",
