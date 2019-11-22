@@ -1,6 +1,15 @@
 import requests
 from nerium import __version__
 from requests.exceptions import ConnectionError
+from git import Repo
+from pathlib import Path
+
+
+def get_local_head_commit():
+    workdir = Path(__file__).resolve().parents[1]
+    repo = Repo(workdir)
+    commit = repo.head.commit.hexsha
+    return commit
 
 
 def get_commit_for_version(version=__version__):
@@ -15,7 +24,7 @@ def get_commit_for_version(version=__version__):
         resp = requests.get(commit_url)
         commit = resp.json()["url"]
     except (IndexError, KeyError, TypeError, ConnectionError, ValueError):
-        commit = "Not found"
+        commit = get_local_head_commit()
     return commit
 
 

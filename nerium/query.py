@@ -4,7 +4,8 @@ from importlib import import_module
 from pathlib import Path
 from types import SimpleNamespace
 
-# import frontmatter
+import sqlparse
+import yaml
 from jinja2.sandbox import SandboxedEnvironment
 
 
@@ -20,6 +21,25 @@ def query_file(query_name):
     return query_file
 
 
+def extract_metadata(query_string):
+    """ Find `:meta` labeled comment in query string and load yaml from it
+    """
+    tokens = sqlparse.parse(query_string)[0].tokens
+    try:
+        meta_comment = str(
+            [
+                token
+                for token in tokens
+                if type(token) == sqlparse.sql.Comment and ":meta" in str(token)
+            ][0]
+        )
+    except IndexError:
+        return None
+    meta_string = meta_comment.split("---")[1]
+    metadata = yaml.safe_load(meta_string)
+    return metadata
+
+
 def parse_query_file(query_name):
     """Parse query file and return query object
     """
@@ -32,13 +52,12 @@ def parse_query_file(query_name):
 
     try:
         with open(query_path) as f:
-            metadata, query_body = frontmatter.parse(f.read())
-            result_module = query_path.suffix.strip(".")
+            query_string = f.read()
 
-        query_obj.metadata = metadata
+        query_obj.metadata = extract_metadata(query_string)
         query_obj.path = query_path
-        query_obj.result_module = result_module
-        query_obj.body = query_body
+        query_obj.result_module = query_path.suffix.strip(".")
+        query_obj.body = query_string
 
     except (FileNotFoundError, TypeError):
         query_obj.error = f"No query found matching '{query_name}'"
