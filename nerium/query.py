@@ -1,11 +1,12 @@
 import os
 from datetime import datetime
-from importlib import import_module
 from pathlib import Path
 from types import SimpleNamespace
 
-import frontmatter
+import sqlparse
+import yaml
 from jinja2.sandbox import SandboxedEnvironment
+from nerium.db import result
 
 
 def query_file(query_name):
@@ -20,11 +21,29 @@ def query_file(query_name):
     return query_file
 
 
+def extract_metadata(query_string):
+    """ Find `:meta` labeled comment in query string and load yaml from it
+    """
+    tokens = sqlparse.parse(query_string)[0].tokens
+    try:
+        meta_comment = str(
+            [
+                token
+                for token in tokens
+                if type(token) == sqlparse.sql.Comment and ":meta" in str(token)
+            ][0]
+        )
+    except IndexError:
+        return {}
+    meta_string = meta_comment.split("---")[1]
+    metadata = yaml.safe_load(meta_string)
+    return metadata
+
+
 def parse_query_file(query_name):
     """Parse query file and return query object
-    TODO: Use a proper class here instead of SimpleNamespace
     """
-    # TODO: Create a proper class here
+    # TODO: immutable named tuple
     query_obj = SimpleNamespace(
         name=query_name, executed=datetime.utcnow().isoformat(), error=False
     )
@@ -33,13 +52,11 @@ def parse_query_file(query_name):
 
     try:
         with open(query_path) as f:
-            metadata, query_body = frontmatter.parse(f.read())
-            result_module = query_path.suffix.strip(".")
+            query_string = f.read()
 
-        query_obj.metadata = metadata
+        query_obj.metadata = extract_metadata(query_string)
         query_obj.path = query_path
-        query_obj.result_module = result_module
-        query_obj.body = query_body
+        query_obj.body = query_string
 
     except (FileNotFoundError, TypeError):
         query_obj.error = f"No query found matching '{query_name}'"
@@ -57,37 +74,6 @@ def process_template(body, **kwargs):
     return template.render(kwargs)
 
 
-def plugin_module(name):
-    """Load all modules named like `nerium_*` as plugin registry and return
-    module matching query file stem if available, or default to sql built-in
-
-    Besides being named like `nerium_*`, plugins are expected to accept a query object
-    and provide a `result` method that returns an iterable dataset (list of dicts, e.g.)
-    """
-    from pkgutil import iter_modules
-
-    plugins = {
-        name: import_module(name)
-        for finder, name, ispkg in iter_modules()
-        if name.startswith("nerium_")
-    }
-    plugin_name = f"nerium_{name}"
-    if plugin_name in plugins.keys():
-        return plugins[plugin_name]
-    else:
-        return import_module("nerium.resultset.sql")
-
-
-def assign_module(name="sql"):
-    """Import resultset module matching query file stem from nerium.resultset or plugin
-    """
-    try:
-        result_module = import_module(f"nerium.resultset.{name}")
-    except ModuleNotFoundError:
-        result_module = plugin_module(name)
-    return result_module
-
-
 def get_result_set(query_name, **kwargs):
     """Call parse_query_file, then submit query object to resultset module
     """
@@ -97,9 +83,11 @@ def get_result_set(query_name, **kwargs):
     if query.error:
         return query
 
-    result_module = assign_module(query.result_module)
+    # result_module = assign_module(query.result_module)
+
+    # TODO: New resultset object here instead of mutating query object
     query.body = process_template(body=query.body, **kwargs)
-    query.result = result_module.result(query, **kwargs)
+    query.result = result(query, **kwargs)
 
     # Set query.error in case result_module captures an excecption
     if isinstance(query.result[0], dict) and "error" in query.result[0].keys():

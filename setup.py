@@ -19,9 +19,9 @@ VERSION = None
 
 REQUIRED = [
     "flask",
+    "gitpython",
     "marshmallow",
     "python-dotenv",
-    "python-frontmatter",
     "pyyaml",
     "requests",
     "sqlalchemy",

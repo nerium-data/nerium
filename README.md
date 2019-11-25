@@ -7,15 +7,9 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/nerium.svg)](https://pypi.org/project/nerium/)
 [![PyPI - License](https://img.shields.io/pypi/l/nerium.svg)](https://pypi.org/project/nerium/)
 
-A lightweight [Flask](http://flask.pocoo.org/)-based microservice that submits queries to a database and returns machine-readable serialized results (typically JSON). By analogy with static site generators, Nerium reads its queries and serialization formats from local files, stored  on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them.
+A lightweight [Flask](http://flask.pocoo.org/)-based microservice that submits queries to any [SQLAlchemy](https://www.sqlalchemy.org/)-supported database, and returns results as JSON. By analogy with static site generators, Nerium reads its queries and serialization formats from local files, stored  on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them.
 
-Nerium provides a quick, simple, and easy way to develop JSON APIs for use in reporting and analytic applications.
-
-Nerium features an extendable architecture, allowing support for multiple query types and output formats.
-
-Currently supports SQL queries using the fine [SQLAlchemy](https://www.sqlalchemy.org/) library. In keeping with SQLAlchemy usage, query parameters can be specified in `key=value` format, and (_safely_!) injected into your query in `:key` format.
-
-Other query types can be added as plugins, for non-SQL query languages. (Documentation on plugins forthcoming. See [nerium.query.plugin_module](nerium/query.py#L60-L78) in the meantime.)
+Nerium provides a quick, simple, and easy way to develop JSON APIs for use in reporting and analytic applications. In keeping with SQLAlchemy usage, query parameters can be specified in `key=value` format, and (_safely_!) injected into your query in `:key` format.
 
 Default JSON output represents `data` as an array of objects, one per result row, with database column names as keys. The default schema also provides top-level nodes for `name`, `metadata`, and `params` (details below). A `compact` JSON output format may also be requested, with separate `column` (array of column names) and `data` (array of row value arrays) nodes for compactness. Additional formats can be added by adding [marshmallow](https://marshmallow.readthedocs.io) schema definitions to `format_files`.
 
@@ -43,7 +37,7 @@ You might also want to use `tymxqo/nerium` as a base image for your own custom c
 pipenv install nerium[pg]
 ```
 
-Then add a `query_files` (and, optionally, `format_files`) directory to your project, write your queries, and configure the app as described in the next section. The command `FLASK_APP=nerium/app.py` starts a local development server running the app, listening on port 5000. For production use, you will want to add a proper WSGI server (we like `gunicorn`).
+Then add a `query_files` (and, optionally, `format_files`) directory to your project, write your queries, and configure the app as described in the next section. The command `FLASK_APP=nerium/app.py flask run` starts a local development server running the app, listening on port 5000. For production use, you will want to add a proper WSGI server (we like [`gunicorn`](https://gunicorn.org/)).
 
 ## Configuration
 
@@ -61,36 +55,35 @@ If you want to query multiple databases from a single Nerium installation, any i
 
 ## Query files
 
-As indicated above, queries are simply text files placed in a local `query_files` directory, or another arbitrary filesystem location specified by `QUERY_PATH` in the environment. The base name of the file (`stem` in Python `pathlib` parlance) will determine the `{query_name}` portion of the matching API endpoint; the file extension (or `suffix`) maps to the query type (literally the name of the `nerium.resultset` module that will handle the query).
-
-Note that Nerium loads the query files on server start; while adding additional query scripts does not require any code or config changes, the server needs to be restarted in order to use them.
+As indicated above, queries are simply text files placed in a local `query_files` directory, or another arbitrary filesystem location specified by `QUERY_PATH` in the environment. The base name of the file (`stem` in Python `pathlib` parlance) will determine the `{query_name}` portion of the matching API endpoint.
 
 ### Query parameters
 
-Use `:<param>` to specify bind parameters in your query text. These are given specific values in the URL query string by the results request.
+Use `:<param>` to specify bind parameters in your query text. These are given specific values in the URL query string by the `results` request.
 
-### Front matter
+### Metadata
 
-Query files can optionally include a [YAML](http://yaml.org/) front matter block. The front matter goes at the top of the file, set off by triple-dashed lines, as in this example:
+Query files can optionally include a [YAML](http://yaml.org/) metadata block. To add this metadata, create a special comment using the label `:meta` and surround the YAML document with standard triple-dashed lines, as in this example:
 
-```yaml
+```sql
+/* :meta
 ---
 Author: Joelle van Dyne
 Description: Returns all active usernames in the system
----
+---*/
 select username from user;
 
 ```
 
-Front matter can generally be thought of as a way to pass arbitrary key-value pairs to a front-end client; in the default format, the contents of front matter are returned under as a `metadata` object in the results response. (The `compact` formatter simply drops the metadata.) Possibilities include whatever a reporting service and front end developer want to coordinate on.
+Metadata can generally be thought of as a way to pass arbitrary key-value pairs to a front-end client; in the default format, the metadata is simply returned in the results response. (The `compact` formatter drops the metadata.) Possibilities include whatever a reporting service and front end developer want to coordinate on. The use of a special comment for metadata allows for the SQL file to be used as-is in other SQL clients.
 
-There are a couple of special-case front matter items:
+There are a couple of special-case metadata items:
 
 1. As noted above, it can be used to specify a database connection for the query, overriding the main `DATABASE_URL` in the environment
-2. If the front matter includes a `params` block, its contents are returned as the `params` object in the `v1/reports/` discovery response.
-3. Similarly, front matter describing `columns` will populate that section of the `/reports/` response.
+2. If the metadata includes a `params` block, its contents are returned as the `params` object in the `v1/reports/` discovery response.
+3. Similarly, metadata describing `columns` will populate that section of the `/reports/` response.
 
-In the absence of front matter, Nerium attempts to find column specifications and named parameters by inspecting the query text itself. Although it is more manual, front matter can provide greater detail in these sections — a report developer might specify the data type of a column or parameter, for example, in addition to its name.
+In the absence of explicit metadata, Nerium attempts to find column specifications and named parameters by inspecting the query text itself. Although it is more manual, a metadata comment can provide greater detail in these sections — a report developer might specify the data type of a column or parameter, for example, in addition to its name.
 
 ### Jinja templating
 
@@ -120,14 +113,6 @@ One known dangerous case is if your entire query file just does a Jinja variable
 ## Custom format files
 
 For serialization formats besides the built-in default and `compact`, schema definitions can be added to your `format_files` directory, using the Python [marshmallow](https://marshmallow.readthedocs.io) library. Similarly to query files, the app will look for a format module name matching the `{format}` specified in the endpoint URL. The app expects a `marshmallow.Schema` subclass named `ResultSchema`. Available attributes passed to this schema are all those in the [original `query` object](nerium/query.py#L29) with additional `result` and `params` attributes added. (See [`nerium/schema`](nerium/schema) for examples of how this is done by built-in formats.)
-
-## Query type extensions
-
-A `resultset` module is expected to have a `result` method that takes a `query` object and optional keyword argument (`kwargs`) dictionary, connects to a data source, and returns tabular results as a serializable Python structure (most typically a list of dictionaries).
-
-A Nerium `query` object is a [`SimpleNamespace`](https://docs.python.org/3/library/types.html?highlight=types#types.SimpleNamespace), with elements found in [`get_query()`](nerium/query.py#L29).
-
-Query files to be passed to this module should be named with a file extension that matches the module name (for example, `foo.sql` will be handed to the `resultset/sql.py` module).
 
 ## API
 
