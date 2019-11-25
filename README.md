@@ -20,13 +20,13 @@ Nerium supports any backend that SQLAlchemy can, but since none of these are har
 ### Using Docker
 
 ```bash
-$ docker run -d --name=nerium \
+docker run -d --name=nerium \
 --envfile=.env \
--v /local/path/to/query_files:/app/query_files 
+-v /local/path/to/query_files:/app/query_files
 -v /local/path/to/format_files:/app/format_files \
 -p 5000:5000 tymxqo/nerium
 
-$ curl http://localhost:5000/v1/<query_name>?<params>
+curl http://localhost:5000/v1/<query_name>?<params>
 ```
 
 You might also want to use `tymxqo/nerium` as a base image for your own custom container, in order to add different database drivers, etc. Or you can build locally from the included Dockerfile. The base image includes `psycopg2` PostgreSQL adapter, along with `gunicorn` WSGI server for a production-ready service.
