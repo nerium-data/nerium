@@ -49,8 +49,6 @@ def serve_query_result(query_name, format_="default"):
 
     format_schema = formatter.get_format(format_)
     formatted = format_schema.dump(query_results)
-    if isinstance(formatted, list):
-        formatted = formatted[0]
     return jsonify(formatted)
 
 

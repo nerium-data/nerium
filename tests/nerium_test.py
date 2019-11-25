@@ -32,7 +32,7 @@ COMPACT_EXPECTED = {
 DESCR_EXPECTED = {
     "columns": ["foo", "bar", "quux", "quuux"],
     "error": False,
-    "metadata": {"foo": "bar"},
+    "metadata": {"database_url": "sqlite:///", "foo": "bar"},
     "name": "test",
     "params": ["greeting"],
 }
