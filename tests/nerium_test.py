@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pytest
 
-# import nerium_mock
 from nerium import query
 from nerium.app import app
 
@@ -36,7 +35,6 @@ DESCR_EXPECTED = {
     "metadata": {"foo": "bar"},
     "name": "test",
     "params": ["greeting"],
-    "type": "sql",
 }
 
 query_name = "test"
@@ -64,7 +62,6 @@ def test_results_expected():
 
 
 def test_health_check(client):
-    # with app.test_client() as client:
     resp = client.get("/")
     assert resp.status_code == 200
     text = resp.get_json()
@@ -97,7 +94,7 @@ def test_get_query(client):
     url = f"/v1/results/{query_name}"
     resp = client.get(url)
     assert resp.status_code == 200
-    assert EXPECTED == resp.get_json()[0]["data"]
+    assert EXPECTED == resp.get_json()["data"]
 
 
 def test_results_csv(client):
@@ -111,14 +108,14 @@ def test_results_compact(client):
     url = f"/v1/results/{query_name}/compact"
     resp = client.get(url)
     assert resp.status_code == 200
-    assert COMPACT_EXPECTED == resp.get_json()[0]
+    assert COMPACT_EXPECTED == resp.get_json()
 
 
 def test_reports_list(client):
     url = "/v1/reports/list"
     resp = client.get(url)
     assert resp.status_code == 200
-    assert resp.get_json() == {"reports": ["error_test", "mock", "test", "test_body"]}
+    assert resp.get_json() == {"reports": ["error_test", "test", "test_body"]}
 
 
 def test_report_descr(client):
@@ -133,13 +130,6 @@ def test_report_descr_body(client):
     resp = client.get(url)
     assert resp.status_code == 200
     assert "columns" in resp.get_json().keys()
-
-
-def test_load_plugin(client, test_dir):
-    url = "/v1/results/mock?foo=bar&baz=quux"
-    resp = client.get(url)
-    assert resp.status_code == 200
-    assert "plugin loaded" in str(resp.data)
 
 
 def test_report_descr_error(client):

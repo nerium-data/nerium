@@ -34,15 +34,14 @@ def columns_from_body(query):
     """Parse columns from SELECT statement
     """
     columns = []
-    if query.result_module == "sql":
-        parsed_query = parse(query.body)[0]
-        for tkn in parsed_query.tokens:
-            if isinstance(tkn, IdentifierList):
-                for id_ in tkn:
-                    if isinstance(id_, Identifier):
-                        columns.append(id_.get_name())
+    parsed_query = parse(query.body)[0]
+    for tkn in parsed_query.tokens:
+        if isinstance(tkn, IdentifierList):
+            for id_ in tkn:
+                if isinstance(id_, Identifier):
+                    columns.append(id_.get_name())
     if not columns:
-        columns = "unknown"
+        columns = ["unknown"]
     return columns
 
 
@@ -68,7 +67,6 @@ def describe_report(query_name):
     report_description = SimpleNamespace(
         error=report_query.error,
         name=report_query.name,
-        type=report_query.result_module,
         columns=columns,
         params=params,
         metadata=report_query.metadata,
