@@ -8,6 +8,7 @@ columns:
   - quuux
 params: 
   - greeting
+database_url: sqlite:///
 ---
 */
 

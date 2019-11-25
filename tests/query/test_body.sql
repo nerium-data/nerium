@@ -1,6 +1,7 @@
 /* :meta
 ---
 foo: bar
+database_url: sqlite:///
 ---
 */
 select cast(1.25 as float) as foo  -- float check

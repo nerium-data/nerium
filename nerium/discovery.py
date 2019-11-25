@@ -40,8 +40,6 @@ def columns_from_body(query):
             for id_ in tkn:
                 if isinstance(id_, Identifier):
                     columns.append(id_.get_name())
-    if not columns:
-        columns = ["unknown"]
     return columns
 
 
