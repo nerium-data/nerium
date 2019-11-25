@@ -5,7 +5,6 @@ name = "pypi"
 
 [packages]
 nerium = {editable = true,path = "."}
-gitpython = "*"
 
 [dev-packages]
 coverage = "*"
