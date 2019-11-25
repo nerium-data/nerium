@@ -33,8 +33,16 @@ You might also want to use `tymxqo/nerium` as a base image for your own custom c
 
 ### Local install
 
-```bash
+```sh
 pipenv install nerium[pg]
+```
+
+Or install latest version from Github:
+
+```sh
+git clone https://github.com/tym-xqo/nerium.git
+cd nerim
+pipenv install --dev
 ```
 
 Then add a `query_files` (and, optionally, `format_files`) directory to your project, write your queries, and configure the app as described in the next section. The command `FLASK_APP=nerium/app.py flask run` starts a local development server running the app, listening on port 5000. For production use, you will want to add a proper WSGI server (we like [`gunicorn`](https://gunicorn.org/)).
