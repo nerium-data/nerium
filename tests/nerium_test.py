@@ -111,6 +111,14 @@ def test_results_compact(client):
     assert COMPACT_EXPECTED == resp.get_json()
 
 
+def test_result_post(client):
+    url = "/v1/result"
+    data = dict(query_name="test", format="compact")
+    resp = client.post(url, json=data)
+    assert resp.status_code == 200
+    assert COMPACT_EXPECTED == resp.get_json()
+
+
 def test_reports_list(client):
     url = "/v1/reports/list"
     resp = client.get(url)

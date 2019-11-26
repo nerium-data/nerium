@@ -2,8 +2,11 @@
 # -*- coding: utf-8 -*
 from pathlib import Path
 
-from flask import Flask, jsonify, make_response, request
 from dotenv import load_dotenv
+from flask import Flask, jsonify, make_response, request
+from marshmallow import INCLUDE, Schema, fields
+from marshmallow.exceptions import ValidationError
+
 from nerium import __version__, commit, csv_result, discovery, formatter, query
 from nerium.utils import convert_multidict
 
@@ -38,10 +41,41 @@ def serve_report_description(query_name):
     return jsonify(vars(report_descr))
 
 
-@app.route("/v1/results/<query_name>/")
-@app.route("/v1/results/<query_name>/<format_>")
+@app.route("/v1/results/<query_name>/", methods=["GET", "POST"])
+@app.route("/v1/results/<query_name>/<format_>", methods=["GET", "POST"])
 def serve_query_result(query_name, format_="default"):
-    params = convert_multidict(request.args.to_dict(flat=False))
+    if request.method == "POST":
+        params = request.json
+    else:
+        params = convert_multidict(request.args.to_dict(flat=False))
+    query_results = query.get_result_set(query_name, **params)
+    if query_results.error:
+        status_code = getattr(query_results, "status_code", 400)
+        return jsonify(dict(error=query_results.error)), status_code
+
+    format_schema = formatter.get_format(format_)
+    formatted = format_schema.dump(query_results)
+    return jsonify(formatted)
+
+
+class ResultRequestSchema(Schema):
+    class Meta:
+        unknown = INCLUDE
+
+    query_name = fields.String(required=True)
+    format_ = fields.String(missing="default", data_key="format")
+
+
+@app.route("/v1/result", methods=["POST"])
+def serve_query_result_json():
+    if request.method != "POST":
+        return jsonify(dict(error=f"Method not allowed ({request.method})")), 405
+    try:
+        params = ResultRequestSchema().load(request.json)
+    except ValidationError as e:
+        return jsonify(e.normalized_messages()), 400
+    query_name = params.pop("query_name")
+    format_ = params.pop("format_")
     query_results = query.get_result_set(query_name, **params)
     if query_results.error:
         status_code = getattr(query_results, "status_code", 400)

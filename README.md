@@ -61,7 +61,7 @@ If you want to query multiple databases from a single Nerium installation, any i
 
 ## Usage
 
-## Query files
+### Query files
 
 As indicated above, queries are simply text files placed in a local `query_files` directory, or another arbitrary filesystem location specified by `QUERY_PATH` in the environment. The base name of the file (`stem` in Python `pathlib` parlance) will determine the `{query_name}` portion of the matching API endpoint.
 
@@ -118,7 +118,7 @@ One known dangerous case is if your entire query file just does a Jinja variable
 
 ---
 
-## Custom format files
+### Custom format files
 
 For serialization formats besides the built-in default and `compact`, schema definitions can be added to your `format_files` directory, using the Python [marshmallow](https://marshmallow.readthedocs.io) library. Similarly to query files, the app will look for a format module name matching the `{format}` specified in the endpoint URL. The app expects a `marshmallow.Schema` subclass named `ResultSchema`. Available attributes passed to this schema are all those in the [original `query` object](nerium/query.py#L29) with additional `result` and `params` attributes added. (See [`nerium/schema`](nerium/schema) for examples of how this is done by built-in formats.)
 
