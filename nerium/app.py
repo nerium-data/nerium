@@ -22,17 +22,18 @@ app.url_map.strict_slashes = False
 
 @app.route("/")
 @app.route("/v1/")
+@app.route("/v2/")
 def base_route():
     return jsonify({"status": "ok", "version": __version__, "commit": commit})
 
 
-@app.route("/v1/reports/")
-@app.route("/v1/reports/list/")
+@app.route("/v2/reports/")
+@app.route("/v2/reports/list/")
 def serve_report_list():
     return jsonify(discovery.list_reports())
 
 
-@app.route("/v1/reports/<query_name>/")
+@app.route("/v2/reports/<query_name>/")
 def serve_report_description(query_name):
     report_descr = discovery.describe_report(query_name)
     if report_descr.error:
@@ -41,8 +42,10 @@ def serve_report_description(query_name):
     return jsonify(vars(report_descr))
 
 
-@app.route("/v1/results/<query_name>/", methods=["GET", "POST"])
-@app.route("/v1/results/<query_name>/<format_>", methods=["GET", "POST"])
+@app.route("/v1/<query_name>/", methods=["GET"])
+@app.route("/v1/<query_name>/<format_>", methods=["GET"])
+@app.route("/v2/results/<query_name>/", methods=["GET", "POST"])
+@app.route("/v2/results/<query_name>/<format_>", methods=["GET", "POST"])
 def serve_query_result(query_name, format_="default"):
     if request.method == "POST":
         params = request.json
@@ -66,7 +69,7 @@ class ResultRequestSchema(Schema):
     format_ = fields.String(missing="default", data_key="format")
 
 
-@app.route("/v1/result", methods=["POST"])
+@app.route("/v2/result", methods=["POST"])
 def serve_query_result_json():
     if request.method != "POST":
         return jsonify(dict(error=f"Method not allowed ({request.method})")), 405
@@ -86,7 +89,8 @@ def serve_query_result_json():
     return jsonify(formatted)
 
 
-@app.route("/v1/results/<query_name>/csv")
+@app.route("/v1/<query_name>/csv")
+@app.route("/v2/results/<query_name>/csv")
 def serve_csv_result(query_name):
     params = convert_multidict(request.args.to_dict(flat=False))
     query_results = csv_result.results_to_csv(query_name, **params)
