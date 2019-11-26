@@ -3,15 +3,16 @@ import re
 from pathlib import Path
 from types import SimpleNamespace
 
+import sqlparse
+from sqlparse.sql import Identifier, IdentifierList
+
 from nerium.query import parse_query_file
-from sqlparse import parse
-from sqlparse.sql import IdentifierList, Identifier
 
 
 def list_reports():
-    flat_queries = list(Path(os.getenv("QUERY_PATH", "query_files")).glob("**/*"))
     """Return list of available report names from query dir
     """
+    flat_queries = list(Path(os.getenv("QUERY_PATH", "query_files")).glob("**/*"))
     # Filter out docs and metadata
     query_paths = list(filter(lambda i: i.suffix not in [".md", ".yaml"], flat_queries))
     query_names = [i.stem for i in query_paths]
@@ -34,7 +35,7 @@ def columns_from_body(query):
     """Parse columns from SELECT statement
     """
     columns = []
-    parsed_query = parse(query.body)[0]
+    parsed_query = sqlparse.parse(query.body)[0]
     for tkn in parsed_query.tokens:
         if isinstance(tkn, IdentifierList):
             for id_ in tkn:

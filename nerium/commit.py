@@ -1,6 +1,5 @@
 import requests
 from nerium import __version__
-from requests.exceptions import ConnectionError
 from git import Repo
 from pathlib import Path
 
@@ -23,7 +22,13 @@ def get_commit_for_version(version=__version__):
         commit_url = vtag["commit"]["url"]
         resp = requests.get(commit_url)
         commit = resp.json()["url"]
-    except (IndexError, KeyError, TypeError, ConnectionError, ValueError):
+    except (
+        IndexError,
+        KeyError,
+        TypeError,
+        requests.exceptions.ConnectionError,
+        ValueError,
+    ):
         commit = get_local_head_commit()
     return commit
 
