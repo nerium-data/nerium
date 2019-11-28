@@ -120,7 +120,7 @@ def test_result_json(client):
 
 
 def test_reports_list(client):
-    url = "/v2/reports/list"
+    url = "/v2/reports/"
     resp = client.get(url)
     assert resp.status_code == 200
     assert resp.get_json() == {"reports": ["error_test", "test", "test_body"]}
