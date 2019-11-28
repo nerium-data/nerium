@@ -129,7 +129,6 @@ For serialization formats besides the built-in default and `compact`, schema def
 #### URLs
 
 - `/v1/reports`
-- `/v1/reports/list` - these are both equivalent; the `list` is optional
 
 #### Method
 

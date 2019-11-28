@@ -112,7 +112,7 @@ def test_results_compact(client):
 
 
 def test_result_json(client):
-    url = "/v2/result"
+    url = "/v2/results"
     data = dict(query_name="test", format="compact")
     resp = client.get(url, json=data)
     assert resp.status_code == 200

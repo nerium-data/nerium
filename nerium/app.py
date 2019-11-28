@@ -24,17 +24,22 @@ app.url_map.strict_slashes = False
 @app.route("/v1/")
 @app.route("/v2/")
 def base_route():
+    """Health check route; returns OK with version and git commit detail
+    """
     return jsonify({"status": "ok", "version": __version__, "commit": commit})
 
 
 @app.route("/v2/reports/")
-@app.route("/v2/reports/list/")
 def serve_report_list():
+    """Discovery route; returns a list of available reports known to the service
+    """
     return jsonify(discovery.list_reports())
 
 
 @app.route("/v2/reports/<query_name>/")
 def serve_report_description(query_name):
+    """Returns details and metadata about a report by name
+    """
     report_descr = discovery.describe_report(query_name)
     if report_descr.error:
         status_code = getattr(report_descr, "status_code", 400)
@@ -52,31 +57,27 @@ class ResultRequestSchema(Schema):
 
 @app.route("/v1/<query_name>/")
 @app.route("/v1/<query_name>/<format_>")
+@app.route("/v2/results")
 @app.route("/v2/results/<query_name>/")
 @app.route("/v2/results/<query_name>/<format_>")
-def serve_query_result(query_name, format_="default"):
-    # TODO: Make this all one view with serve_query_result_json below
+def serve_query_result(query_name="", format_=""):
+    """
+    """
     params = request.json or convert_multidict(request.args.to_dict(flat=False))
-    query_results = query.get_result_set(query_name, **params)
-    if query_results.error:
-        status_code = getattr(query_results, "status_code", 400)
-        return jsonify(dict(error=query_results.error)), status_code
-
-    format_schema = formatter.get_format(format_)
-    formatted = format_schema.dump(query_results)
-    return jsonify(formatted)
-
-
-@app.route("/v2/result")
-def serve_query_result_json():
-    params = request.json or convert_multidict(request.args.to_dict(flat=False))
+    if query_name:
+        params["query_name"] = query_name
+    if format_:
+        params["format_"] = format_
     try:
         params = ResultRequestSchema().load(params)
     except ValidationError as e:
         return jsonify(e.normalized_messages()), 400
+
     query_name = params.pop("query_name")
     format_ = params.pop("format_")
+
     query_results = query.get_result_set(query_name, **params)
+
     if query_results.error:
         status_code = getattr(query_results, "status_code", 400)
         return jsonify(dict(error=query_results.error)), status_code
