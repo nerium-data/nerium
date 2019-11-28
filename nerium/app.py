@@ -42,15 +42,21 @@ def serve_report_description(query_name):
     return jsonify(vars(report_descr))
 
 
-@app.route("/v1/<query_name>/", methods=["GET"])
-@app.route("/v1/<query_name>/<format_>", methods=["GET"])
-@app.route("/v2/results/<query_name>/", methods=["GET", "POST"])
-@app.route("/v2/results/<query_name>/<format_>", methods=["GET", "POST"])
+class ResultRequestSchema(Schema):
+    class Meta:
+        unknown = INCLUDE
+
+    query_name = fields.String(required=True)
+    format_ = fields.String(missing="default", data_key="format")
+
+
+@app.route("/v1/<query_name>/")
+@app.route("/v1/<query_name>/<format_>")
+@app.route("/v2/results/<query_name>/")
+@app.route("/v2/results/<query_name>/<format_>")
 def serve_query_result(query_name, format_="default"):
-    if request.method == "POST":
-        params = request.json
-    else:
-        params = convert_multidict(request.args.to_dict(flat=False))
+    # TODO: Make this all one view with serve_query_result_json below
+    params = request.json or convert_multidict(request.args.to_dict(flat=False))
     query_results = query.get_result_set(query_name, **params)
     if query_results.error:
         status_code = getattr(query_results, "status_code", 400)
@@ -61,20 +67,11 @@ def serve_query_result(query_name, format_="default"):
     return jsonify(formatted)
 
 
-class ResultRequestSchema(Schema):
-    class Meta:
-        unknown = INCLUDE
-
-    query_name = fields.String(required=True)
-    format_ = fields.String(missing="default", data_key="format")
-
-
-@app.route("/v2/result", methods=["POST"])
+@app.route("/v2/result")
 def serve_query_result_json():
-    if request.method != "POST":
-        return jsonify(dict(error=f"Method not allowed ({request.method})")), 405
+    params = request.json or convert_multidict(request.args.to_dict(flat=False))
     try:
-        params = ResultRequestSchema().load(request.json)
+        params = ResultRequestSchema().load(params)
     except ValidationError as e:
         return jsonify(e.normalized_messages()), 400
     query_name = params.pop("query_name")
