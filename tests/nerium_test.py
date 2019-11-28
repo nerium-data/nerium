@@ -6,7 +6,6 @@ import pytest
 from nerium import query
 from nerium.app import app
 
-# from _pytest.fixtures import monkeypatch
 
 # Fixtures
 EXPECTED = [
@@ -19,7 +18,10 @@ EXPECTED = [
     {"foo": 42, "bar": "2031-05-25", "quux": "yo", "quuux": "ƺƺƺƺ"},
 ]
 
-CSV_EXPECTED = "foo,bar,quux,quuux\r\n1.25,2019-09-09,Hello,Björk Guðmundsdóttir\r\n42,2031-05-25,yo,ƺƺƺƺ\r\n"  # noqa E501
+CSV_EXPECTED = (
+    "foo,bar,quux,quuux\r\n"
+    "1.25,2019-09-09,Hello,Björk Guðmundsdóttir\r\n42,2031-05-25,yo,ƺƺƺƺ\r\n"
+)
 
 COMPACT_EXPECTED = {
     "columns": ["foo", "bar", "quux", "quuux"],
