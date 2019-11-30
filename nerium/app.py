@@ -38,7 +38,7 @@ def serve_report_list():
 
 @app.route("/v2/reports/<query_name>/")
 def serve_report_description(query_name):
-    """Returns details and metadata about a report by name
+    """Discovery route; returns details and metadata about a report by name
     """
     report_descr = discovery.describe_report(query_name)
     if report_descr.error:
@@ -48,11 +48,43 @@ def serve_report_description(query_name):
 
 
 class ResultRequestSchema(Schema):
+    """Require query_name in valid results request, set format to "default" if
+    not supplied
+    """
+
     class Meta:
         unknown = INCLUDE
 
     query_name = fields.String(required=True)
     format_ = fields.String(missing="default", data_key="format")
+
+
+def get_query_result(params):
+    """Get query results from set of request parameters
+    Return tuple with formatted results and status code
+    """
+    # load against schema, return with error message unless valid
+    try:
+        params = ResultRequestSchema().load(params)
+    except ValidationError as e:
+        return (e.normalized_messages(), 400)
+
+    # Separate query_name and format from other parameters
+    query_name = params.pop("query_name")
+    format_ = params.pop("format_")
+
+    # Fetch results from nerium.query
+    query_results = query.get_result_set(query_name, **params)
+
+    # Handle error from query submission
+    if query_results.error:
+        status_code = getattr(query_results, "status_code", 400)
+        return (dict(error=query_results.error), status_code)
+
+    # Format results before returning to view
+    format_schema = formatter.get_format(format_)
+    formatted = format_schema.dump(query_results)
+    return (formatted, 200)
 
 
 @app.route("/v1/<query_name>/")
@@ -61,30 +93,20 @@ class ResultRequestSchema(Schema):
 @app.route("/v2/results/<query_name>/")
 @app.route("/v2/results/<query_name>/<format_>")
 def serve_query_result(query_name="", format_=""):
-    """
+    """Parse request and hand params to get_query_result
     """
     params = request.json or convert_multidict(request.args.to_dict(flat=False))
     if query_name:
         params["query_name"] = query_name
     if format_:
         params["format_"] = format_
-    try:
-        params = ResultRequestSchema().load(params)
-    except ValidationError as e:
-        return jsonify(e.normalized_messages()), 400
 
-    query_name = params.pop("query_name")
-    format_ = params.pop("format_")
+    query_result = get_query_result(params)
 
-    query_results = query.get_result_set(query_name, **params)
+    result = query_result[0]
+    status_code = query_result[1]
 
-    if query_results.error:
-        status_code = getattr(query_results, "status_code", 400)
-        return jsonify(dict(error=query_results.error)), status_code
-
-    format_schema = formatter.get_format(format_)
-    formatted = format_schema.dump(query_results)
-    return jsonify(formatted)
+    return jsonify(result), status_code
 
 
 @app.route("/v1/<query_name>/csv")
