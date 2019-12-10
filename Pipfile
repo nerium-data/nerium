@@ -10,6 +10,3 @@ nerium = {editable = true,path = "."}
 coverage = "*"
 pytest = "*"
 pytest-cov = "*"
-
-[requires]
-python_version = "3.7"

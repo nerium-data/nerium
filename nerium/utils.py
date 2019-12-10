@@ -1,5 +1,5 @@
 def convert_multidict(obj):
-    """Convert responder querystring params, pulling values out of list
+    """Convert querystring params, pulling values out of list
     if there's only one.
     """
     new_dict = {

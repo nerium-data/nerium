@@ -61,17 +61,17 @@ If you want to query multiple databases from a single Nerium installation, any i
 
 ## Usage
 
-## Query files
+### Query files
 
 As indicated above, queries are simply text files placed in a local `query_files` directory, or another arbitrary filesystem location specified by `QUERY_PATH` in the environment. The base name of the file (`stem` in Python `pathlib` parlance) will determine the `{query_name}` portion of the matching API endpoint.
 
 ### Query parameters
 
-Use `:<param>` to specify bind parameters in your query text. These are given specific values in the URL query string by the `results` request.
+Use `:<param>` to specify bind parameters in your query text. Clients can then specify values for these bind parameters in their `results` request, passed either as JSON or query string arguments.
 
 ### Metadata
 
-Query files can optionally include a [YAML](http://yaml.org/) metadata block. To add this metadata, create a special comment using the label `:meta` and surround the YAML document with standard triple-dashed lines, as in this example:
+Query files can optionally include a [YAML](http://yaml.org/) metadata block. The use of a special comment for metadata allows for the SQL file to be used as-is in other SQL clients. To add this metadata, create a multiline comment surrounded by `\* ... */` markers, and include the label `:meta` at the top. Within this comment, surround the YAML document with standard triple-dashed lines, as in this example:
 
 ```sql
 /* :meta
@@ -83,7 +83,7 @@ select username from user;
 
 ```
 
-Metadata can generally be thought of as a way to pass arbitrary key-value pairs to a front-end client; in the default format, the metadata is simply returned in the results response. (The `compact` formatter drops the metadata.) Possibilities include whatever a reporting service and front end developer want to coordinate on. The use of a special comment for metadata allows for the SQL file to be used as-is in other SQL clients.
+Metadata can generally be thought of as a way to pass arbitrary key-value pairs to a front-end client; in the default format, the metadata is simply returned in the results response. (The `compact` formatter drops the metadata.) Other possible use cases include whatever a reporting service and front-end developer want to coordinate on.
 
 There are a couple of special-case metadata items:
 
@@ -118,9 +118,9 @@ One known dangerous case is if your entire query file just does a Jinja variable
 
 ---
 
-## Custom format files
+### Custom format files
 
-For serialization formats besides the built-in default and `compact`, schema definitions can be added to your `format_files` directory, using the Python [marshmallow](https://marshmallow.readthedocs.io) library. Similarly to query files, the app will look for a format module name matching the `{format}` specified in the endpoint URL. The app expects a `marshmallow.Schema` subclass named `ResultSchema`. Available attributes passed to this schema are all those in the [original `query` object](nerium/query.py#L29) with additional `result` and `params` attributes added. (See [`nerium/schema`](nerium/schema) for examples of how this is done by built-in formats.)
+For serialization formats besides the built-in default and `compact`, schema definitions can be added to your `format_files` directory, using the Python [marshmallow](https://marshmallow.readthedocs.io) library. Similarly to query files, the app will look for a format module name matching the `{format}` specified in the endpoint URL. The app expects a `marshmallow.Schema` subclass named `ResultSchema`. Available attributes passed to this schema are all found in the [original `query` object](nerium/query.py#L28). (See [`nerium/schema`](nerium/schema) for examples of how this is done by built-in formats.)
 
 ## API
 
@@ -128,8 +128,7 @@ For serialization formats besides the built-in default and `compact`, schema def
 
 #### URLs
 
-- `/v1/reports`
-- `/v1/reports/list` - these are both equivalent; the `list` is optional
+- `/v2/reports`
 
 #### Method
 
@@ -145,7 +144,7 @@ For serialization formats besides the built-in default and `compact`, schema def
 
 #### URLs
 
-- `/v1/reports/{string:query_name}`
+- `/v2/reports/{string:query_name}`
 
 #### Method
 
@@ -159,10 +158,19 @@ For serialization formats besides the built-in default and `compact`, schema def
 
 #### URLs
 
+- `/v1/<string:query_name>?<query_params>`  
+- `/v1/<string:query_name>/<string:format>?<query_params>`
+- `/v1/results/`
 - `/v1/results/<string:query_name>?<query_params>`  
 - `/v1/results/<string:query_name>/<string:format>?<query_params>`
 
-`query_name` should match the name of a given query script file, minus the file extension. URL querystring parameters are passed to the invoked data source query, matched to any parameter keys specified in the query file. If any parameters expected by the query are missing, an error will be returned. Extra/unrecognized parameters are silently ignored (this might seem surprising, but it's standard SQLAlchemy behavior for parameter substitution).
+[`v1` endpoints are deprecated and will be removed eventually]
+
+As shown above `query_name` and `format` may be accessed as part of the URL structure, or can be passed as parameters to the request.
+
+Because we're retrieving report results here, the request is a `GET` in any case, but parameters may be sent in a JSON body or as querystring parameters. `query_name` and `format` in URL base path will be preferred if a request to such a path happens to include either in the body (client apps should avoid doing this to avoid confusion).
+
+`query_name` should match the name of a given query script file, minus the file extension. URL querystring parameters (or JSON keys other than `query_string` and `format`) are passed to the invoked data source query, matched to any parameter keys specified in the query file. If any parameters expected by the query are missing, an error will be returned. Extra/unrecognized parameters are silently ignored (this might seem surprising, but it's standard SQLAlchemy behavior for parameter substitution).
 
 `format` path may be included as an optional formatter name, and defaults to 'default'. Other supported `formatter` options are described in Content section below.
 

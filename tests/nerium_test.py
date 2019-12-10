@@ -6,7 +6,6 @@ import pytest
 from nerium import query
 from nerium.app import app
 
-# from _pytest.fixtures import monkeypatch
 
 # Fixtures
 EXPECTED = [
@@ -19,7 +18,10 @@ EXPECTED = [
     {"foo": 42, "bar": "2031-05-25", "quux": "yo", "quuux": "ƺƺƺƺ"},
 ]
 
-CSV_EXPECTED = "foo,bar,quux,quuux\r\n1.25,2019-09-09,Hello,Björk Guðmundsdóttir\r\n42,2031-05-25,yo,ƺƺƺƺ\r\n"  # noqa E501
+CSV_EXPECTED = (
+    "foo,bar,quux,quuux\r\n"
+    "1.25,2019-09-09,Hello,Björk Guðmundsdóttir\r\n42,2031-05-25,yo,ƺƺƺƺ\r\n"
+)
 
 COMPACT_EXPECTED = {
     "columns": ["foo", "bar", "quux", "quuux"],
@@ -70,70 +72,78 @@ def test_health_check(client):
 
 
 def test_sql_error(client):
-    url = "/v1/results/error_test"
+    url = "/v2/results/error_test"
     resp = client.get(url)
     assert resp.status_code == 400
     assert "error" in resp.get_json().keys()
 
 
 def test_missing_query_error(client):
-    url = "/v1/results/not_a_query"
+    url = "/v2/results/not_a_query"
     resp = client.get(url)
     assert resp.status_code == 404
     assert "error" in resp.get_json().keys()
 
 
 def test_missing_report_error(client):
-    url = "/v1/reports/not_a_query"
+    url = "/v2/reports/not_a_query"
     resp = client.get(url)
     assert resp.status_code == 404
     assert "error" in resp.get_json().keys()
 
 
 def test_get_query(client):
-    url = f"/v1/results/{query_name}"
+    url = f"/v2/results/{query_name}"
     resp = client.get(url)
     assert resp.status_code == 200
     assert EXPECTED == resp.get_json()["data"]
 
 
 def test_results_csv(client):
-    url = f"/v1/results/{query_name}/csv"
+    url = f"/v2/results/{query_name}/csv"
     resp = client.get(url)
     assert resp.headers["content_type"] == "text/csv"
     assert str(resp.data, "utf-8") == CSV_EXPECTED
 
 
 def test_results_compact(client):
-    url = f"/v1/results/{query_name}/compact"
+    url = f"/v2/results/{query_name}/compact"
     resp = client.get(url)
     assert resp.status_code == 200
     assert COMPACT_EXPECTED == resp.get_json()
 
 
+def test_result_json(client):
+    url = "/v2/results"
+    data = dict(query_name="test", format="compact")
+    resp = client.get(url, json=data)
+    assert resp.status_code == 200
+    assert COMPACT_EXPECTED == resp.get_json()
+
+
 def test_reports_list(client):
-    url = "/v1/reports/list"
+    url = "/v2/reports/"
     resp = client.get(url)
     assert resp.status_code == 200
     assert resp.get_json() == {"reports": ["error_test", "test", "test_body"]}
 
 
 def test_report_descr(client):
-    url = f"/v1/reports/{query_name}"
+    url = f"/v2/reports/{query_name}"
     resp = client.get(url)
     assert resp.status_code == 200
     assert resp.get_json() == DESCR_EXPECTED
 
 
 def test_report_descr_body(client):
-    url = "/v1/reports/test_body"
+    url = "/v2/reports/test_body"
     resp = client.get(url)
     assert resp.status_code == 200
     assert "columns" in resp.get_json().keys()
 
 
 def test_report_descr_error(client):
-    url = "/v1/reports/goo"
+    url = "/v2/reports/goo"
     resp = client.get(url)
     assert resp.status_code == 404
     assert ("error", "No query found matching 'goo'") in resp.get_json().items()
