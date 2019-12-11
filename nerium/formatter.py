@@ -11,7 +11,7 @@ def get_format(format_="default"):
     try:
         format_mod = import_module(f"nerium.schema.{format_}")
     except ModuleNotFoundError:
-        # attempt to load custom format from $FORMAT_PATH
+        # Attempt to load custom format from $FORMAT_PATH
         try:
             format_path = os.getenv("FORMAT_PATH", "format_files")
             spec = importlib.util.spec_from_file_location(
@@ -19,8 +19,9 @@ def get_format(format_="default"):
             )
             format_mod = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(format_mod)
+        # Fallback to default schema if no other match
         except FileNotFoundError:
-            format_mod = import_module(f"nerium.schema.default")
+            format_mod = import_module("nerium.schema.default")
     schema = format_mod.ResultSchema()
     return schema
 

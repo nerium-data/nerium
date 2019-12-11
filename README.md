@@ -37,11 +37,11 @@ You might also want to use `tymxqo/nerium` as a base image for your own custom c
 pipenv install nerium[pg]
 ```
 
-Or install latest version from Github:
+Or install latest source from Github:
 
 ```sh
 git clone https://github.com/tym-xqo/nerium.git
-cd nerim
+cd nerium
 pipenv install --dev
 ```
 
