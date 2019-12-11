@@ -160,15 +160,15 @@ For serialization formats besides the built-in default and `compact`, schema def
 
 - `/v1/<string:query_name>?<query_params>`  
 - `/v1/<string:query_name>/<string:format>?<query_params>`
-- `/v1/results/`
-- `/v1/results/<string:query_name>?<query_params>`  
-- `/v1/results/<string:query_name>/<string:format>?<query_params>`
+- `/v2/results/`
+- `/v2/results/<string:query_name>?<query_params>`  
+- `/v2/results/<string:query_name>/<string:format>?<query_params>`
 
 [`v1` endpoints are deprecated and will be removed eventually]
 
 As shown above `query_name` and `format` may be accessed as part of the URL structure, or can be passed as parameters to the request.
 
-Because we're retrieving report results here, the request is a `GET` in any case, but parameters may be sent in a JSON body or as querystring parameters. `query_name` and `format` in URL base path will be preferred if a request to such a path happens to include either in the body (client apps should avoid doing this to avoid confusion).
+Because we're retrieving report results here, the request is a `GET` in any case, but parameters may be sent in a JSON body or as querystring parameters. Note that `query_name` and `format` from URL base path will be preferred, even if a request to such a path happens to include either key in the request body (client apps should avoid doing this to avoid confusion).
 
 `query_name` should match the name of a given query script file, minus the file extension. URL querystring parameters (or JSON keys other than `query_string` and `format`) are passed to the invoked data source query, matched to any parameter keys specified in the query file. If any parameters expected by the query are missing, an error will be returned. Extra/unrecognized parameters are silently ignored (this might seem surprising, but it's standard SQLAlchemy behavior for parameter substitution).
 
