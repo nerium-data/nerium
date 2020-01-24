@@ -37,8 +37,10 @@ def init_query(query_name):
             "result",
             "status_code",
         ],
-        defaults=(False, {}, "", "", "", 200),
     )
+    # `nametuple.defaults` option only available in >=3.7
+    # .__new__.defaults__ works with older versions
+    Query.__new__.__defaults__ = (False, {}, "", "", "", 200)
     query_obj = Query(
         name=query_name,
         executed=datetime.utcnow().isoformat(),
