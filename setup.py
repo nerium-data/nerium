@@ -19,6 +19,7 @@ VERSION = None
 
 REQUIRED = [
     "flask",
+    "flask-cors",
     "gitpython",
     "marshmallow",
     "python-dotenv",
@@ -30,8 +31,8 @@ REQUIRED = [
 
 EXTRAS = {"mysql": ["PyMySQL"], "pg": ["psycopg2"]}
 
-# The rest you shouldn't have to touch too much :)
-# ------------------------------------------------
+# The rest you shouldn't have to touch too much
+# ----------------------------------------------
 
 here = os.path.abspath(os.path.dirname(__file__))
 

@@ -4,9 +4,9 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, make_response, request
+from flask_cors import CORS
 from marshmallow import INCLUDE, Schema, fields
 from marshmallow.exceptions import ValidationError
-
 from nerium import __version__, commit, csv_result, discovery, formatter, query
 from nerium.utils import convert_multidict
 
@@ -18,6 +18,7 @@ load_dotenv("/dotenv/.env")
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+CORS(app)
 
 
 @app.route("/")
