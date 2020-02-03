@@ -1,5 +1,5 @@
 FROM alpine:3.10
-LABEL maintainer='yagermadden@gmail.com'
+LABEL maintainer='thomas@yager-madden.com'
 
 # Install python3
 # Not using python:3-alpine to avoid
