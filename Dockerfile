@@ -1,9 +1,7 @@
 FROM alpine:3.10
 LABEL maintainer='thomas@yager-madden.com'
 
-# Install python3
-# Not using python:3-alpine to avoid
-#   psycopg2 starting a separate python3 install'
+# Install python3 and alpine packages for psycopg2 and gevent
 RUN apk add --no-cache python3 py3-psycopg2 py3-gevent git
 
 # Copy in the code

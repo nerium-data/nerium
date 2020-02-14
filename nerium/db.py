@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""SQL database query implementation of resultset, using Records library
-to fetch a dataset from configured query_name
+"""Use SQLAlchemy engine to fetch a dataset from configured query_name
 """
 import os
 from sqlalchemy import create_engine
@@ -8,14 +7,14 @@ from sqlalchemy import create_engine
 
 def get_data_source(query):
     """ Get data source connection metadata based on config. Prefer, in order:
-        - Query file frontmatter
+        - Query file metadata
         - DATABASE_URL in environment
     """
-    # from frontmatter
+    # from file metadata
     if "database_url" in query.metadata.keys():
         return query.metadata["database_url"]
 
-    # Default to $DATABASE_URL with sqlite fallback if not set in frontmatter
+    # Default to $DATABASE_URL (with sqlite fallback) if not set in frontmatter
     return os.getenv("DATABASE_URL", "sqlite:///")
 
 
