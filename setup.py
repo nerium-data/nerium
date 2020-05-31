@@ -12,7 +12,7 @@ from setuptools import find_packages, setup, Command
 NAME = "Nerium"
 DESCRIPTION = "The little business intelligence engine that could."
 URL = "https://github.com/tym-xqo/nerium"
-EMAIL = "yagermadden@gmail.com"
+EMAIL = "thomas@yager-madden.com"
 AUTHOR = "Thomas Yager-Madden"
 REQUIRES_PYTHON = ">=3.6.0"
 VERSION = None
