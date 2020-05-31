@@ -24,3 +24,4 @@ format_files/*
 !format_files/README.md
 .coverage
 htmlcov/
+.markdownlint.json

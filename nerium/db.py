@@ -2,7 +2,7 @@
 """Use SQLAlchemy engine to fetch a dataset from configured query_name
 """
 import os
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 
 def get_data_source(query):
@@ -29,7 +29,7 @@ def result(query, **kwargs):
     try:
         db = connection(query)
         sql = query.body
-        cur = db.execute(sql, **kwargs)
+        cur = db.execute(text(sql), **kwargs)
         cols = cur.keys()
         result = cur.fetchall()
         rows = [dict(zip(cols, row)) for row in result]
