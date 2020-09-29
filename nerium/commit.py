@@ -1,7 +1,9 @@
-import requests
-from nerium import __version__
-from git import Repo
 from pathlib import Path
+
+import requests
+from git import Repo
+from git.exc import InvalidGitRepositoryError
+from nerium import __version__
 
 
 def get_local_head_commit():
@@ -29,7 +31,10 @@ def get_commit_for_version(version=__version__):
         requests.exceptions.ConnectionError,
         ValueError,
     ):
-        commit = get_local_head_commit()
+        try:
+            commit = get_local_head_commit()
+        except InvalidGitRepositoryError:
+            commit = "unknown"
     return commit
 
 
