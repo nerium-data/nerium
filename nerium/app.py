@@ -1,20 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
-from pathlib import Path
-
-from dotenv import load_dotenv
 from flask import Flask, jsonify, make_response, request
 from flask_cors import CORS
 from marshmallow import INCLUDE, Schema, fields
 from marshmallow.exceptions import ValidationError
 from nerium import __version__, commit, csv_result, discovery, formatter, query
 from nerium.utils import convert_multidict
-
-# Provision environment as needed
-# Load local .env first
-load_dotenv(Path.cwd() / ".env")
-# Load this one for use w/ Kubernetes secret mount
-load_dotenv("/dotenv/.env")
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
@@ -25,22 +16,19 @@ CORS(app)
 @app.route("/v1/")
 @app.route("/v2/")
 def base_route():
-    """Health check route; returns OK with version and git commit detail
-    """
+    """Health check route; returns OK with version and git commit detail"""
     return jsonify({"status": "ok", "version": __version__, "commit": commit})
 
 
 @app.route("/v2/reports/")
 def serve_report_list():
-    """Discovery route; returns a list of available reports known to the service
-    """
+    """Discovery route; returns a list of available reports known to the service"""
     return jsonify(discovery.list_reports())
 
 
 @app.route("/v2/reports/<query_name>/")
 def serve_report_description(query_name):
-    """Discovery route; returns details and metadata about a report by name
-    """
+    """Discovery route; returns details and metadata about a report by name"""
     report_descr = discovery.describe_report(query_name)
     if report_descr.error:
         status_code = getattr(report_descr, "status_code", 400)
@@ -94,8 +82,7 @@ def get_query_result(params):
 @app.route("/v2/results/<query_name>/")
 @app.route("/v2/results/<query_name>/<format_>")
 def serve_query_result(query_name="", format_=""):
-    """Parse request and hand params to get_query_result
-    """
+    """Parse request and hand params to get_query_result"""
     params = request.json or convert_multidict(request.args.to_dict(flat=False))
     if query_name:
         params["query_name"] = query_name

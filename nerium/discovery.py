@@ -10,8 +10,7 @@ from nerium.query import parse_query_file
 
 
 def list_reports():
-    """Return list of available report names from query dir
-    """
+    """Return list of available report names from query dir"""
     flat_queries = list(Path(os.getenv("QUERY_PATH", "query_files")).glob("**/*"))
     # Filter out docs and metadata
     query_paths = list(filter(lambda i: i.suffix not in [".md", ".yaml"], flat_queries))
@@ -32,8 +31,7 @@ def columns_from_metadata(query):
 
 
 def columns_from_body(query):
-    """Parse columns from SELECT statement
-    """
+    """Parse columns from SELECT statement"""
     columns = []
     parsed_query = sqlparse.parse(query.body)[0]
     for tkn in parsed_query.tokens:

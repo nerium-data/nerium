@@ -34,7 +34,7 @@ def get_commit_for_version(version=__version__):
         try:
             commit = get_local_head_commit()
         except InvalidGitRepositoryError:
-            commit = "unknown"
+            commit = "Unable to retrieve commit here"
     return commit
 
 
