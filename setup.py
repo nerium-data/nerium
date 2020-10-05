@@ -22,7 +22,6 @@ REQUIRED = [
     "flask-cors",
     "gitpython",
     "marshmallow",
-    "python-dotenv",
     "pyyaml",
     "requests",
     "sqlalchemy",
