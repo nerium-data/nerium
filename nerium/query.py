@@ -5,14 +5,14 @@ from pathlib import Path
 
 import sqlparse
 import yaml
-from jinja2.sandbox import SandboxedEnvironment
 
-from nerium import db
+# from jinja2.sandbox import SandboxedEnvironment
+
+from raw import db
 
 
 def query_file(query_name):
-    """Find file matching query_name and return Path object
-    """
+    """Find file matching query_name and return Path object"""
     flat_queries = list(Path(os.getenv("QUERY_PATH", "query_files")).glob("**/*"))
     query_file = None
     query_file_match = list(filter(lambda i: query_name == i.stem, flat_queries))
@@ -23,8 +23,7 @@ def query_file(query_name):
 
 
 def init_query(query_name):
-    """Initialize query namedtuple from file name
-    """
+    """Initialize query namedtuple from file name"""
     Query = namedtuple(
         "Query",
         [
@@ -50,8 +49,7 @@ def init_query(query_name):
 
 
 def extract_metadata(query_string):
-    """ Find `:meta` labeled comment in query string and load yaml from it
-    """
+    """Find `:meta` labeled comment in query string and load yaml from it"""
     tokens = sqlparse.parse(query_string)[0].tokens
     # Get comment with :meta label
     try:
@@ -70,26 +68,15 @@ def extract_metadata(query_string):
     return metadata
 
 
-def process_template(body, **kwargs):
-    """Render query body using jinja2 sandbox
-    TODO: Prevent variable expansion
-    """
-    env = SandboxedEnvironment()
-    template = env.from_string(body)
-    return template.render(kwargs)
-
-
 def parse_query_file(query_name):
-    """Parse query file and add query body and metadata.
-    """
+    """Parse query file and add query body and metadata."""
     query_obj = init_query(query_name)
     try:
         with open(query_obj.path) as f:
             query_string = f.read()
 
         metadata = extract_metadata(query_string)
-        rendered = process_template(query_string)
-        body = sqlparse.format(rendered, strip_comments=True)
+        body = sqlparse.format(query_string, strip_comments=True)
 
         query_obj = query_obj._replace(metadata=metadata, body=body)
 
@@ -103,15 +90,14 @@ def parse_query_file(query_name):
 
 
 def get_result_set(query_name, **kwargs):
-    """Call parse_query_file, then submit query and return new object with result
-    """
+    """Call parse_query_file, then submit query and return new object with result"""
     query = parse_query_file(query_name)
 
     # Bail if parser captures error:
     if query.error:
         return query
 
-    result = db.result(query, **kwargs)
+    result = db.result(query.body, jinja=True, **kwargs)
     query = query._replace(result=result)
 
     # Set query.error in case db module captures an excecption
