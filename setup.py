@@ -24,7 +24,6 @@ REQUIRED = [
     "marshmallow",
     "pyyaml",
     "requests",
-    # "sqlalchemy",
     "sqla-raw",
     "sqlparse",
 ]
