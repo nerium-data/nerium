@@ -25,3 +25,4 @@ format_files/*
 .coverage
 htmlcov/
 .markdownlint.json
+.flake8
