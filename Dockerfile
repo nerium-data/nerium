@@ -1,18 +1,18 @@
-FROM alpine:3.10
-LABEL maintainer='thomas@yager-madden.com'
+FROM python:3.9.2-slim-buster
+LABEL maintainer='Thomas Yager-Madden <thomas@yager-madden.com>'
 
-# Install python3 and alpine packages for psycopg2 and gevent
-RUN apk add --no-cache python3 py3-psycopg2 py3-gevent git
-
+# install git to support Nerium commit endpoint
+RUN apt-get update && apt-get install -y git
 # Copy in the code
 COPY . /app
 
 WORKDIR /app
 
 # install from code currently in repo
-RUN pip3 install flask gunicorn==19.9.0
-RUN python3 setup.py install
+RUN python setup.py install
 
+# install gunicorn and psycopg2 Postgres database driver
+RUN pip3 install gevent gunicorn psycopg2-binary
 
 VOLUME /app/query_files
 VOLUME /app/format_files

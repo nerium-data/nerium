@@ -18,7 +18,7 @@ REQUIRES_PYTHON = ">=3.6.0"
 VERSION = None
 
 REQUIRED = [
-    "flask",
+    "Flask>=1.1.2",
     "flask-cors",
     "gitpython",
     "marshmallow",
@@ -118,6 +118,8 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Database :: Front-Ends",
         "Topic :: Software Development :: Libraries",
         "Topic :: Utilities",
