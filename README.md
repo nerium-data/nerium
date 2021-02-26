@@ -1,6 +1,6 @@
 # Nerium
 
-![small bicycle](https://dl.dropboxusercontent.com/s/7kba2cgrcvuj0hy/nerium-bicycle-sm.jpg "Keeping the 'micro' in microservices")
+![small bicycle](https://www.yager-madden.com/image/nerium-bicycle-sm.jpg "Keeping the 'micro' in microservices")
 
 [![CircleCI](https://img.shields.io/circleci/project/github/tym-xqo/nerium.svg)](https://circleci.com/gh/tym-xqo/nerium)
 [![Codecov](https://img.shields.io/codecov/c/github/tym-xqo/nerium.svg)](https://codecov.io/gh/tym-xqo/nerium)
