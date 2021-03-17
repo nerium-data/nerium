@@ -2,8 +2,8 @@
 
 ![small bicycle](https://www.yager-madden.com/image/nerium-bicycle-sm.jpg "Keeping the 'micro' in microservices")
 
-[![CircleCI](https://img.shields.io/circleci/project/github/tym-xqo/nerium.svg)](https://circleci.com/gh/tym-xqo/nerium)
-[![Codecov](https://img.shields.io/codecov/c/github/tym-xqo/nerium.svg)](https://codecov.io/gh/tym-xqo/nerium)
+[![CircleCI](https://img.shields.io/circleci/project/github/nerium-data/nerium.svg)](https://circleci.com/gh/nerium-data/nerium)
+[![Codecov](https://img.shields.io/codecov/c/github/nerium-data/nerium.svg)](https://codecov.io/gh/nerium-data/nerium)
 [![PyPI - Version](https://img.shields.io/pypi/v/nerium.svg)](https://pypi.org/project/nerium/)
 [![PyPI - License](https://img.shields.io/pypi/l/nerium.svg)](https://pypi.org/project/nerium/)
 
@@ -34,15 +34,17 @@ You might also want to use `tymxqo/nerium` as a base image for your own custom c
 ### Local install
 
 ```sh
-pipenv install nerium[pg]
+pip install nerium[pg]
 ```
 
 Or install latest source from Github:
 
 ```sh
-git clone https://github.com/tym-xqo/nerium.git
+git clone https://github.com/nerium-data/nerium.git
 cd nerium
-pipenv install --dev
+python -m venv .venv
+source .venv/bin/activate
+pip install .
 ```
 
 Then add a `query_files` (and, optionally, `format_files`) directory to your project, write your queries, and configure the app as described in the next section. The command `FLASK_APP=nerium/app.py flask run` starts a local development server running the app, listening on port 5000. For production use, you will want to add a proper WSGI server (we like [`gunicorn`](https://gunicorn.org/)).
@@ -71,19 +73,20 @@ Use `:<param>` to specify bind parameters in your query text. Clients can then s
 
 ### Metadata
 
-Query files can optionally include a [YAML](http://yaml.org/) metadata block. The use of a special comment for metadata allows for the SQL file to be used as-is in other SQL clients. To add this metadata, create a multiline comment surrounded by `\* ... */` markers, and include the label `:meta` at the top. Within this comment, surround the YAML document with standard triple-dashed lines, as in this example:
+Query files can optionally include a [YAML](http://yaml.org/) metadata frontmatter block. The use of a special comment for metadata allows for the SQL file to be used as-is in other SQL clients. To add this metadata, create a multiline comment surrounded by `\* ... */` markers, and within this comment, surround the YAML document with standard triple-dashed lines, as in this example:
 
 ```sql
-/* :meta
+/*
 ---
 Author: Joelle van Dyne
 Description: Returns all active usernames in the system
----*/
+---
+*/
 select username from user;
 
 ```
 
-Metadata can generally be thought of as a way to pass arbitrary key-value pairs to a front-end client; in the default format, the metadata is simply returned in the results response. (The `compact` formatter drops the metadata.) Other possible use cases include whatever a reporting service and front-end developer want to coordinate on.
+Metadata can generally be thought of as a way to pass arbitrary key-value pairs to a front-end client; in the default format, the metadata is simply returned as an attribute of the results response. (The `compact` formatter drops the metadata.) Other possible use cases include whatever a reporting service and front-end developer want to coordinate on.
 
 There are a couple of special-case metadata items:
 
@@ -190,10 +193,14 @@ Unknown values of `format` will silently fall back to default.
 'compact': `{"columns": [<list of column names>], "data": [<array of row value arrays>]}`
 'csv': `<csv formatted string (with \r\n newline)>`
   
-Of course, it is possible that a database query might return no results. In this case, Nerium will respond with an empty JSON array `[]` regardless of specified format. This is not considered an error, and clients should be prepared to handle it appropriately.
+Of course, it is possible that a database query might return no results. In this case, Nerium will respond with an empty JSON array `[]` for the `data` attribute, regardless of specified format. This is not considered an error, and clients should be prepared to handle it appropriately.
 
 #### Error Responses
 
 **Code**: 400
 
 **Content**: `{"error": <exception.repr from Python>}`
+
+## Tests
+
+`pytest` tests are located in [tests/](tests/). Install test prerequisites with `pip install -r tests/requirements.txt`; then they can be run with: `coverage run setup.py test` (or just `pytest`).

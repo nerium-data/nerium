@@ -1,6 +1,7 @@
 import os
 import re
 from pathlib import Path
+
 from types import SimpleNamespace
 
 import sqlparse
@@ -21,19 +22,18 @@ def list_reports():
 
 
 def columns_from_metadata(query):
-    """Return `columns` block from query front matter,
-    if present
-    """
+    """Return `columns` block from query front matter, if present"""
     columns = None
     if "columns" in query.metadata.keys():
         columns = query.metadata.pop("columns")
     return columns
 
 
-def columns_from_body(query):
-    """Parse columns from SELECT statement"""
+def columns_from_statement(query):
+    """Parse columns from SELECT list"""
+    # TODO: can we base this on SQLA attributes instead of using sqlparse?
     columns = []
-    parsed_query = sqlparse.parse(query.body)[0]
+    parsed_query = sqlparse.parse(query.statement)[0]
     for tkn in parsed_query.tokens:
         if isinstance(tkn, IdentifierList):
             for id_ in tkn:
@@ -49,9 +49,10 @@ def params_from_metadata(query):
     return params
 
 
-def params_from_body(query):
+def params_from_statement(query):
+    # TODO: can we base this on SQLA attributes instead of using sqlparse?
     param_regex = re.compile("(?<!\\w)\\:\\w+")
-    param_list = [i.strip(":") for i in re.findall(param_regex, query.body)]
+    param_list = [i.strip(":") for i in re.findall(param_regex, query.statement)]
     return param_list
 
 
@@ -59,8 +60,10 @@ def describe_report(query_name):
     report_query = parse_query_file(query_name)
     if report_query.error:
         return report_query
-    params = params_from_metadata(report_query) or params_from_body(report_query)
-    columns = columns_from_metadata(report_query) or columns_from_body(report_query)
+    params = params_from_metadata(report_query) or params_from_statement(report_query)
+    columns = columns_from_metadata(report_query) or columns_from_statement(
+        report_query
+    )
     report_description = SimpleNamespace(
         error=report_query.error,
         name=report_query.name,
