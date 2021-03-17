@@ -5,7 +5,6 @@ from datetime import datetime
 
 # from pathlib import Path
 
-import sqlparse
 import yaml
 
 # from jinja2.sandbox import SandboxedEnvironment
@@ -44,7 +43,7 @@ def extract_metadata(query_string):
     metadata = {}
     meta_comment = re.search(r"---[\s\S]+?---", query_string, re.MULTILINE)
     if meta_comment:
-        meta_string = meta_comment[0].split("---")[1]
+        meta_string = meta_comment[0].strip("---")
         metadata = yaml.safe_load(meta_string)
 
     return metadata
@@ -55,10 +54,9 @@ def parse_query_file(query_name):
     query_obj = init_query(query_name)
     try:
         with open(query_obj.path) as f:
-            query_string = f.read()
+            statement = f.read()
 
-        metadata = extract_metadata(query_string)
-        statement = sqlparse.format(query_string)
+        metadata = extract_metadata(statement)
 
         query_obj = query_obj._replace(metadata=metadata, statement=statement)
 

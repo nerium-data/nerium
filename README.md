@@ -73,7 +73,7 @@ Use `:<param>` to specify bind parameters in your query text. Clients can then s
 
 ### Metadata
 
-Query files can optionally include a [YAML](http://yaml.org/) metadata block. The use of a special comment for metadata allows for the SQL file to be used as-is in other SQL clients. To add this metadata, create a multiline comment surrounded by `\* ... */` markers, and within this comment, surround the YAML document with standard triple-dashed lines, as in this example:
+Query files can optionally include a [YAML](http://yaml.org/) metadata frontmatter block. The use of a special comment for metadata allows for the SQL file to be used as-is in other SQL clients. To add this metadata, create a multiline comment surrounded by `\* ... */` markers, and within this comment, surround the YAML document with standard triple-dashed lines, as in this example:
 
 ```sql
 /*
@@ -200,3 +200,7 @@ Of course, it is possible that a database query might return no results. In this
 **Code**: 400
 
 **Content**: `{"error": <exception.repr from Python>}`
+
+## Tests
+
+`pytest` tests are located in [tests/](tests/). Install test prerequisites with `pip install -r tests/requirements.txt`; then they can be run with: `coverage run setup.py test` (or just `pytest`).
