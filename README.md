@@ -2,7 +2,7 @@
 
 ![small bicycle](https://www.yager-madden.com/image/nerium-bicycle-sm.jpg "Keeping the 'micro' in microservices")
 
-[![CircleCI](https://img.shields.io/circleci/project/github/tym-xqo/nerium.svg)](https://circleci.com/gh/tym-xqo/nerium)
+[![CircleCI](https://img.shields.io/circleci/project/github/nerium-data/nerium.svg)](https://circleci.com/gh/tym-xqo/nerium)
 [![Codecov](https://img.shields.io/codecov/c/github/tym-xqo/nerium.svg)](https://codecov.io/gh/tym-xqo/nerium)
 [![PyPI - Version](https://img.shields.io/pypi/v/nerium.svg)](https://pypi.org/project/nerium/)
 [![PyPI - License](https://img.shields.io/pypi/l/nerium.svg)](https://pypi.org/project/nerium/)
