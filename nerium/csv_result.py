@@ -4,8 +4,7 @@ from nerium.query import get_result_set
 
 
 def results_to_csv(query_name, **kwargs):
-    """ Generate CSV from result data
-    """
+    """Generate CSV from result data"""
     query = get_result_set(query_name, **kwargs)
     result = query.result
     stream = StringIO()

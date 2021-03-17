@@ -8,9 +8,8 @@ jobs:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: circleci/python:3.7
+      - image: cimg/python:3.9.2
         environment:
-          PIPENV_VENV_IN_PROJECT: true
           QUERY_PATH: tests/query
 
     working_directory: ~/nerium
@@ -21,16 +20,16 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            pipenv install -d
+            pip install -r requirements.txt
+            pip install -r tests/requirements.txt
       - run:
           name: run tests
           command:
-            pipenv run coverage run setup.py test
+            coverage run setup.py test
       - run:
           name: Send to Codecov
           command: |
-            pipenv install codecov
-            pipenv run codecov 
+            pip install codecov
+            codecov 
       - store_artifacts:
           path: .coverage
-          

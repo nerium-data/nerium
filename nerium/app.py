@@ -100,7 +100,7 @@ def serve_query_result(query_name="", format_=""):
 @app.route("/v1/<query_name>/csv")
 @app.route("/v2/results/<query_name>/csv")
 def serve_csv_result(query_name):
-    params = convert_multidict(request.args.to_dict(flat=False))
+    params = request.json or convert_multidict(request.args.to_dict(flat=False))
     query_results = csv_result.results_to_csv(query_name, **params)
     resp = make_response()
     resp.headers["content_type"] = "text/csv"

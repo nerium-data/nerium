@@ -9,7 +9,7 @@ COPY . /app
 WORKDIR /app
 
 # install from code currently in repo
-RUN python setup.py install
+RUN pip3 install -r requirements.txt
 
 # install gunicorn and psycopg2 Postgres database driver
 RUN pip3 install gevent gunicorn psycopg2-binary

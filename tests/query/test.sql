@@ -1,4 +1,4 @@
-/* :meta
+/* 
 ---
 foo: bar
 columns:
