@@ -11,6 +11,7 @@ jobs:
       - image: cimg/python:3.9.2
         environment:
           QUERY_PATH: tests/query
+          CODECOV_TOKEN: 5e50df73-32b8-4589-bbf9-1fc2913dd89d
 
     working_directory: ~/nerium
 
