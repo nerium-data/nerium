@@ -11,7 +11,6 @@ jobs:
       - image: cimg/python:3.9.2
         environment:
           QUERY_PATH: tests/query
-          CODECOV_TOKEN: 5e50df73-32b8-4589-bbf9-1fc2913dd89d
 
     working_directory: ~/nerium
 
@@ -25,12 +24,11 @@ jobs:
             pip install -r tests/requirements.txt
       - run:
           name: run tests
-          command:
-            coverage run setup.py test
+          command: coverage run setup.py test
       - run:
           name: Send to Codecov
           command: |
             pip install codecov
-            codecov 
+            codecov
       - store_artifacts:
           path: .coverage
