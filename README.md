@@ -7,7 +7,7 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/nerium.svg)](https://pypi.org/project/nerium/)
 [![PyPI - License](https://img.shields.io/pypi/l/nerium.svg)](https://pypi.org/project/nerium/)
 
-A lightweight [Flask](http://flask.pocoo.org/)-based microservice that submits queries to any [SQLAlchemy](https://www.sqlalchemy.org/)-supported database, and returns results as JSON or CSV. By analogy with static site generators, Nerium reads its queries and serialization formats from local files, stored on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them.
+A lightweight [Flask](http://flask.pocoo.org/)-based microservice that submits queries to any [SQLAlchemy](https://www.sqlalchemy.org/)-supported database, and returns results as JSON or CSV. Inspired by static site generators, Nerium reads its queries and serialization formats from local files, stored on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them.
 
 Nerium provides a quick, simple, and easy way to develop JSON APIs for use in reporting and analytic applications. In keeping with SQLAlchemy usage, query parameters can be specified in `key=value` format, and (_safely_!) injected into your query in `:key` format.
 
