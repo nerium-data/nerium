@@ -45,7 +45,7 @@ class ResultRequestSchema(Schema):
         unknown = INCLUDE
 
     query_name = fields.String(required=True)
-    format_ = fields.String(missing="default", data_key="format")
+    format_ = fields.String(load_default="default", data_key="format")
 
 
 def get_query_result(params):
