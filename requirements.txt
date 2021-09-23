@@ -46,7 +46,7 @@ sqla-raw==1.1.2
     # via Nerium (setup.py)
 sqlalchemy==1.4.22
     # via sqla-raw
-sqlparse==0.4.1
+sqlparse==0.4.2
     # via Nerium (setup.py)
 urllib3==1.26.6
     # via requests
