@@ -7,13 +7,13 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/nerium.svg)](https://pypi.org/project/nerium/)
 [![PyPI - License](https://img.shields.io/pypi/l/nerium.svg)](https://pypi.org/project/nerium/)
 
-A lightweight [Flask](http://flask.pocoo.org/)-based microservice that submits queries to any [SQLAlchemy](https://www.sqlalchemy.org/)-supported database, and returns results as JSON or CSV. Inspired by static site generators, Nerium reads its queries and serialization formats from local files, stored on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them.
+A lightweight [Flask](http://flask.pocoo.org/)-based query broker microservice that submits queries to any [SQLAlchemy](https://www.sqlalchemy.org/)-supported database, and returns results as JSON or CSV. Inspired by static site generators, Nerium reads its queries and serialization formats from local files, stored on the filesystem. The idea is that report analysts should be able to write queries in their preferred local editor, and upload or mount them where Nerium can use them. This workflow broadly supports rapid report development, and Nerium strives for a simplest-thing-that-could-possibly work approach to its implementation.
 
 Nerium provides a quick, simple, and easy way to develop JSON APIs for use in reporting and analytic applications. In keeping with SQLAlchemy usage, query parameters can be specified in `key=value` format, and (_safely_!) injected into your query in `:key` format.
 
 Default JSON output represents `data` as an array of objects, one per result row, with database column names as keys. The default schema also provides top-level nodes for `name`, `metadata`, and `params` (details below). A `compact` JSON output format may also be requested, with separate `column` (array of column names) and `data` (array of row value arrays) nodes for compactness. Additional formats can be added by adding [marshmallow](https://marshmallow.readthedocs.io) schema definitions to `format_files`.
 
-Nerium supports any backend that SQLAlchemy can, but since none of these are hard dependencies, drivers aren't included in Pipfile, and the Dockerfile only supports PostgreSQL. If you want Nerium to work with other databases, you can install Python connectors with `pip`, either in a virtualenv or by creating your own Dockerfile using `FROM tymxqo/nerium`. (To ease installation, options for `nerium[mysql]` and `nerium[pg]` are provided in `setup.py`)
+Nerium supports any backend that SQLAlchemy can, but since none of these are hard dependencies, drivers aren't included in the default setup, and the Dockerfile only supports PostgreSQL. If you want Nerium to work with other databases, you can install Python connectors with `pip`, either in a virtualenv or by creating your own Dockerfile using `FROM tymxqo/nerium`. (To ease installation, `extras_require` options for `nerium[mysql]` and `nerium[pg]` are provided in `setup.py`)
 
 ## Install/Run
 
@@ -59,7 +59,7 @@ By default, Nerium looks for query and format schema files in `query_files` and 
 
 ### Multiple Data Sources
 
-If you want to query multiple databases from a single Nerium installation, any individual query file can define its own `database_url` as a key in YAML front matter (see below). This will override the `$DATABASE_URL` setting in the environment for that query only. If you have a large number of queries across several databases, keep in mind that running a separate Nerium instance for each database is always an option.
+If you want to query multiple databases from a single Nerium installation, any individual query file can define its own `database_url` as a key in YAML front matter (see below). This will override the `$DATABASE_URL` setting in the environment for that query only. If you have a large number of queries across several databases, keep in mind that running a separate Nerium instance for each database could be an option.
 
 ## Usage
 
