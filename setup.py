@@ -18,7 +18,7 @@ REQUIRES_PYTHON = ">=3.6.0"
 VERSION = None
 
 REQUIRED = [
-    "Flask>=1.1.2",
+    "Flask>=1.1.2,<=2.0.2",
     "flask-cors",
     "gitpython",
     "marshmallow",
@@ -26,6 +26,7 @@ REQUIRED = [
     "requests",
     "sqla-raw",
     "sqlparse",
+    "Werkzeug<=2.0.3",
 ]
 
 EXTRAS = {"mysql": ["PyMySQL"], "pg": ["psycopg2"]}

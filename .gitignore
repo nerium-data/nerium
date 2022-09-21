@@ -26,3 +26,4 @@ format_files/*
 htmlcov/
 .markdownlint.json
 .flake8
+.env.docker
