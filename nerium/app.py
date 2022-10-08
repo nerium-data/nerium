@@ -4,7 +4,9 @@ from flask import Flask, jsonify, make_response, request
 from flask_cors import CORS
 from marshmallow import INCLUDE, Schema, fields
 from marshmallow.exceptions import ValidationError
+
 from nerium import __version__, commit, csv_result, discovery, formatter, query
+from nerium.auth import require_api_key
 from nerium.utils import convert_multidict
 
 app = Flask(__name__)
@@ -15,18 +17,21 @@ CORS(app)
 @app.route("/")
 @app.route("/v1/")
 @app.route("/v2/")
+@require_api_key
 def base_route():
     """Health check route; returns OK with version and git commit detail"""
     return jsonify({"status": "ok", "version": __version__, "commit": commit})
 
 
 @app.route("/v2/reports/")
+@require_api_key
 def serve_report_list():
     """Discovery route; returns a list of available reports known to the service"""
     return jsonify(discovery.list_reports())
 
 
 @app.route("/v2/reports/<query_name>/")
+@require_api_key
 def serve_report_description(query_name):
     """Discovery route; returns details and metadata about a report by name"""
     report_descr = discovery.describe_report(query_name)
@@ -81,6 +86,7 @@ def get_query_result(params):
 @app.route("/v2/results")
 @app.route("/v2/results/<query_name>/")
 @app.route("/v2/results/<query_name>/<format_>")
+@require_api_key
 def serve_query_result(query_name="", format_=""):
     """Parse request and hand params to get_query_result"""
     params = request.json or convert_multidict(request.args.to_dict(flat=False))
@@ -99,6 +105,7 @@ def serve_query_result(query_name="", format_=""):
 
 @app.route("/v1/<query_name>/csv")
 @app.route("/v2/results/<query_name>/csv")
+@require_api_key
 def serve_csv_result(query_name):
     params = request.json or convert_multidict(request.args.to_dict(flat=False))
     query_results = csv_result.results_to_csv(query_name, **params)

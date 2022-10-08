@@ -59,6 +59,12 @@ By default, Nerium looks for query and format schema files in `query_files` and 
 
 If you want to query multiple databases from a single Nerium installation, any individual query file can define its own `database_url` as a key in YAML front matter (see below). This will override the `$DATABASE_URL` setting in the environment for that query only. If you have a large number of queries across several databases, keep in mind that running a separate Nerium instance for each database could be an option.
 
+### Security and API key authorization
+
+As a simple minimal microservice by design, Nerium's default security posture is to presume its clients and the network between them can be trusted, and that it is the responsibility of client applications and/or a separate authentication service to ensure that users can only request reports they are authorized to see.
+
+If `API_KEY` is set in the environment, Nerium will check all incoming requests for an `X-API-Key` header and compare it to the envvar value. Requests missing the header receive a 400 error, requests with an invalid value in the header get a 403. This can be used simply to afford an extra measure of internal security, or perhaps, for example, to run separate instances of Nerium in a multi-tenant configuration: each tenant receives its own key which is then matched with the setting in a particular Nerium deployment. These key values are obviously to be protected as shared secrets, and shared with client operators via secure channels. We recommend using [`secrets.token_hex()`](https://docs.python.org/3/library/secrets.html#secrets.token_hex) or similar to generate them.
+
 ## Usage
 
 ### Query files
