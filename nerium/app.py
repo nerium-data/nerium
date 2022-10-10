@@ -16,29 +16,10 @@ CORS(app)
 
 @app.route("/")
 @app.route("/v1/")
-@app.route("/v2/")
 @require_api_key
 def base_route():
     """Health check route; returns OK with version and git commit detail"""
     return jsonify({"status": "ok", "version": __version__, "commit": commit})
-
-
-@app.route("/v2/reports/")
-@require_api_key
-def serve_report_list():
-    """Discovery route; returns a list of available reports known to the service"""
-    return jsonify(discovery.list_reports())
-
-
-@app.route("/v2/reports/<query_name>/")
-@require_api_key
-def serve_report_description(query_name):
-    """Discovery route; returns details and metadata about a report by name"""
-    report_descr = discovery.describe_report(query_name)
-    if report_descr.error:
-        status_code = getattr(report_descr, "status_code", 400)
-        return jsonify(dict(error=report_descr.error)), status_code
-    return jsonify(vars(report_descr))
 
 
 class ResultRequestSchema(Schema):
@@ -83,9 +64,6 @@ def get_query_result(params):
 
 @app.route("/v1/<query_name>/")
 @app.route("/v1/<query_name>/<format_>")
-@app.route("/v2/results")
-@app.route("/v2/results/<query_name>/")
-@app.route("/v2/results/<query_name>/<format_>")
 @require_api_key
 def serve_query_result(query_name="", format_=""):
     """Parse request and hand params to get_query_result"""
@@ -113,3 +91,21 @@ def serve_csv_result(query_name):
     resp.headers["content_type"] = "text/csv"
     resp.data = query_results
     return resp
+
+
+@app.route("/v1/docs/")
+@require_api_key
+def serve_report_list():
+    """Discovery route; returns a list of available reports known to the service"""
+    return jsonify(discovery.list_reports())
+
+
+@app.route("/v1/<query_name>/docs/")
+@require_api_key
+def serve_report_description(query_name):
+    """Discovery route; returns details and metadata about a report by name"""
+    report_descr = discovery.describe_report(query_name)
+    if report_descr.error:
+        status_code = getattr(report_descr, "status_code", 400)
+        return jsonify(dict(error=report_descr.error)), status_code
+    return jsonify(vars(report_descr))

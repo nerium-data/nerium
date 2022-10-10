@@ -131,49 +131,14 @@ For serialization formats besides the built-in default and `compact`, schema def
 
 ## API
 
-### Report listing endpoint
-
-#### URLs
-
-- `/v2/reports`
-
-#### Method
-
-`GET`
-
-#### Success Response
-
-**Code**: 200
-
-**Content**: `{"reports": [<an array of report names>]}`
-
-### Report description endpoints
-
-#### URLs
-
-- `/v2/reports/{string:query_name}`
-
-#### Method
-
-`GET`
-
-#### Success Response
-
-`{"columns":[<list of columns from report>],"error":false,"metadata":{<report: metadata object>},"name":"<query_name>","params":[<array of parameterized keys in query>],"type":"sql"}`
-
 ### Results endpoints
 
 #### URLs
 
 - `/v1/<string:query_name>?<query_params>`  
 - `/v1/<string:query_name>/<string:format>?<query_params>`
-- `/v2/results/`
-- `/v2/results/<string:query_name>?<query_params>`  
-- `/v2/results/<string:query_name>/<string:format>?<query_params>`
 
-[`v1` endpoints are deprecated and will be removed eventually]
-
-As shown above `query_name` and `format` may be accessed as part of the URL structure, or can be passed as parameters to the request.
+As shown above, `query_name` and `format` may be accessed as part of the URL structure, or can be passed as parameters to the request.
 
 Because we're retrieving report results here, the request is a `GET` in any case, but parameters may be sent in a JSON body or as querystring parameters. Note that `query_name` and `format` from URL base path will be preferred, even if a request to such a path happens to include either key in the request body (client apps should avoid doing this to avoid confusion).
 
@@ -204,6 +169,39 @@ Of course, it is possible that a database query might return no results. In this
 **Code**: 400
 
 **Content**: `{"error": <exception.repr from Python>}`
+
+### Documentation endpoints
+
+#### Report listing endpoint
+
+##### URLs
+
+- `/v1/docs/`
+
+##### Method
+
+`GET`
+
+##### Success Response
+
+**Code**: 200
+
+**Content**: `{"reports": [<an array of report names>]}`
+
+#### Report description endpoints
+
+##### URLs
+
+- `/v1/{string:query_name}/docs/`
+
+##### Method
+
+`GET`
+
+##### Success Response
+
+`{"columns":[<list of columns from report>],"error":false,"metadata":{<report: metadata object>},"name":"<query_name>","params":[<array of parameterized keys in query>],"type":"sql"}`
+
 
 ## Tests
 
