@@ -14,14 +14,6 @@ app.url_map.strict_slashes = False
 CORS(app)
 
 
-@app.route("/")
-@app.route("/v1/")
-@require_api_key
-def base_route():
-    """Health check route; returns OK with version and git commit detail"""
-    return jsonify({"status": "ok", "version": __version__, "commit": commit})
-
-
 class ResultRequestSchema(Schema):
     """Require query_name in valid results request, set format to "default" if
     not supplied
@@ -62,6 +54,8 @@ def get_query_result(params):
     return (formatted, 200)
 
 
+@app.route("/")
+@app.route("/v1/")
 @app.route("/v1/<query_name>/")
 @app.route("/v1/<query_name>/<format_>")
 @require_api_key
@@ -72,6 +66,11 @@ def serve_query_result(query_name="", format_=""):
         params["query_name"] = query_name
     if format_:
         params["format_"] = format_
+
+    if "query_name" not in params.keys():
+        # If no query_name is in request, treat as heath check;
+        # returns OK with version and git commit detail"""
+        return jsonify({"status": "ok", "version": __version__, "commit": commit})
 
     query_result = get_query_result(params)
 
