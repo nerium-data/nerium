@@ -86,7 +86,7 @@ smmap==5.0.0
     # via gitdb
 sqla-raw==1.4.0
     # via Nerium (setup.py)
-sqlalchemy==1.4.41
+sqlalchemy==1.4.42
     # via sqla-raw
 sqlparse==0.4.3
     # via Nerium (setup.py)
