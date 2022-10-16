@@ -59,7 +59,7 @@ By default, Nerium looks for query and format schema files in `query_files` and 
 
 If desired, instead of the local filesystem, Nerium can read its query files from an S3 bucket using [s3fs](https://s3fs.readthedocs.io/en/latest/). When Nerium is running as a remote service, a cloud storage bucket can provide a convenient shared location for report analysts to upload SQL to, so that reports can be enhanced or additional reports without having to restart or redeploy Nerium.
 
-Simply set the `QUERY_PATH` to your S3 bucket. Nerium looks for paths beginning with the `s3://` scheme, and reads from there when it finds one. Authentication to S3 is handled via [boto environment variables](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#using-environment-variables).
+Simply set the `QUERY_PATH` to your S3 bucket URL. Nerium looks for paths beginning with the `s3://` scheme, and reads from there when it finds one. Authentication to S3 is handled via [boto environment variables](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#using-environment-variables).
 
 [S3-compatible storage that does not use URLs beginning with `s3://` is not supported. Neither is reading marshmallow format files from S3. Both may be coming in a later release.]
 
