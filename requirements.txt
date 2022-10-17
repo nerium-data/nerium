@@ -4,10 +4,28 @@
 #
 #    pip-compile
 #
-certifi==2022.9.14
+aiobotocore==2.4.0
+    # via s3fs
+aiohttp==3.8.3
+    # via
+    #   aiobotocore
+    #   s3fs
+aioitertools==0.11.0
+    # via aiobotocore
+aiosignal==1.2.0
+    # via aiohttp
+async-timeout==4.0.2
+    # via aiohttp
+attrs==22.1.0
+    # via aiohttp
+botocore==1.27.59
+    # via aiobotocore
+certifi==2022.9.24
     # via requests
 charset-normalizer==2.1.1
-    # via requests
+    # via
+    #   aiohttp
+    #   requests
 click==8.1.3
     # via flask
 flask==2.0.2
@@ -16,45 +34,73 @@ flask==2.0.2
     #   flask-cors
 flask-cors==3.0.10
     # via Nerium (setup.py)
+frozenlist==1.3.1
+    # via
+    #   aiohttp
+    #   aiosignal
+fsspec==2022.8.2
+    # via s3fs
 gitdb==4.0.9
     # via gitpython
-gitpython==3.1.27
+gitpython==3.1.29
     # via Nerium (setup.py)
-greenlet==1.1.3
+greenlet==1.1.3.post0
     # via sqlalchemy
 idna==3.4
-    # via requests
+    # via
+    #   requests
+    #   yarl
 itsdangerous==2.1.2
     # via flask
 jinja2==3.1.2
     # via
     #   flask
     #   sqla-raw
+jmespath==1.0.1
+    # via botocore
 markupsafe==2.1.1
     # via jinja2
 marshmallow==3.18.0
     # via Nerium (setup.py)
+multidict==6.0.2
+    # via
+    #   aiohttp
+    #   yarl
 packaging==21.3
     # via marshmallow
 pyparsing==3.0.9
     # via packaging
+python-dateutil==2.8.2
+    # via botocore
 pyyaml==6.0
     # via Nerium (setup.py)
 requests==2.28.1
     # via Nerium (setup.py)
+s3fs==2022.8.2
+    # via sqla-raw
 six==1.16.0
-    # via flask-cors
+    # via
+    #   flask-cors
+    #   python-dateutil
 smmap==5.0.0
     # via gitdb
-sqla-raw==1.3.0
+sqla-raw==1.4.1
     # via Nerium (setup.py)
-sqlalchemy==1.4.41
+sqlalchemy==1.4.42
     # via sqla-raw
-sqlparse==0.4.2
+sqlparse==0.4.3
     # via Nerium (setup.py)
+typing-extensions==4.4.0
+    # via aioitertools
 urllib3==1.26.12
-    # via requests
+    # via
+    #   botocore
+    #   requests
 werkzeug==2.0.3
     # via
     #   Nerium (setup.py)
     #   flask
+wrapt==1.14.1
+    # via aiobotocore
+yarl==1.8.1
+    # via aiohttp

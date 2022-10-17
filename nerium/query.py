@@ -1,14 +1,9 @@
-# import os
 import re
 from collections import namedtuple
 from datetime import datetime
 
-# from pathlib import Path
-
+import s3fs
 import yaml
-
-# from jinja2.sandbox import SandboxedEnvironment
-
 from raw import db
 
 
@@ -49,23 +44,32 @@ def extract_metadata(query_string):
     return metadata
 
 
+def read_query_file(path):
+    if path.startswith("s3://"):
+        # Read file from S3 and convert to string with decode()
+        fs = s3fs.S3FileSystem(anon=False)
+        with fs.open(path, "rb") as f:
+            statement = f.read().decode()
+    else:
+        # Read file as text from local filesystem
+        with open(path, "rt") as f:
+            statement = f.read()
+    return statement
+
+
 def parse_query_file(query_name):
     """Parse query file and add query statement and metadata."""
     query_obj = init_query(query_name)
-    try:
-        with open(query_obj.path) as f:
-            statement = f.read()
 
-        metadata = extract_metadata(statement)
-
-        query_obj = query_obj._replace(metadata=metadata, statement=statement)
-
-    # Set 404 if no file matches query_name
-    except (FileNotFoundError, TypeError):
+    if not query_obj.path:
         query_obj = query_obj._replace(
             error=f"No query found matching '{query_name}'", status_code=404
         )
+        return query_obj
 
+    statement = read_query_file(query_obj.path)
+    metadata = extract_metadata(statement)
+    query_obj = query_obj._replace(metadata=metadata, statement=statement)
     return query_obj
 
 

@@ -1,4 +1,3 @@
-import os
 import re
 from pathlib import Path
 
@@ -8,14 +7,14 @@ import sqlparse
 from sqlparse.sql import Identifier, IdentifierList
 
 from nerium.query import parse_query_file
+from raw import db
 
 
 def list_reports():
     """Return list of available report names from query dir"""
-    flat_queries = list(Path(os.getenv("QUERY_PATH", "query_files")).glob("**/*"))
-    # Filter out docs and metadata
-    query_paths = list(filter(lambda i: i.suffix not in [".md", ".yaml"], flat_queries))
-    query_names = [i.stem for i in query_paths]
+    flat_queries = db.list_queries()
+    query_names = [Path(i).stem for i in flat_queries]
+
     query_names.sort()
     reports = dict(reports=query_names)
     return reports

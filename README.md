@@ -55,6 +55,14 @@ Then add a `query_files` (and, optionally, `format_files`) directory to your pro
 
 By default, Nerium looks for query and format schema files in `query_files` and `format_files` respectively, in the current working directory from which the service is launched. `QUERY_PATH` and `FORMAT_PATH` environment variables can optionally be set in order to use files from other locations on the filesystem, as desired.
 
+#### Read SQL queries from S3
+
+If desired, instead of the local filesystem, Nerium can read its query files from an S3 bucket using [s3fs](https://s3fs.readthedocs.io/en/latest/). When Nerium is running as a remote service, a cloud storage bucket can provide a convenient shared location for report analysts to upload SQL to, so that reports can be enhanced or additional reports without having to restart or redeploy Nerium.
+
+Simply set the `QUERY_PATH` to your S3 bucket URL. Nerium looks for paths beginning with the `s3://` scheme, and reads from there when it finds one. Authentication to S3 is handled via [boto environment variables](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#using-environment-variables).
+
+[S3-compatible storage that does not use URLs beginning with `s3://` is not supported. Neither is reading marshmallow format files from S3. Both may be coming in a later release.]
+
 ### Multiple Data Sources
 
 If you want to query multiple databases from a single Nerium installation, any individual query file can define its own `database_url` as a key in YAML front matter (see below). This will override the `$DATABASE_URL` setting in the environment for that query only. If you have a large number of queries across several databases, keep in mind that running a separate Nerium instance for each database could be an option.
@@ -131,49 +139,14 @@ For serialization formats besides the built-in default and `compact`, schema def
 
 ## API
 
-### Report listing endpoint
-
-#### URLs
-
-- `/v2/reports`
-
-#### Method
-
-`GET`
-
-#### Success Response
-
-**Code**: 200
-
-**Content**: `{"reports": [<an array of report names>]}`
-
-### Report description endpoints
-
-#### URLs
-
-- `/v2/reports/{string:query_name}`
-
-#### Method
-
-`GET`
-
-#### Success Response
-
-`{"columns":[<list of columns from report>],"error":false,"metadata":{<report: metadata object>},"name":"<query_name>","params":[<array of parameterized keys in query>],"type":"sql"}`
-
 ### Results endpoints
 
 #### URLs
 
 - `/v1/<string:query_name>?<query_params>`  
 - `/v1/<string:query_name>/<string:format>?<query_params>`
-- `/v2/results/`
-- `/v2/results/<string:query_name>?<query_params>`  
-- `/v2/results/<string:query_name>/<string:format>?<query_params>`
 
-[`v1` endpoints are deprecated and will be removed eventually]
-
-As shown above `query_name` and `format` may be accessed as part of the URL structure, or can be passed as parameters to the request.
+As shown above, `query_name` and `format` may be accessed as part of the URL structure, or can be passed as parameters to the request.
 
 Because we're retrieving report results here, the request is a `GET` in any case, but parameters may be sent in a JSON body or as querystring parameters. Note that `query_name` and `format` from URL base path will be preferred, even if a request to such a path happens to include either key in the request body (client apps should avoid doing this to avoid confusion).
 
@@ -204,6 +177,39 @@ Of course, it is possible that a database query might return no results. In this
 **Code**: 400
 
 **Content**: `{"error": <exception.repr from Python>}`
+
+### Documentation endpoints
+
+#### Report listing endpoint
+
+##### URLs
+
+- `/v1/docs/`
+
+##### Method
+
+`GET`
+
+##### Success Response
+
+**Code**: 200
+
+**Content**: `{"reports": [<an array of report names>]}`
+
+#### Report description endpoints
+
+##### URLs
+
+- `/v1/{string:query_name}/docs/`
+
+##### Method
+
+`GET`
+
+##### Success Response
+
+`{"columns":[<list of columns from report>],"error":false,"metadata":{<report: metadata object>},"name":"<query_name>","params":[<array of parameterized keys in query>],"type":"sql"}`
+
 
 ## Tests
 

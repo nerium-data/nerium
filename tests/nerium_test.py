@@ -75,21 +75,21 @@ def test_health_check(client):
 
 
 def test_sql_error(client):
-    url = "/v2/results/error_test"
+    url = "/v1/error_test"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
     assert resp.status_code == 400
     assert "error" in resp.get_json().keys()
 
 
 def test_missing_query_error(client):
-    url = "/v2/results/not_a_query"
+    url = "/v1/not_a_query"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
     assert resp.status_code == 404
     assert "error" in resp.get_json().keys()
 
 
 def test_missing_report_error(client):
-    url = "/v2/reports/not_a_query"
+    url = "/v1/not_a_query/docs"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
     assert resp.status_code == 404
     assert "error" in resp.get_json().keys()
@@ -120,28 +120,28 @@ def test_auth_header_not_required(client):
 
 
 def test_get_query(client):
-    url = f"/v2/results/{query_name}"
+    url = f"/v1/{query_name}"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
     assert resp.status_code == 200
     assert EXPECTED == resp.get_json()["data"]
 
 
 def test_results_csv(client):
-    url = f"/v2/results/{query_name}/csv"
+    url = f"/v1/{query_name}/csv"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
     assert resp.headers["content_type"] == "text/csv"
     assert str(resp.data, "utf-8") == CSV_EXPECTED
 
 
 def test_results_compact(client):
-    url = f"/v2/results/{query_name}/compact"
+    url = f"/v1/{query_name}/compact"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
     assert resp.status_code == 200
     assert COMPACT_EXPECTED == resp.get_json()
 
 
 def test_result_json(client):
-    url = "/v2/results"
+    url = "/v1/test"
     data = dict(query_name="test", format="compact")
     resp = client.get(url, json=data, headers={"X-API-Key": TEST_API_KEY})
     assert resp.status_code == 200
@@ -149,28 +149,28 @@ def test_result_json(client):
 
 
 def test_reports_list(client):
-    url = "/v2/reports/"
+    url = "/v1/docs/"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
     assert resp.status_code == 200
     assert resp.get_json() == {"reports": ["error_test", "test", "test_body"]}
 
 
 def test_report_descr(client):
-    url = f"/v2/reports/{query_name}"
+    url = f"/v1/{query_name}/docs"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
     assert resp.status_code == 200
     assert resp.get_json() == DESCR_EXPECTED
 
 
 def test_report_descr_body(client):
-    url = "/v2/reports/test_body"
+    url = "/v1/test_body/docs"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
     assert resp.status_code == 200
     assert "columns" in resp.get_json().keys()
 
 
 def test_report_descr_error(client):
-    url = "/v2/reports/goo"
+    url = "/v1/goo/docs"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
     assert resp.status_code == 404
     assert ("error", "No query found matching 'goo'") in resp.get_json().items()
