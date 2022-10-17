@@ -3,6 +3,7 @@ from pathlib import Path
 import requests
 from git import Repo
 from git.exc import InvalidGitRepositoryError
+
 from nerium import __version__
 
 
