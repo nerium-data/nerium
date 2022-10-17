@@ -1,13 +1,12 @@
 import re
 from pathlib import Path
-
 from types import SimpleNamespace
 
 import sqlparse
+from raw import db
 from sqlparse.sql import Identifier, IdentifierList
 
 from nerium.query import parse_query_file
-from raw import db
 
 
 def list_reports():
