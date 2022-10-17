@@ -1,4 +1,3 @@
-# import os
 import re
 from collections import namedtuple
 from datetime import datetime
@@ -47,10 +46,12 @@ def extract_metadata(query_string):
 
 def read_query_file(path):
     if path.startswith("s3://"):
+        # Read file from S3 and convert to string with decode()
         fs = s3fs.S3FileSystem(anon=False)
-        with fs.open(path, "rt") as f:
-            statement = f.read()
+        with fs.open(path, "rb") as f:
+            statement = f.read().decode()
     else:
+        # Read file as text from local filesystem
         with open(path, "rt") as f:
             statement = f.read()
     return statement
