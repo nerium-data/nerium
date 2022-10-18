@@ -61,7 +61,9 @@ def get_query_result(params):
 @require_api_key
 def serve_query_result(query_name="", format_=""):
     """Parse request and hand params to get_query_result"""
-    params = request.json or convert_multidict(request.args.to_dict(flat=False))
+    params = request.get_json(silent=True) or convert_multidict(
+        request.args.to_dict(flat=False)
+    )
     if query_name:
         params["query_name"] = query_name
     if format_:
@@ -84,7 +86,9 @@ def serve_query_result(query_name="", format_=""):
 @app.route("/v2/results/<query_name>/csv")
 @require_api_key
 def serve_csv_result(query_name):
-    params = request.json or convert_multidict(request.args.to_dict(flat=False))
+    params = request.get_json(silent=True) or convert_multidict(
+        request.args.to_dict(flat=False)
+    )
     query_results = csv_result.results_to_csv(query_name, **params)
     resp = make_response()
     resp.headers["content_type"] = "text/csv"
