@@ -7,11 +7,13 @@
 [![PyPI - Version](https://img.shields.io/pypi/v/nerium.svg)](https://pypi.org/project/nerium/)
 [![PyPI - License](https://img.shields.io/pypi/l/nerium.svg)](https://pypi.org/project/nerium/)
 
-Nerium is a simple, lightweight, headless [Flask](http://flask.pocoo.org/)-based query broker microservice that submits flexible SQL to any [SQLAlchemy](https://www.sqlalchemy.org/)-supported database, and returns results as JSON or CSV—enabling rapid development and deployment of API endpoints for business intelligence reporting and data analytics applications. Inspired by [jamstack](https://jamstack.org/what-is-jamstack/) workflows, Nerium's queries and serialization formats are simply text files stored on the filesystem. Developers and report analysts can write SQL queries in their preferred editor, manage them with standard version control tools, and upload or mount them into a Nerium installation. In keeping with SQLAlchemy usage, query parameters can be specified in `key=value` format, and (_safely_!) injected into your query in `:key` format. Queries can also include [Jinja](http://jinja.pocoo.org/docs/dev/templates/) template syntax, allowing greater flexibility and reuse of SQL logic.
+Nerium is a simple, lightweight, headless [Flask](http://flask.pocoo.org/)-based query broker microservice that submits flexible SQL to any [SQLAlchemy](https://www.sqlalchemy.org/)-supported database, and returns results as JSON or CSV—enabling rapid development and deployment of API endpoints for business intelligence reporting and data analytics applications. 
+
+Inspired by [jamstack](https://jamstack.org/what-is-jamstack/) workflows, Nerium's queries and serialization formats are simply text files stored on the filesystem. Developers and report analysts can write SQL queries in their preferred editor, manage them with standard version control tools, and upload or mount them into a Nerium installation. In keeping with SQLAlchemy usage, query parameters can be specified in `key=value` format, and (_safely_!) injected into your query in `:key` format. Queries can also include [Jinja](http://jinja.pocoo.org/docs/dev/templates/) template syntax, allowing greater flexibility and reuse of SQL logic.
 
 Default JSON output represents `data` as an array of objects, one per result row, with database column names as keys. The default schema also provides top-level nodes for `name`, `metadata`, and `params` (details below). A `compact` JSON output format may also be requested, with separate `column` (array of column names) and `data` (array of row value arrays) nodes for compactness. Additional formats can be added by adding [marshmallow](https://marshmallow.readthedocs.io) schema definitions to `format_files`.
 
-Nerium supports any backend that SQLAlchemy can, but since none of these are hard dependencies, drivers aren't included in the default setup, and the Dockerfile only supports PostgreSQL. If you want Nerium to work with other databases, you can install Python connectors with `pip`, either in a virtualenv or by creating your own Dockerfile using `FROM tymxqo/nerium`. (To ease installation, options for `nerium[mysql]` and `nerium[pg]` are provided as [extras](https://packaging.python.org/en/latest/tutorials/installing-packages/#installing-setuptools-extras) in `setup.py`)
+Nerium supports any backend database that SQLAlchemy can, but since none of these are hard dependencies, drivers aren't included in the default setup, and the Dockerfile only supports PostgreSQL. If you want Nerium to work with other databases, you can install Python connectors with `pip`, either in a virtualenv or by creating your own Dockerfile using `FROM tymxqo/nerium`. (To ease installation, options for `nerium[mysql]` and `nerium[pg]` are provided as [extras](https://packaging.python.org/en/latest/tutorials/installing-packages/#installing-setuptools-extras) in `setup.py`)
 
 ## Install/Run
 
@@ -27,12 +29,12 @@ docker run -d --name=nerium \
 curl http://localhost:5000/v1/<query_name>?<params>
 ```
 
-You might also want to use `tymxqo/nerium` as a base image for your own custom container, in order to add different database drivers, etc. Or you can build locally from the included Dockerfile. The base image includes `psycopg2` PostgreSQL adapter, along with `gunicorn` WSGI server for a production-ready service.
+You might also want to use `tymxqo/nerium` as a base image for your own custom container, in order to add different database drivers, etc. Or you can build locally from the included Dockerfile. The base image includes the `psycopg2` PostgreSQL adapter, along with `gunicorn` WSGI server for a production-ready service.
 
 ### Local install
 
 ```sh
-pip install nerium[pg]
+python -m pip install nerium[pg]
 ```
 
 Or install latest source from Github:
@@ -42,7 +44,7 @@ git clone https://github.com/nerium-data/nerium.git
 cd nerium
 python -m venv .venv
 source .venv/bin/activate
-pip install .
+python -m pip install .
 ```
 
 Then add a `query_files` (and, optionally, `format_files`) directory to your project, write your queries, and configure the app as described in the next section. The command `FLASK_APP=nerium/app.py flask run` starts a local development server running the app, listening on port 5000. For production use, you will want to add a proper WSGI server (we like [`gunicorn`](https://gunicorn.org/)).
@@ -57,7 +59,7 @@ By default, Nerium looks for query and format schema files in `query_files` and 
 
 #### Read SQL queries from S3
 
-If desired, instead of the local filesystem, Nerium can read its query files from an S3 bucket using [s3fs](https://s3fs.readthedocs.io/en/latest/). When Nerium is running as a remote service, a cloud storage bucket can provide a convenient shared location for report analysts to upload SQL to, so that reports can be enhanced or additional reports without having to restart or redeploy Nerium.
+If desired, instead of the local filesystem, Nerium can read its query files from an S3 bucket using [s3fs](https://s3fs.readthedocs.io/en/latest/). When Nerium is running as a remote service, a cloud storage bucket can provide a convenient shared location for report analysts to upload SQL to, so that reports can be enhanced or additional reports added without having to restart or redeploy Nerium.
 
 Simply set the `QUERY_PATH` to your S3 bucket URL. Nerium looks for paths beginning with the `s3://` scheme, and reads from there when it finds one. Authentication to S3 is handled via [boto environment variables](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#using-environment-variables).
 
@@ -81,7 +83,7 @@ As indicated above, queries are simply text files placed in a local `query_files
 
 ### Query parameters
 
-Use `:<param>` to specify bind parameters in your query text. Clients can then specify values for these bind parameters in their `results` request, passed either as JSON or query string arguments.
+Use `:<param>` to specify bind parameters in your query text. Clients can then specify values for these bind parameters in their request, passed either as JSON or query string arguments.
 
 ### Metadata
 
@@ -103,10 +105,10 @@ Metadata can generally be thought of as a way to pass arbitrary key-value pairs 
 There are a couple of special-case metadata items:
 
 1. As noted above, it can be used to specify a database connection for the query, overriding the main `DATABASE_URL` in the environment
-2. If the metadata includes a `params` block, its contents are returned as the `params` object in the `v1/reports/` discovery response.
-3. Similarly, metadata describing `columns` will populate that section of the `/reports/` response.
+2. If the metadata includes a `params` block, its contents are returned as the `params` object in the `v1/<query_name/docs` discovery response.
+3. Similarly, metadata describing `columns` will populate that section of the `/docs/` response.
 
-In the absence of explicit metadata, Nerium attempts to find column specifications and named parameters by inspecting the query text itself. Although it is more manual, a metadata comment can provide greater detail in these sections — a report developer might specify the data type of a column or parameter, for example, in addition to its name.
+In the absence of explicit metadata, Nerium attempts to find column specifications and named parameters for `/docs` endpoints by inspecting the query text itself with [sqlparse](https://sqlparse.readthedocs.io/en/latest/). Although it is more manual, a metadata comment can provide greater detail in these sections — a report developer might specify the data type of a column or parameter, for example, in addition to its name.
 
 ### Jinja templating
 
@@ -148,7 +150,7 @@ For serialization formats besides the built-in default and `compact`, schema def
 
 As shown above, `query_name` and `format` may be accessed as part of the URL structure, or can be passed as parameters to the request.
 
-Because we're retrieving report results here, the request is a `GET` in any case, but parameters may be sent in a JSON body or as querystring parameters. Note that `query_name` and `format` from URL base path will be preferred, even if a request to such a path happens to include either key in the request body (client apps should avoid doing this to avoid confusion).
+Because we're retrieving report results here, the request is a `GET` in any case, but parameters may be sent in a JSON body or as querystring parameters. [Yes, sending JSON with a `GET` feels weird to us to, but as we're fetching serialized results and not changing any data here, `GET` seems to be the most appropriate [REST](https://www.w3.org/2001/sw/wiki/REST) semantic. It does work, we promise!] Note that `query_name` and `format` from URL base path will be preferred, even if a request to such a path happens to include either key in the request body (client apps should avoid doing this to minimize confusion).
 
 `query_name` should match the name of a given query script file, minus the file extension. URL querystring parameters (or JSON keys other than `query_string` and `format`) are passed to the invoked data source query, matched to any parameter keys specified in the query file. If any parameters expected by the query are missing, an error will be returned. Extra/unrecognized parameters are silently ignored (this might seem surprising, but it's standard SQLAlchemy behavior for parameter substitution).
 
