@@ -1,5 +1,6 @@
 from csv import DictWriter
 from io import StringIO
+
 from nerium.query import get_result_set
 
 
