@@ -5,6 +5,7 @@ from datetime import datetime
 import s3fs
 import yaml
 from raw import db
+from nerium import streaming
 
 
 def init_query(query_name):
@@ -73,18 +74,46 @@ def parse_query_file(query_name):
     return query_obj
 
 
+def query_decorator(func):
+    """Decorates a "result" query method, e.g. a sqla-raw method, in a
+    Query for parsing and execution error handling.
+
+    """
+
+    def inner(query_name, *args, **kwargs):
+        query = parse_query_file(query_name)
+
+        # Bail if parser captures error:
+        if query.error:
+            return query
+
+        try:
+            result = func(query_name, *args, **kwargs)
+            query = query._replace(result=result)
+        except Exception as e:
+            query = query._replace(error=repr(e), status_code=400)
+
+        return query
+    return inner
+
+
+@query_decorator
 def get_result_set(query_name, **kwargs):
     """Call parse_query_file, then submit query and return new object with result"""
-    query = parse_query_file(query_name)
 
-    # Bail if parser captures error:
-    if query.error:
-        return query
+    return db.result_by_name(query_name, **kwargs)
 
-    try:
-        r = db.result_by_name(query_name, **kwargs)
-        query = query._replace(result=r)
-    except Exception as e:
-        query = query._replace(error=repr(e), status_code=400)
 
-    return query
+@query_decorator
+def serialize_stream(query_name, writer_constructor, **kwargs):
+    """Call parse_query_file, then submit query and return generator with result"""
+
+    result = db.stream_result_by_name(query_name, **kwargs)
+    # Initialization here (outside of a generator) allows for
+    # exception handling in `wrap_results_in_query` and an HTTP error
+    # return prior to starting a 200 streaming HTTP
+    # response. Otherwise, an exception raised from within the
+    # generator iteration would occur after the stream response is returned
+    stream, writer = streaming.initialize_stream(result, writer_constructor)
+
+    return streaming.yield_stream(result, stream, writer, **kwargs)
