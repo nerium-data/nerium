@@ -12,7 +12,7 @@ class Writer(streaming.BufferWriter):
 
 @pytest.fixture
 def results():
-    max_record = 2918  # chosen from BUFFER_SIZE + serialization length
+    max_record = 2918  # chosen from BUFFER_SIZE and serialization length
     return (i for i in range(max_record))
 
 

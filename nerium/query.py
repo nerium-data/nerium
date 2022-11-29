@@ -110,7 +110,7 @@ def serialize_stream(query_name, writer_constructor, **kwargs):
 
     result = db.stream_result_by_name(query_name, **kwargs)
     # Initialization here (outside of a generator) allows for
-    # exception handling in `wrap_results_in_query` and an HTTP error
+    # exception handling in `query_decorator` and an HTTP error
     # return prior to starting a 200 streaming HTTP
     # response. Otherwise, an exception raised from within the
     # generator iteration would occur after the stream response is returned
