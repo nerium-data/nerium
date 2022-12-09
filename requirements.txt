@@ -20,7 +20,7 @@ attrs==22.1.0
     # via aiohttp
 botocore==1.27.59
     # via aiobotocore
-certifi==2022.9.24
+certifi==2022.12.7
     # via requests
 charset-normalizer==2.1.1
     # via
