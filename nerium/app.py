@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*
-from flask import Flask, jsonify, make_response, request
+from flask import Flask, jsonify, make_response, request, Response
 from flask_cors import CORS
 from marshmallow import INCLUDE, Schema, fields
 from marshmallow.exceptions import ValidationError
@@ -54,6 +54,12 @@ def get_query_result(params):
     return (formatted, 200)
 
 
+def parse_query_params():
+    return request.get_json(silent=True) or convert_multidict(
+        request.args.to_dict(flat=False)
+    )
+
+
 @app.route("/")
 @app.route("/v1/")
 @app.route("/v1/<query_name>/")
@@ -61,9 +67,9 @@ def get_query_result(params):
 @require_api_key
 def serve_query_result(query_name="", format_=""):
     """Parse request and hand params to get_query_result"""
-    params = request.get_json(silent=True) or convert_multidict(
-        request.args.to_dict(flat=False)
-    )
+
+    params = parse_query_params()
+
     if query_name:
         params["query_name"] = query_name
     if format_:
@@ -86,14 +92,18 @@ def serve_query_result(query_name="", format_=""):
 @app.route("/v2/results/<query_name>/csv")
 @require_api_key
 def serve_csv_result(query_name):
-    params = request.get_json(silent=True) or convert_multidict(
-        request.args.to_dict(flat=False)
-    )
-    query_results = csv_result.results_to_csv(query_name, **params)
-    resp = make_response()
-    resp.headers["content_type"] = "text/csv"
-    resp.data = query_results
-    return resp
+    """Parse request and stream CSV back"""
+
+    params = parse_query_params()
+    query = csv_result.results_to_csv(query_name, **params)
+
+    if query.error:
+        return (query.error, 400)
+
+    response = Response(query.result, mimetype='text/csv')
+    response.headers['Content-Disposition'] = f"attachment; filename={query_name}.csv"
+
+    return response
 
 
 @app.route("/v1/docs/")

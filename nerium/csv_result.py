@@ -1,18 +1,24 @@
 from csv import DictWriter
-from io import StringIO
 
-from nerium.query import get_result_set
+from nerium.query import serialize_stream
+from nerium.streaming import BufferWriter
+
+
+class CsvStreamWriter(BufferWriter):
+    """Serializes dicts to a StringIO buffer"""
+
+    def __init__(self, stream, first_record):
+        self.stream = stream
+        self.writer = DictWriter(stream, fieldnames=first_record.keys())
+        self.writer.writeheader()
+
+    def write(self, record):
+        """Absraction to support writers with methods other than writerow"""
+
+        self.writer.writerow(record)
 
 
 def results_to_csv(query_name, **kwargs):
     """Generate CSV from result data"""
-    query = get_result_set(query_name, **kwargs)
-    result = query.result
-    stream = StringIO()
-    headers = list(result[0].keys())
-    dw = DictWriter(stream, fieldnames=headers)
-    dw.writeheader()
-    for row in result:
-        dw.writerow(row)
-    csv = stream.getvalue()
-    return csv
+
+    return serialize_stream(query_name, CsvStreamWriter, **kwargs)

@@ -129,8 +129,15 @@ def test_get_query(client):
 def test_results_csv(client):
     url = f"/v1/{query_name}/csv"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
-    assert resp.headers["content_type"] == "text/csv"
+    assert "text/csv" in resp.headers["content-type"]
     assert str(resp.data, "utf-8") == CSV_EXPECTED
+
+
+def test_results_csv_error(client):
+    url = "/v1/error_test/csv"
+    resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
+    assert resp.status_code == 400
+    assert "no such table: not_a_table" in str(resp.data, "utf-8")
 
 
 def test_results_compact(client):
