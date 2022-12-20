@@ -1,7 +1,6 @@
 import abc
 
 from io import StringIO
-from raw import db
 
 BUFFER_SIZE = 16384
 
