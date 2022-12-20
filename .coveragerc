@@ -3,7 +3,6 @@ source=nerium
 omit=
     nerium/__version__.py
     nerium/commit.py
-    nerium/data_source.py
     */__init__.py
 
 [report]
@@ -12,3 +11,4 @@ exclude_lines =
     if __name__ == .__main__.:
     except.
     raise.
+    pass
