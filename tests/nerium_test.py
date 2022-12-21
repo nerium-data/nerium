@@ -62,7 +62,7 @@ def test_dir(monkeypatch):
 
 
 def test_results_expected():
-    result = query.get_result_set(query_name)
+    result = query.get_result_set(query_name, greeting="yo")
     assert result.result == EXPECTED
 
 
@@ -120,14 +120,14 @@ def test_auth_header_not_required(client):
 
 
 def test_get_query(client):
-    url = f"/v1/{query_name}"
+    url = f"/v1/{query_name}?greeting=yo"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
     assert resp.status_code == 200
     assert EXPECTED == resp.get_json()["data"]
 
 
 def test_results_csv(client):
-    url = f"/v1/{query_name}/csv"
+    url = f"/v1/{query_name}/csv?greeting=yo"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
     assert "text/csv" in resp.headers["content-type"]
     assert str(resp.data, "utf-8") == CSV_EXPECTED
@@ -141,7 +141,7 @@ def test_results_csv_error(client):
 
 
 def test_results_compact(client):
-    url = f"/v1/{query_name}/compact"
+    url = f"/v1/{query_name}/compact?greeting=yo"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
     assert resp.status_code == 200
     assert COMPACT_EXPECTED == resp.get_json()
@@ -149,7 +149,7 @@ def test_results_compact(client):
 
 def test_result_json(client):
     url = "/v1/test"
-    data = dict(query_name="test", format="compact")
+    data = dict(query_name="test", format="compact", greeting="yo")
     resp = client.get(url, json=data, headers={"X-API-Key": TEST_API_KEY})
     assert resp.status_code == 200
     assert COMPACT_EXPECTED == resp.get_json()
