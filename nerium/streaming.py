@@ -38,7 +38,7 @@ def initialize_stream(iterable, writer_constructor):
     return stream, writer
 
 
-def yield_stream(iterable, stream, writer):
+def yield_stream(iterable, stream, writer, **kwargs):
     """Buffers contents of iterable to stream and yields blocks of
     BUFFER_SIZE until completion. Arguments `stream` and `writer` are
     expected to be the return values of `initialize_stream`.
