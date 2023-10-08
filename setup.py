@@ -24,7 +24,7 @@ REQUIRED = [
     "marshmallow",
     "pyyaml",
     "requests",
-    "sqla-raw",
+    "sqla-raw >= 1.5.1",
     "sqlparse",
     "Werkzeug",
 ]
