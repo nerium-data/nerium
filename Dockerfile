@@ -1,4 +1,4 @@
-FROM python:3.9.2-slim-buster
+FROM python:3.11-bullseye
 LABEL maintainer='Thomas Yager-Madden <thomas@yager-madden.com>'
 
 # install git to support Nerium commit endpoint
