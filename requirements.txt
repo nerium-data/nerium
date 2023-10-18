@@ -90,7 +90,7 @@ sqlalchemy==1.4.49
     # via sqla-raw
 sqlparse==0.4.4
     # via Nerium (setup.py)
-urllib3==1.26.17
+urllib3==1.26.18
     # via
     #   botocore
     #   requests
