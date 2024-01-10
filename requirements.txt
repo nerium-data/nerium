@@ -44,7 +44,7 @@ fsspec==2023.9.2
     # via s3fs
 gitdb==4.0.10
     # via gitpython
-gitpython==3.1.37
+gitpython==3.1.41
     # via Nerium (setup.py)
 greenlet==3.0.0
     # via sqlalchemy
