@@ -74,7 +74,6 @@ def test_initialize_stream_compressed(byte_results):
 
 def test_initialize_stream_empty_iterator():
     writer = streaming.initialize_stream(iter(()), None)
-    #   assert writer.target_stream.getvalue() == ""
     assert writer == None
 
 
