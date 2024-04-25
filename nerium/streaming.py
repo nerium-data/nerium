@@ -1,11 +1,11 @@
 import abc
 
-from io import StringIO
+from io import StringIO, BytesIO
 
 BUFFER_SIZE = 16384
 
 
-def initialize_stream(iterable, writer_constructor):
+def initialize_stream(iterable, writer_constructor, **kwargs):
     """Initialize a stream and writer. Popping the first record from
     the iterable allows both for error handling prior to entering a
     stream generator as well as header formatting. The first record will
@@ -25,7 +25,7 @@ def initialize_stream(iterable, writer_constructor):
 
     """
 
-    stream = StringIO()
+    stream = BytesIO() if kwargs.get("format_") == "csv.gz" else StringIO()
 
     try:
         first = next(iterable)
@@ -59,17 +59,27 @@ def yield_stream(iterable, stream, writer, **kwargs):
     for row in iterable:
         writer.write(row)
         if stream.tell() > BUFFER_SIZE:
-            yield _flush(stream)
-    yield _flush(stream)
+            # ensure all data is written to the stream from GzipFile
+            writer.flush()
+            yield _consume(stream)
+
+    # the compressed writer/stream must be closed/flushed before we can read
+    # the last bit of data from the target stream
+    writer.close()
+    yield _consume(stream)
 
 
-def _flush(stream):
-    """Consume the current StringIO buffer and return the contents"""
+def _consume(stream):
+    """Consume the current StringIO/BytesIO buffer and return the contents"""
 
-    stream.seek(0)
+    if not stream.closed:
+        stream.seek(0)
     data = stream.read()
-    stream.truncate(0)
-    stream.seek(0)
+    if not stream.closed:
+        # BytesIO requires seek(0) before truncate(0)
+        stream.seek(0)
+        stream.truncate(0)
+        stream.seek(0)
 
     return data
 
@@ -83,4 +93,12 @@ class BufferWriter(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def write(self, record):
+        pass
+
+    @abc.abstractmethod
+    def close(self):
+        pass
+
+    @abc.abstractmethod
+    def flush(self):
         pass
