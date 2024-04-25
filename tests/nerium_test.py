@@ -133,6 +133,13 @@ def test_results_csv(client):
     assert str(resp.data, "utf-8") == CSV_EXPECTED
 
 
+def test_results_csvgz(client):
+    url = f"/v1/{query_name}/csv.gz?greeting=yo"
+    resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
+    assert "application/gzip" in resp.headers["content-type"]
+    assert len(resp.data) > 0
+
+
 def test_results_csv_error(client):
     url = "/v1/error_test/csv"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
