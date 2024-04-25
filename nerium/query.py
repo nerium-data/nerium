@@ -118,6 +118,6 @@ def serialize_stream(query_name, writer_constructor, **kwargs):
     # return prior to starting a 200 streaming HTTP
     # response. Otherwise, an exception raised from within the
     # generator iteration would occur after the stream response is returned
-    stream, writer = streaming.initialize_stream(result, writer_constructor, **kwargs)
+    writer = streaming.initialize_stream(result, writer_constructor, **kwargs)
 
-    return streaming.yield_stream(result, stream, writer, **kwargs)
+    return streaming.yield_stream(result, writer, **kwargs)

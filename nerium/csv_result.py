@@ -3,12 +3,12 @@ from gzip import GzipFile
 from io import TextIOWrapper
 
 from nerium.query import serialize_stream
-from nerium.streaming import BufferWriter
+from nerium.streaming import BufferWriterBase
 
 
-class GzipCompressWriteStream(BufferWriter):
+class GzipCompressWriteStream(BufferWriterBase):
     def __init__(self, stream):
-        self.write_stream = stream
+        super().__init__(stream)
         self.binary_file = GzipFile(fileobj=stream, mode='wb')
         encoding = 'utf-8'
 
@@ -30,11 +30,11 @@ class GzipCompressWriteStream(BufferWriter):
         self.binary_file.flush()
 
 
-class CsvStreamWriter(BufferWriter):
+class CsvStreamWriter(BufferWriterBase):
     """Serializes dicts to a StringIO buffer"""
 
     def __init__(self, stream, first_record):
-        self.write_stream = stream
+        super().__init__(stream)
         self.writer = DictWriter(stream, fieldnames=first_record.keys())
         self.writer.writeheader()
 
@@ -50,11 +50,11 @@ class CsvStreamWriter(BufferWriter):
         pass
 
 
-class CsvGzipStreamWriter(BufferWriter):
+class CsvGzipStreamWriter(BufferWriterBase):
     """Serializes dicts to a compressed StringIO buffer"""
 
     def __init__(self, stream, first_record):
-        self.write_stream = stream
+        super().__init__(stream)
         self.gzip_stream = GzipCompressWriteStream(stream)
 
         self.writer = DictWriter(self.gzip_stream, fieldnames=first_record.keys())

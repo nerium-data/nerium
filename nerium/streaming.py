@@ -30,15 +30,15 @@ def initialize_stream(iterable, writer_constructor, **kwargs):
     try:
         first = next(iterable)
     except StopIteration:
-        return stream, None
+        return None
 
     writer = writer_constructor(stream, first)
     writer.write(first)
 
-    return stream, writer
+    return writer
 
 
-def yield_stream(iterable, stream, writer, **kwargs):
+def yield_stream(iterable, writer, **kwargs):
     """Buffers contents of iterable to stream and yields blocks of
     BUFFER_SIZE until completion. Arguments `stream` and `writer` are
     expected to be the return values of `initialize_stream`.
@@ -56,43 +56,44 @@ def yield_stream(iterable, stream, writer, **kwargs):
 
     """
 
+    stream = writer.target_stream
+
     for row in iterable:
         writer.write(row)
         if stream.tell() > BUFFER_SIZE:
             # ensure all data is written to the stream from GzipFile
             writer.flush()
-            yield _consume(stream)
+            yield writer.consume_target_stream()
 
     # the compressed writer/stream must be closed/flushed before we can read
     # the last bit of data from the target stream
     writer.close()
-    yield _consume(stream)
-
-
-def _consume(stream):
-    """Consume the current StringIO/BytesIO buffer and return the contents"""
-
-    if not stream.closed:
-        stream.seek(0)
-    data = stream.read()
-    if not stream.closed:
-        # BytesIO requires seek(0) before truncate(0)
-        stream.seek(0)
-        stream.truncate(0)
-        stream.seek(0)
-
-    return data
+    yield writer.consume_target_stream()
 
 
 class BufferWriter(metaclass=abc.ABCMeta):
-    """Interface specifying serialization to a StringIO buffer"""
+    """Interface specifying serialization to an IOBase buffer"""
 
     @abc.abstractmethod
     def __init__(self, stream, first_record):
         pass
 
+    @property
+    @abc.abstractmethod
+    def target_stream(self):
+        pass
+
+    @target_stream.setter
+    @abc.abstractmethod
+    def target_stream(self, stream):
+        pass
+
     @abc.abstractmethod
     def write(self, record):
+        pass
+
+    @abc.abstractmethod
+    def consume_target_stream(self):
         pass
 
     @abc.abstractmethod
@@ -102,3 +103,40 @@ class BufferWriter(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def flush(self):
         pass
+
+class BufferWriterBase(BufferWriter):
+    """Base class for BufferWriter implementations"""
+
+    def __init__(self, stream):
+        self._target_stream = stream
+
+    @property
+    def target_stream(self):
+        return self._target_stream
+
+    @target_stream.setter
+    def target_stream(self, stream):
+        self._target_stream = stream
+
+    def write(self, record):
+        raise NotImplementedError
+
+    def consume_target_stream(self):
+        """Consume the target_stream buffer and return the contents"""
+
+        if not self.target_stream.closed:
+            self.target_stream.seek(0)
+        data = self.target_stream.read()
+        if not self.target_stream.closed:
+            # BytesIO requires seek(0) before truncate(0)
+            self.target_stream.seek(0)
+            self.target_stream.truncate(0)
+            self.target_stream.seek(0)
+
+        return data
+
+    def close(self):
+        raise NotImplementedError
+
+    def flush(self):
+        raise NotImplementedError

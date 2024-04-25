@@ -3,12 +3,20 @@ import pytest
 from nerium import streaming
 
 
-class Writer(streaming.BufferWriter):
+class Writer(streaming.BufferWriterBase):
     def __init__(self, stream, _first):
-        self.stream = stream
+        self._target_stream = stream
+
+    @property
+    def target_stream(self):
+        return self._target_stream
+
+    @target_stream.setter
+    def target_stream(self, stream):
+        self._target_stream = stream
 
     def write(self, record):
-        self.stream.write(f"<{record}>")
+        self._target_stream.write(f"<{record}>")
 
     def close(self):
         pass
@@ -17,13 +25,21 @@ class Writer(streaming.BufferWriter):
         pass
 
 
-class BytesWriter(streaming.BufferWriter):
+class BytesWriter(streaming.BufferWriterBase):
 
     def __init__(self, stream, _first):
-        self.stream = stream
+        self._target_stream = stream
+
+    @property
+    def target_stream(self):
+        return self._target_stream
+
+    @target_stream.setter
+    def target_stream(self, stream):
+        self._target_stream = stream
 
     def write(self, record):
-        self.stream.write(record)
+        self._target_stream.write(record)
 
     def close(self):
         pass
@@ -45,26 +61,27 @@ def byte_results():
 
 
 def test_initialize_stream(results):
-    stream, writer = streaming.initialize_stream(results, Writer, format_="csv")
-    assert stream.getvalue() == "<0>"
+    writer = streaming.initialize_stream(results, Writer, format_="csv")
+    assert writer.target_stream.getvalue() == "<0>"
     assert next(results) == 1
 
 
 def test_initialize_stream_compressed(byte_results):
-    stream, writer = streaming.initialize_stream(byte_results, BytesWriter, format_="csv.gz")
-    assert stream.getvalue() == b'\x00\x00'
+    writer = streaming.initialize_stream(byte_results, BytesWriter, format_="csv.gz")
+    assert writer.target_stream.getvalue() == b'\x00\x00'
     assert next(byte_results) == b'\x00\x01'
 
 
 def test_initialize_stream_empty_iterator():
-    stream, writer = streaming.initialize_stream(iter(()), None)
-    assert stream.getvalue() == ""
+    writer = streaming.initialize_stream(iter(()), None)
+    #   assert writer.target_stream.getvalue() == ""
+    assert writer == None
 
 
 def test_yield_stream(results):
-    stream, writer = streaming.initialize_stream(results, Writer)
-    blocks = list(streaming.yield_stream(results, stream, writer))
+    writer = streaming.initialize_stream(results, Writer)
+    blocks = list(streaming.yield_stream(results, writer))
     assert "<0><1><2><3>" in blocks[0]
     assert "<2914><2915>" in blocks[0]
     assert "<2916><2917>" in blocks[1]
-    assert stream.getvalue() == ""
+    assert writer.target_stream.getvalue() == ""
