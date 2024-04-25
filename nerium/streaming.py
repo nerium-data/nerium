@@ -30,7 +30,7 @@ def initialize_stream(iterable, writer_constructor, **kwargs):
     try:
         first = next(iterable)
     except StopIteration:
-        return None
+        return NullBufferWriter(stream)
 
     writer = writer_constructor(stream, first)
     writer.write(first)
@@ -140,3 +140,20 @@ class BufferWriterBase(BufferWriter):
 
     def flush(self):
         raise NotImplementedError
+
+
+class NullBufferWriter(BufferWriterBase):
+    def __init__(self, stream):
+        super().__init__(stream)
+
+    def write(self, data):
+        pass
+
+    def consume_target_stream(self):
+        return ""
+
+    def close(self):
+        pass
+
+    def flush(self):
+        pass
