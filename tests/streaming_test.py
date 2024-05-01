@@ -62,13 +62,13 @@ def byte_results():
 
 def test_initialize_stream(results):
     writer = streaming.initialize_stream(results, Writer, format_="csv")
-    assert writer.target_stream.getvalue() == "<0>"
+    assert writer.consume_target_stream() == "<0>"
     assert next(results) == 1
 
 
 def test_initialize_stream_compressed(byte_results):
     writer = streaming.initialize_stream(byte_results, BytesWriter, format_="csv.gz")
-    assert writer.target_stream.getvalue() == b'\x00\x00'
+    assert writer.consume_target_stream() == b'\x00\x00'
     assert next(byte_results) == b'\x00\x01'
 
 
@@ -83,4 +83,4 @@ def test_yield_stream(results):
     assert "<0><1><2><3>" in blocks[0]
     assert "<2914><2915>" in blocks[0]
     assert "<2916><2917>" in blocks[1]
-    assert writer.target_stream.getvalue() == ""
+    assert writer.consume_target_stream() == ""
