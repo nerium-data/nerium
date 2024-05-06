@@ -1,7 +1,5 @@
 import abc
 
-from io import StringIO, BytesIO
-
 BUFFER_SIZE = 16384
 
 
@@ -24,14 +22,12 @@ def initialize_stream(iterable, writer_constructor, **kwargs):
 
     """
 
-    stream = BytesIO() if kwargs.get("format_") == "csv.gz" else StringIO()
-
     try:
         first = next(iterable)
     except StopIteration:
-        return NullBufferWriter(stream)
+        return NullBufferWriter()
 
-    writer = writer_constructor(stream, first)
+    writer = writer_constructor(first)
     writer.write(first)
 
     return writer
@@ -53,11 +49,9 @@ def yield_stream(iterable, writer, **kwargs):
 
     """
 
-    stream = writer.target_stream
-
     for row in iterable:
         writer.write(row)
-        if stream.tell() > BUFFER_SIZE:
+        if writer.target_stream_size() > BUFFER_SIZE:
             # ensure all data is written to the stream from GzipFile
             writer.flush()
             yield writer.consume_target_stream()
@@ -72,7 +66,7 @@ class BufferWriter(metaclass=abc.ABCMeta):
     """Interface specifying serialization to an IOBase buffer"""
 
     @abc.abstractmethod
-    def __init__(self, stream, first_record):
+    def __init__(self, first_record):
         pass
 
     @property
@@ -94,12 +88,17 @@ class BufferWriter(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractmethod
+    def target_stream_size(self):
+        pass
+
+    @abc.abstractmethod
     def close(self):
         pass
 
     @abc.abstractmethod
     def flush(self):
         pass
+
 
 class BufferWriterBase(BufferWriter):
     """Base class for BufferWriter implementations"""
@@ -132,6 +131,9 @@ class BufferWriterBase(BufferWriter):
 
         return data
 
+    def target_stream_size(self):
+        return self.target_stream.tell()
+
     def close(self):
         raise NotImplementedError
 
@@ -140,14 +142,17 @@ class BufferWriterBase(BufferWriter):
 
 
 class NullBufferWriter(BufferWriterBase):
-    def __init__(self, stream):
-        super().__init__(stream)
+    def __init__(self):
+        super().__init__(None)
 
     def write(self, data):
         pass
 
     def consume_target_stream(self):
         return ""
+
+    def target_stream_size(self):
+        return 0
 
     def close(self):
         pass
