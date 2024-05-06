@@ -6,10 +6,10 @@ BUFFER_SIZE = 16384
 
 
 def initialize_stream(iterable, writer_constructor, **kwargs):
-    """Initialize a stream and writer. Popping the first record from
+    """Initialize a BufferWriter. Popping the first record from
     the iterable allows both for error handling prior to entering a
     stream generator as well as header formatting. The first record will
-    be written to the `stream` buffer here.
+    be written with the `writer` here.
 
     Args:
         `iterable`: an iterable of results, e.g. a generator streaming
@@ -18,10 +18,9 @@ def initialize_stream(iterable, writer_constructor, **kwargs):
             implements the BufferWriter interface
 
     Returns:
-        A tuple containing, respectively, a stream (StringIO stream
-        buffer) and a writer (implementing BufferWriter). These can be
-        passed to yield_stream along with the original `iterable` to
-        yield the stream until completion
+        A writer (implementing BufferWriter). This can be passed to
+        `yield_stream` along with the original `iterable` to yield the stream
+        until completion.
 
     """
 
@@ -39,14 +38,12 @@ def initialize_stream(iterable, writer_constructor, **kwargs):
 
 
 def yield_stream(iterable, writer, **kwargs):
-    """Buffers contents of iterable to stream and yields blocks of
-    BUFFER_SIZE until completion. Arguments `stream` and `writer` are
-    expected to be the return values of `initialize_stream`.
+    """Buffers contents of iterable to writer/stream and yields blocks of
+    BUFFER_SIZE until completion. Argument `writer` is expected to be the
+    return values of `initialize_stream`.
 
     Args:
         `iterable`: an iterable of results, e.g. a generator streaming
-            a sqlalchemy cursor
-        `stream`: an iterable of results, e.g. a generator streaming
             a sqlalchemy cursor
         `writer`: serializes each record in the iterable to the
             StringIO buffer. Implements the BufferWriter interface.
