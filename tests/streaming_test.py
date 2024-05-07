@@ -79,7 +79,7 @@ def test_yield_stream_bytes(byte_results):
     writer = streaming.initialize_stream(byte_results, BytesWriter)
     blocks = list(streaming.yield_stream(byte_results, writer))
     assert b'\x00\x01\x00\x02' in blocks[0] # beginning of block
-    assert b'\x0b\x64\x0b\x65' in blocks[0] # end of block
+    assert b'\x1f\xff\x20\x00' in blocks[0] # end of block
     assert b'\x20\x01\x20\x02' in blocks[1] # beginning of block
     assert b'\x23\x26\x23\x27' in blocks[1] # end of block
     assert writer.consume_target_stream() == b''
