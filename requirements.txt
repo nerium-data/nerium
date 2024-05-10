@@ -4,9 +4,9 @@
 #
 #    pip-compile
 #
-aiobotocore==2.5.4
+aiobotocore==2.12.3
     # via s3fs
-aiohttp==3.8.6
+aiohttp==3.9.5
     # via
     #   aiobotocore
     #   s3fs
@@ -14,71 +14,67 @@ aioitertools==0.11.0
     # via aiobotocore
 aiosignal==1.3.1
     # via aiohttp
-async-timeout==4.0.3
+attrs==23.2.0
     # via aiohttp
-attrs==23.1.0
-    # via aiohttp
-blinker==1.6.3
+blinker==1.8.2
     # via flask
-botocore==1.31.17
+botocore==1.34.69
     # via aiobotocore
-certifi==2023.7.22
+certifi==2024.2.2
     # via requests
-charset-normalizer==3.3.0
-    # via
-    #   aiohttp
-    #   requests
+charset-normalizer==3.3.2
+    # via requests
 click==8.1.7
     # via flask
-flask==3.0.0
+flask==3.0.3
     # via
     #   Nerium (setup.py)
     #   flask-cors
-flask-cors==4.0.0
+flask-cors==4.0.1
     # via Nerium (setup.py)
-frozenlist==1.4.0
+frozenlist==1.4.1
     # via
     #   aiohttp
     #   aiosignal
-fsspec==2023.9.2
+fsspec==2024.3.1
     # via s3fs
-gitdb==4.0.10
+gitdb==4.0.11
     # via gitpython
-gitpython==3.1.37
+gitpython==3.1.43
     # via Nerium (setup.py)
-greenlet==3.0.0
+greenlet==3.0.3
     # via sqlalchemy
-idna==3.4
+idna==3.7
     # via
     #   requests
     #   yarl
-itsdangerous==2.1.2
+itsdangerous==2.2.0
     # via flask
-jinja2==3.1.2
+jinja2==3.1.4
     # via
     #   flask
     #   sqla-raw
 jmespath==1.0.1
     # via botocore
-markupsafe==2.1.3
+markupsafe==2.1.5
     # via
     #   jinja2
     #   werkzeug
-marshmallow==3.20.1
+marshmallow==3.21.2
     # via Nerium (setup.py)
-multidict==6.0.4
+multidict==6.0.5
     # via
     #   aiohttp
     #   yarl
-packaging==23.2
+packaging==24.0
     # via marshmallow
-python-dateutil==2.8.2
+python-dateutil==2.9.0.post0
     # via botocore
 pyyaml==6.0.1
     # via Nerium (setup.py)
 requests==2.31.0
     # via Nerium (setup.py)
-s3fs==2023.9.2
+s3fs==2024.3.1
     # via sqla-raw
 six==1.16.0
     # via python-dateutil
@@ -86,19 +82,19 @@ smmap==5.0.1
     # via gitdb
 sqla-raw==1.5.1
     # via Nerium (setup.py)
-sqlalchemy==1.4.49
+sqlalchemy==1.4.52
     # via sqla-raw
-sqlparse==0.4.4
+sqlparse==0.5.0
     # via Nerium (setup.py)
-urllib3==1.26.17
+urllib3==2.2.1
     # via
     #   botocore
     #   requests
-werkzeug==3.0.0
+werkzeug==3.0.3
     # via
     #   Nerium (setup.py)
     #   flask
-wrapt==1.15.0
+wrapt==1.16.0
     # via aiobotocore
-yarl==1.9.2
+yarl==1.9.4
     # via aiohttp
