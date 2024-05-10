@@ -106,6 +106,27 @@ def serve_csv_result(query_name):
     return response
 
 
+@app.route("/v1/<query_name>/csv.gz")
+@app.route("/v2/results/<query_name>/csv.gz")
+@require_api_key
+def serve_csvgz_result(query_name):
+    """Parse request and stream gzipped CSV back"""
+
+    params = parse_query_params()
+    if 'format_' not in params:
+        params['format_'] = 'csv.gz'
+
+    query = csv_result.results_to_csv(query_name, **params)
+
+    if query.error:
+        return (query.error, 400)
+
+    response = Response(query.result, mimetype='application/gzip')
+    response.headers['Content-Disposition'] = f"attachment; filename={query_name}.csv.gz"
+
+    return response
+
+
 @app.route("/v1/docs/")
 @require_api_key
 def serve_report_list():

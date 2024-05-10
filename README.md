@@ -171,6 +171,7 @@ Unknown values of `format` will silently fall back to default.
 'default': `{"name": "<query_name>", "data": [{<column_name>:<row_value>, etc..., }, {etc...}, ], "metadata": {<key>: <value>, etc..., }, "params": {<array of name-value pairs submitted to query with request>}}`  
 'compact': `{"columns": [<list of column names>], "data": [<array of row value arrays>]}`
 'csv': `<csv formatted string (with \r\n newline)>`
+'csv.gz': `<gzip compressed csv stream>`
   
 Of course, it is possible that a database query might return no results. In this case, Nerium will respond with an empty JSON array `[]` for the `data` attribute, regardless of specified format. This is not considered an error, and clients should be prepared to handle it appropriately.
 

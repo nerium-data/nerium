@@ -140,6 +140,24 @@ def test_results_csv_error(client):
     assert "no such table: not_a_table" in str(resp.data, "utf-8")
 
 
+def test_results_csvgz(client):
+    url = f"/v1/{query_name}/csv.gz?greeting=yo"
+    resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
+    assert "application/gzip" in resp.headers["content-type"]
+    assert len(resp.data) > 0
+
+
+def test_results_csvgz_error(client):
+    url = "/v1/error_test/csv.gz"
+    resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
+    assert resp.status_code == 400
+    assert "no such table: not_a_table" in str(resp.data, "utf-8")
+    url = f"/v1/{query_name}/csv.gz?greeting=yo"
+    resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})
+    assert "application/gzip" in resp.headers["content-type"]
+    assert len(resp.data) > 0
+
+
 def test_results_compact(client):
     url = f"/v1/{query_name}/compact?greeting=yo"
     resp = client.get(url, headers={"X-API-Key": TEST_API_KEY})

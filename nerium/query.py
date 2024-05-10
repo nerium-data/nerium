@@ -1,4 +1,5 @@
 import re
+import traceback
 from collections import namedtuple
 from datetime import datetime
 
@@ -6,6 +7,7 @@ import s3fs
 import yaml
 from raw import db
 from nerium import streaming
+from nerium.debug import DebugModeChecker
 
 
 def init_query(query_name):
@@ -91,7 +93,9 @@ def query_decorator(func):
             result = func(query_name, *args, **kwargs)
             query = query._replace(result=result)
         except Exception as e:
-            query = query._replace(error=repr(e), status_code=400)
+            error = traceback.format_exc() if DebugModeChecker.is_debug_mode() else repr(e)
+
+            query = query._replace(error=error, status_code=400)
 
         return query
     return inner
@@ -114,6 +118,6 @@ def serialize_stream(query_name, writer_constructor, **kwargs):
     # return prior to starting a 200 streaming HTTP
     # response. Otherwise, an exception raised from within the
     # generator iteration would occur after the stream response is returned
-    stream, writer = streaming.initialize_stream(result, writer_constructor)
+    writer = streaming.initialize_stream(result, writer_constructor, **kwargs)
 
-    return streaming.yield_stream(result, stream, writer, **kwargs)
+    return streaming.yield_stream(result, writer, **kwargs)
