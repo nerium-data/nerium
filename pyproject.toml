@@ -14,7 +14,6 @@ dependencies = [
     "marshmallow",
     "pyyaml",
     "requests",
-    "s3fs",
     "sqla-raw>=1.5.1",
     "sqlparse",
     "Werkzeug",
