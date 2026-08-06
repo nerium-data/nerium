@@ -13,7 +13,7 @@ Inspired by [jamstack](https://jamstack.org/what-is-jamstack/) workflows, Nerium
 
 Default JSON output represents `data` as an array of objects, one per result row, with database column names as keys. The default schema also provides top-level nodes for `name`, `metadata`, and `params` (details below). A `compact` JSON output format may also be requested, with separate `column` (array of column names) and `data` (array of row value arrays) nodes for compactness. Additional formats can be added by adding [marshmallow](https://marshmallow.readthedocs.io) schema definitions to `format_files`.
 
-Nerium supports any backend database that SQLAlchemy can, but since none of these are hard dependencies, drivers aren't included in the default setup, and the Dockerfile only supports PostgreSQL. If you want Nerium to work with other databases, you can install Python connectors with `pip`, either in a virtualenv or by creating your own Dockerfile using `FROM tymxqo/nerium`. (To ease installation, options for `nerium[mysql]` and `nerium[pg]` are provided as [extras](https://packaging.python.org/en/latest/tutorials/installing-packages/#installing-setuptools-extras) in `setup.py`)
+Nerium supports any backend database that SQLAlchemy can, but since none of these are hard dependencies, drivers aren't included in the default setup, and the Dockerfile only supports PostgreSQL. If you want Nerium to work with other databases, you can install Python connectors with `uv add`, either in a local project or by creating your own Dockerfile using `FROM tymxqo/nerium`. (To ease installation, options for `nerium[mysql]` and `nerium[pg]` are provided as [extras](https://packaging.python.org/en/latest/tutorials/installing-packages/#installing-extras) in `pyproject.toml`)
 
 ## Install/Run
 
@@ -42,10 +42,13 @@ Or install latest source from Github:
 ```sh
 git clone https://github.com/nerium-data/nerium.git
 cd nerium
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install .
+uv sync
 ```
+
+(Nerium uses [`uv`](https://docs.astral.sh/uv/) for dependency and environment
+management. `uv sync` creates a `.venv` from the pinned versions in `uv.lock`;
+prefix commands with `uv run` to use it. To include database drivers or the
+production server, add extras: `uv sync --extra pg --extra serve`.)
 
 Then add a `query_files` (and, optionally, `format_files`) directory to your project, write your queries, and configure the app as described in the next section. The command `FLASK_APP=nerium/app.py flask run` starts a local development server running the app, listening on port 5000. For production use, you will want to add a proper WSGI server (we like [`gunicorn`](https://gunicorn.org/)).
 
@@ -216,4 +219,4 @@ Of course, it is possible that a database query might return no results. In this
 
 ## Tests
 
-`pytest` tests are located in [tests/](tests/). Install test prerequisites with `pip install -r tests/requirements.txt`; then they can be run with: `coverage run setup.py test` (or just `pytest`).
+`pytest` tests are located in [tests/](tests/). `uv sync` installs test prerequisites along with everything else; then they can be run with: `uv run coverage run -m pytest` (or just `uv run pytest`).

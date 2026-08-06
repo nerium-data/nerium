@@ -1,0 +1,61 @@
+[project]
+name = "Nerium"
+description = "The little business intelligence engine that could."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "Apache-2.0"
+license-files = ["LICENSE.md"]
+authors = [{ name = "Thomas Yager-Madden", email = "thomas@yager-madden.com" }]
+dynamic = ["version"]
+dependencies = [
+    "Flask",
+    "flask-cors",
+    "gitpython",
+    "marshmallow",
+    "pyyaml",
+    "requests",
+    "s3fs",
+    "sqla-raw>=1.5.1",
+    "sqlparse",
+    "Werkzeug",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Environment :: Web Environment",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Topic :: Database :: Front-Ends",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://github.com/nerium-data/nerium"
+
+[project.optional-dependencies]
+mysql = ["PyMySQL"]
+pg = ["psycopg2"]
+pg-binary = ["psycopg2-binary"]
+serve = ["gevent", "gunicorn"]
+
+[dependency-groups]
+dev = ["coverage[toml]", "pytest", "pytest-cov"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "nerium/__version__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["nerium"]
+
+[tool.hatch.build.targets.sdist]
+include = ["nerium", "README.md", "LICENSE.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
