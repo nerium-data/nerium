@@ -1,4 +1,4 @@
-FROM python:3.11-bullseye
+FROM python:3.13-bullseye
 LABEL maintainer='Thomas Yager-Madden <thomas@yager-madden.com>'
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
