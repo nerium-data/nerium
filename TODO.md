@@ -43,8 +43,18 @@ Nothing here is urgent; none of it blocks a release.
 - [ ] **`.env` is documented but never loaded.** The README says config can
   live in "a local `.env` file", and `.env.example` implies the same, but
   nothing reads one: `python-dotenv` isn't a dependency and nothing imports
-  it, so `flask run` silently ignores `.env`. Either add `python-dotenv` or
-  correct the docs. (Docker is unaffected — it uses `--envfile`.)
+  it, so `flask run` silently ignores `.env`. (Docker is unaffected — it uses
+  `--envfile`.)
+
+  Resolution: docs, not code. Revise the `### Local install` section to show
+  sourcing the file before starting the dev server, which is how this is
+  handled in practice:
+
+  ```sh
+  set -a; source .env; set +a
+  ```
+
+  No `python-dotenv` dependency needed.
 
 ## Upstream, in sqla-raw
 
