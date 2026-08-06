@@ -59,7 +59,9 @@ path = "nerium/__version__.py"
 packages = ["nerium"]
 
 [tool.hatch.build.targets.sdist]
-include = ["nerium", "README.md", "LICENSE.md"]
+# Ship the test suite so the sdist can be verified where it's unpacked
+include = ["/nerium", "/tests", "/README.md", "/LICENSE.md", "/.coveragerc"]
+exclude = ["/.gitignore"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
