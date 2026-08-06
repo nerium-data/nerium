@@ -30,6 +30,14 @@ curl http://localhost:5000/v1/<query_name>?<params>
 
 You might also want to use `tymxqo/nerium` as a base image for your own custom container, in order to add different database drivers, etc. Or you can build locally from the included Dockerfile. The base image includes the `psycopg` (v3) PostgreSQL adapter, along with `gunicorn` WSGI server for a production-ready service.
 
+When building, pass the commit being built so the running instance can report it:
+
+```sh
+docker build --build-arg GIT_COMMIT=$(git rev-parse HEAD) -t nerium .
+```
+
+The `/` health endpoint returns that value as `commit`, alongside `status` and `version`, which makes it possible to tell exactly what code a deployed instance is running. Omit the build argument and `commit` reads `unknown`.
+
 ### Local install
 
 ```sh

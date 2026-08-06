@@ -3,8 +3,11 @@ LABEL maintainer='Thomas Yager-Madden <thomas@yager-madden.com>'
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-# install git to support Nerium commit endpoint
-RUN apt-get update && apt-get install -y git
+# Bake the commit being built into the image, so a running instance can
+# report it at `/`. Pass with `--build-arg GIT_COMMIT=$(git rev-parse HEAD)`.
+ARG GIT_COMMIT=""
+ENV GIT_COMMIT=${GIT_COMMIT}
+
 # Copy in the code
 COPY . /app
 

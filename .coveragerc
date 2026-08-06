@@ -2,7 +2,6 @@
 source=nerium
 omit=
     nerium/__version__.py
-    nerium/commit.py
     */__init__.py
 
 [report]
