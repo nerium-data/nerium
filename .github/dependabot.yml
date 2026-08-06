@@ -1,0 +1,23 @@
+version: 2
+updates:
+  # Python dependencies, resolved from pyproject.toml into uv.lock
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # One PR per week for routine bumps, rather than one per package.
+      # Security updates are unaffected: they always get their own PR.
+      dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+
+  # Base image and the uv binary copied into it
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: monthly
