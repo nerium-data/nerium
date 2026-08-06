@@ -10,7 +10,6 @@ dynamic = ["version"]
 dependencies = [
     "Flask",
     "flask-cors",
-    "gitpython",
     "marshmallow",
     "pyyaml",
     "requests",

@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from nerium import query
+from nerium.commit import get_commit
 from nerium.app import app
 
 # Environment config
@@ -72,6 +73,23 @@ def test_health_check(client):
     text = resp.get_json()
     assert text["status"] == "ok"
     assert "commit" in text.keys()
+
+
+def test_commit_from_environment(monkeypatch):
+    sha = "7f3ffb25d8b4790c794ad09447a9a370ca52c564"
+    monkeypatch.setenv("GIT_COMMIT", sha)
+    assert get_commit() == sha
+
+
+def test_commit_unknown_when_unset(monkeypatch):
+    monkeypatch.delenv("GIT_COMMIT", raising=False)
+    assert get_commit() == "unknown"
+
+
+def test_commit_unknown_when_empty(monkeypatch):
+    """An empty build arg is as good as no build arg"""
+    monkeypatch.setenv("GIT_COMMIT", "")
+    assert get_commit() == "unknown"
 
 
 def test_sql_error(client):
