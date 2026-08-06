@@ -2,7 +2,7 @@
 name = "Nerium"
 description = "The little business intelligence engine that could."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 license = "Apache-2.0"
 license-files = ["LICENSE.md"]
 authors = [{ name = "Thomas Yager-Madden", email = "thomas@yager-madden.com" }]
