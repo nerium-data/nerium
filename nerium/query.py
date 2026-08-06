@@ -25,10 +25,16 @@ def init_query(query_name):
         ],
         defaults=(False, {}, "", "", "", 200),
     )
+    try:
+        path = db.path_by_name(query_name)
+    except IOError:
+        # sqla-raw raises for an unmatched name; `parse_query_file` turns an
+        # empty path into a 404 response
+        path = ""
     query_obj = Query(
         name=query_name,
         executed=datetime.utcnow().isoformat(),
-        path=db.path_by_name(query_name),
+        path=path,
     )
     return query_obj
 

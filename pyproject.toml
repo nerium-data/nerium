@@ -14,7 +14,7 @@ dependencies = [
     "marshmallow",
     "pyyaml",
     "requests",
-    "sqla-raw>=1.5.1",
+    "sqla-raw>=1.8.0",
     "sqlparse",
     "Werkzeug",
 ]
@@ -38,6 +38,9 @@ mysql = ["PyMySQL"]
 pg = ["psycopg2"]
 pg-binary = ["psycopg2-binary"]
 serve = ["gevent", "gunicorn"]
+snowflake = [
+    "snowflake-sqlalchemy>=1.11.0",
+]
 
 [dependency-groups]
 dev = ["coverage[toml]", "pytest", "pytest-cov"]

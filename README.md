@@ -13,7 +13,7 @@ Inspired by [jamstack](https://jamstack.org/what-is-jamstack/) workflows, Nerium
 
 Default JSON output represents `data` as an array of objects, one per result row, with database column names as keys. The default schema also provides top-level nodes for `name`, `metadata`, and `params` (details below). A `compact` JSON output format may also be requested, with separate `column` (array of column names) and `data` (array of row value arrays) nodes for compactness. Additional formats can be added by adding [marshmallow](https://marshmallow.readthedocs.io) schema definitions to `format_files`.
 
-Nerium supports any backend database that SQLAlchemy can, but since none of these are hard dependencies, drivers aren't included in the default setup, and the Dockerfile only supports PostgreSQL. If you want Nerium to work with other databases, you can install Python connectors with `uv add`, either in a local project or by creating your own Dockerfile using `FROM tymxqo/nerium`. (To ease installation, options for `nerium[mysql]` and `nerium[pg]` are provided as [extras](https://packaging.python.org/en/latest/tutorials/installing-packages/#installing-extras) in `pyproject.toml`)
+Nerium supports any backend database that SQLAlchemy can, but since none of these are hard dependencies, drivers aren't included in the default setup, and the Dockerfile only supports PostgreSQL. If you want Nerium to work with other databases, you can install Python connectors with `uv add`, either in a local project or by creating your own Dockerfile using `FROM tymxqo/nerium`. (To ease installation, options for `nerium[mysql]`, `nerium[pg]`, and `nerium[snowflake]` are provided as [extras](https://packaging.python.org/en/latest/tutorials/installing-packages/#installing-extras) in `pyproject.toml`)
 
 ## Install/Run
 
@@ -59,6 +59,15 @@ Then add a `query_files` (and, optionally, `format_files`) directory to your pro
 ### Script file paths
 
 By default, Nerium looks for query and format schema files in `query_files` and `format_files` respectively, in the current working directory from which the service is launched. `QUERY_PATH` and `FORMAT_PATH` environment variables can optionally be set in order to use files from other locations on the filesystem, as desired.
+
+### Snowflake keypair authentication
+
+Snowflake connections can authenticate with an RSA keypair instead of a password. Install the Snowflake driver (`nerium[snowflake]`, or `uv sync --extra snowflake`), set `DATABASE_URL` to a `snowflake://` URL with no password, and supply the private key in the environment as either:
+
+- `PRIVATE_KEY_PATH` — path to a PEM-formatted private key file, or
+- `PRIVATE_KEY` — the PEM key itself. Because many config systems can't hold multi-line values, literal `\n` sequences in this variable are treated as newlines, so the key can be provided on a single line.
+
+Set one or the other; if both are set, `PRIVATE_KEY_PATH` takes precedence. If the key is encrypted, also set `PRIVATE_KEY_PASSPHRASE`. The key is only read for `snowflake://` URLs, and is passed to the driver by [sqla-raw](https://pypi.org/project/sqla-raw/).
 
 ### Multiple Data Sources
 
