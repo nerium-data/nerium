@@ -11,7 +11,7 @@ COPY . /app
 WORKDIR /app
 
 # install from locked dependencies, including gunicorn/gevent server and
-# psycopg2 Postgres database driver
+# psycopg Postgres database driver
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_PROJECT_ENVIRONMENT=/usr/local

@@ -35,8 +35,12 @@ Homepage = "https://github.com/nerium-data/nerium"
 
 [project.optional-dependencies]
 mysql = ["PyMySQL"]
-pg = ["psycopg2"]
-pg-binary = ["psycopg2-binary"]
+pg = [
+    "psycopg>=3.2.13",
+]
+pg-binary = [
+    "psycopg[binary]>=3.2.13",
+]
 serve = ["gevent", "gunicorn"]
 snowflake = [
     "snowflake-sqlalchemy>=1.11.0",

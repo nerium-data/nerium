@@ -29,7 +29,7 @@ docker run -d --name=nerium \
 curl http://localhost:5000/v1/<query_name>?<params>
 ```
 
-You might also want to use `tymxqo/nerium` as a base image for your own custom container, in order to add different database drivers, etc. Or you can build locally from the included Dockerfile. The base image includes the `psycopg2` PostgreSQL adapter, along with `gunicorn` WSGI server for a production-ready service.
+You might also want to use `tymxqo/nerium` as a base image for your own custom container, in order to add different database drivers, etc. Or you can build locally from the included Dockerfile. The base image includes the `psycopg` (v3) PostgreSQL adapter, along with `gunicorn` WSGI server for a production-ready service.
 
 ### Local install
 
@@ -55,6 +55,8 @@ Then add a `query_files` (and, optionally, `format_files`) directory to your pro
 ## Configuration
 
 `DATABASE_URL` for query connections must be set in the environment (or in a local `.env` file). This is the simplest configuration option.
+
+For PostgreSQL, Nerium uses [`psycopg`](https://www.psycopg.org/psycopg3/) (v3), which SQLAlchemy does not select by default. Name the driver explicitly in the URL scheme — `postgresql+psycopg://user@host:port/database` — otherwise SQLAlchemy looks for the older `psycopg2` and the connection fails.
 
 ### Script file paths
 
