@@ -8,7 +8,7 @@ jobs:
     docker:
       # specify the version you desire here
       # use `-browsers` prefix for selenium tests, e.g. `3.6.1-browsers`
-      - image: cimg/python:3.9.6
+      - image: cimg/python:3.11
         environment:
           QUERY_PATH: tests/query
 
@@ -16,19 +16,17 @@ jobs:
 
     steps:
       - checkout
+      - run:
+          name: install uv
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$BASH_ENV"
       # Download dependencies
       - run:
           name: install dependencies
-          command: |
-            pip install -r requirements.txt
-            pip install -r tests/requirements.txt
+          command: uv sync --locked
       - run:
           name: run tests
-          command: coverage run setup.py test
-      - run:
-          name: Send to Codecov
-          command: |
-            pip install codecov
-            codecov
+          command: uv run coverage run -m pytest
       - store_artifacts:
           path: .coverage

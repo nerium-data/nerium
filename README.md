@@ -3,7 +3,6 @@
 ![small bicycle](https://www.yager-madden.com/image/nerium-bicycle-sm.jpg "Keeping the 'micro' in microservices")
 
 [![CircleCI](https://img.shields.io/circleci/project/github/nerium-data/nerium.svg)](https://circleci.com/gh/nerium-data/nerium)
-[![Codecov](https://img.shields.io/codecov/c/github/nerium-data/nerium.svg)](https://codecov.io/gh/nerium-data/nerium)
 [![PyPI - Version](https://img.shields.io/pypi/v/nerium.svg)](https://pypi.org/project/nerium/)
 [![PyPI - License](https://img.shields.io/pypi/l/nerium.svg)](https://pypi.org/project/nerium/)
 
@@ -13,7 +12,7 @@ Inspired by [jamstack](https://jamstack.org/what-is-jamstack/) workflows, Nerium
 
 Default JSON output represents `data` as an array of objects, one per result row, with database column names as keys. The default schema also provides top-level nodes for `name`, `metadata`, and `params` (details below). A `compact` JSON output format may also be requested, with separate `column` (array of column names) and `data` (array of row value arrays) nodes for compactness. Additional formats can be added by adding [marshmallow](https://marshmallow.readthedocs.io) schema definitions to `format_files`.
 
-Nerium supports any backend database that SQLAlchemy can, but since none of these are hard dependencies, drivers aren't included in the default setup, and the Dockerfile only supports PostgreSQL. If you want Nerium to work with other databases, you can install Python connectors with `pip`, either in a virtualenv or by creating your own Dockerfile using `FROM tymxqo/nerium`. (To ease installation, options for `nerium[mysql]` and `nerium[pg]` are provided as [extras](https://packaging.python.org/en/latest/tutorials/installing-packages/#installing-setuptools-extras) in `setup.py`)
+Nerium supports any backend database that SQLAlchemy can, but since none of these are hard dependencies, drivers aren't included in the default setup, and the Dockerfile only supports PostgreSQL. If you want Nerium to work with other databases, you can install Python connectors with `uv add`, either in a local project or by creating your own Dockerfile using `FROM tymxqo/nerium`. (To ease installation, options for `nerium[mysql]`, `nerium[pg]`, and `nerium[snowflake]` are provided as [extras](https://packaging.python.org/en/latest/tutorials/installing-packages/#installing-extras) in `pyproject.toml`)
 
 ## Install/Run
 
@@ -29,7 +28,7 @@ docker run -d --name=nerium \
 curl http://localhost:5000/v1/<query_name>?<params>
 ```
 
-You might also want to use `tymxqo/nerium` as a base image for your own custom container, in order to add different database drivers, etc. Or you can build locally from the included Dockerfile. The base image includes the `psycopg2` PostgreSQL adapter, along with `gunicorn` WSGI server for a production-ready service.
+You might also want to use `tymxqo/nerium` as a base image for your own custom container, in order to add different database drivers, etc. Or you can build locally from the included Dockerfile. The base image includes the `psycopg` (v3) PostgreSQL adapter, along with `gunicorn` WSGI server for a production-ready service.
 
 ### Local install
 
@@ -42,10 +41,13 @@ Or install latest source from Github:
 ```sh
 git clone https://github.com/nerium-data/nerium.git
 cd nerium
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install .
+uv sync
 ```
+
+(Nerium uses [`uv`](https://docs.astral.sh/uv/) for dependency and environment
+management. `uv sync` creates a `.venv` from the pinned versions in `uv.lock`;
+prefix commands with `uv run` to use it. To include database drivers or the
+production server, add extras: `uv sync --extra pg --extra serve`.)
 
 Then add a `query_files` (and, optionally, `format_files`) directory to your project, write your queries, and configure the app as described in the next section. The command `FLASK_APP=nerium/app.py flask run` starts a local development server running the app, listening on port 5000. For production use, you will want to add a proper WSGI server (we like [`gunicorn`](https://gunicorn.org/)).
 
@@ -53,17 +55,20 @@ Then add a `query_files` (and, optionally, `format_files`) directory to your pro
 
 `DATABASE_URL` for query connections must be set in the environment (or in a local `.env` file). This is the simplest configuration option.
 
+For PostgreSQL, Nerium uses [`psycopg`](https://www.psycopg.org/psycopg3/) (v3), which SQLAlchemy does not select by default. Name the driver explicitly in the URL scheme — `postgresql+psycopg://user@host:port/database` — otherwise SQLAlchemy looks for the older `psycopg2` and the connection fails.
+
 ### Script file paths
 
 By default, Nerium looks for query and format schema files in `query_files` and `format_files` respectively, in the current working directory from which the service is launched. `QUERY_PATH` and `FORMAT_PATH` environment variables can optionally be set in order to use files from other locations on the filesystem, as desired.
 
-#### Read SQL queries from S3
+### Snowflake keypair authentication
 
-If desired, instead of the local filesystem, Nerium can read its query files from an S3 bucket using [s3fs](https://s3fs.readthedocs.io/en/latest/). When Nerium is running as a remote service, a cloud storage bucket can provide a convenient shared location for report analysts to upload SQL to, so that reports can be enhanced or additional reports added without having to restart or redeploy Nerium.
+Snowflake connections can authenticate with an RSA keypair instead of a password. Install the Snowflake driver (`nerium[snowflake]`, or `uv sync --extra snowflake`), set `DATABASE_URL` to a `snowflake://` URL with no password, and supply the private key in the environment as either:
 
-Simply set the `QUERY_PATH` to your S3 bucket URL. Nerium looks for paths beginning with the `s3://` scheme, and reads from there when it finds one. Authentication to S3 is handled via [boto environment variables](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html#using-environment-variables).
+- `PRIVATE_KEY_PATH` — path to a PEM-formatted private key file, or
+- `PRIVATE_KEY` — the PEM key itself. Because many config systems can't hold multi-line values, literal `\n` sequences in this variable are treated as newlines, so the key can be provided on a single line.
 
-[S3-compatible storage that does not use URLs beginning with `s3://` is not supported. Neither is reading marshmallow format files from S3. Both may be coming in a later release.]
+Set one or the other; if both are set, `PRIVATE_KEY_PATH` takes precedence. If the key is encrypted, also set `PRIVATE_KEY_PASSPHRASE`. The key is only read for `snowflake://` URLs, and is passed to the driver by [sqla-raw](https://pypi.org/project/sqla-raw/).
 
 ### Multiple Data Sources
 
@@ -216,4 +221,4 @@ Of course, it is possible that a database query might return no results. In this
 
 ## Tests
 
-`pytest` tests are located in [tests/](tests/). Install test prerequisites with `pip install -r tests/requirements.txt`; then they can be run with: `coverage run setup.py test` (or just `pytest`).
+`pytest` tests are located in [tests/](tests/). `uv sync` installs test prerequisites along with everything else; then they can be run with: `uv run coverage run -m pytest` (or just `uv run pytest`).
