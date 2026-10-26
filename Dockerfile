@@ -1,4 +1,7 @@
-FROM python:3.15-slim-trixie
+# Pinned to 3.14 rather than 3.15: downstream images pip install
+# snowflake-connector-python, which ships no cp315 wheels yet and fails to
+# build from source without a Rust toolchain.
+FROM python:3.14-slim-trixie
 LABEL maintainer='Thomas Yager-Madden <thomas@yager-madden.com>'
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
