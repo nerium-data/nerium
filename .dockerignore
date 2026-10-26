@@ -1,4 +1,5 @@
 .env
+.git
 .gitignore
 .junk_drawer/
 .venv/
@@ -10,4 +11,8 @@ dist/
 format_files/
 query_files/
 *.egg-info
-.coverage*htmlcov/
+.coverage*
+htmlcov/
+.python-version
+__pycache__/
+.pytest_cache/

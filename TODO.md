@@ -11,22 +11,22 @@ Nothing here is urgent; none of it blocks a release.
 
 ## Docker image
 
-- [ ] **Move to a slim base image.** `python:3.11-bullseye` is roughly 350MB
+- [x] **Move to a slim base image.** `python:3.11-bullseye` is roughly 350MB
   compressed per architecture; `python:3.11-slim-bookworm` is closer to 45MB.
   Nothing obviously needs the full image now that the `git` install is gone —
   `psycopg[binary]` bundles its own libpq and `gevent` ships wheels. The
   Dockerfile was on slim as of v0.9.0 and drifted back at some point. This
   matters most when pushing multi-arch over a slow connection.
-- [ ] **Add `.git` to `.dockerignore`.** ~1.5MB of history gets copied into
+- [x] **Add `.git` to `.dockerignore`.** ~1.5MB of history gets copied into
   the image by `COPY . /app`. It was arguably justified while the commit
   lookup read local git; it isn't now.
-- [ ] **Fix the last line of `.dockerignore`.** It reads `.coverage*htmlcov/`
+- [x] **Fix the last line of `.dockerignore`.** It reads `.coverage*htmlcov/`
   — a missing newline joined two patterns into one that matches nothing, so
   `.coverage` and `htmlcov/` are both still copied in.
-- [ ] **Use JSON array form for `CMD`.** buildx emits
+- [x] **Use JSON array form for `CMD`.** buildx emits
   `JSONArgsRecommended`; the shell form doesn't forward OS signals to
   gunicorn, which matters for clean container shutdown.
-- [ ] **Keep publishing multi-arch.** `v0.15.0` is the first `linux/arm64`
+- [x] **Keep publishing multi-arch.** `v0.15.0` is the first `linux/arm64`
   image; everything before it was amd64-only. Worth making routine rather
   than remembering to pass `--platform`.
 

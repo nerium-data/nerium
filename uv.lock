@@ -855,6 +855,7 @@ pg-binary = [
 serve = [
     { name = "gevent" },
     { name = "gunicorn" },
+    { name = "packaging" },
 ]
 snowflake = [
     { name = "snowflake-sqlalchemy" },
@@ -874,6 +875,7 @@ requires-dist = [
     { name = "gevent", marker = "extra == 'serve'" },
     { name = "gunicorn", marker = "extra == 'serve'" },
     { name = "marshmallow" },
+    { name = "packaging", marker = "extra == 'serve'", specifier = ">=26.3" },
     { name = "psycopg", marker = "extra == 'pg'", specifier = ">=3.2.13" },
     { name = "psycopg", extras = ["binary"], marker = "extra == 'pg-binary'", specifier = ">=3.2.13" },
     { name = "pymysql", marker = "extra == 'mysql'" },
