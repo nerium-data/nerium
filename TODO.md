@@ -68,6 +68,14 @@ Nothing here is urgent; none of it blocks a release.
   filename stem, so `a/summary.sql` and `b/summary.sql` both answer to
   `/v1/summary`, decided by glob order. There's already a `# TODO: Warn if
   more than one match` at that spot.
+- [ ] **Dispose the engine at exit.** snowflake-connector-python 5.x emits
+  `FutureWarning: Connection was not explicitly closed before process exit.
+  Auto-cleanup at exit will be disabled by default in a future version.`
+  when gunicorn shuts down. `with connect()` returns connections to the
+  pool, but the module-level engine is never disposed, so the pooled
+  connection is still open at exit. An `atexit` hook calling `DB.dispose()`
+  (in sqla-raw, or failing that in nerium) should do it, and needs to land
+  before a connector release turns off the auto-cleanup.
 
 ## Release housekeeping
 
