@@ -11,7 +11,14 @@ pinned dependencies (including test tools) into `.venv`; run commands with
 the resulting `uv.lock`.
 
 Releases are cut with `uv build && uv publish`, after bumping
-`nerium/__version__.py` and tagging the commit `v<version>`.
+`nerium/__version__.py` and tagging the commit `v<version>`. The Docker image
+is published for `linux/amd64` and `linux/arm64` from `docker-bake.hcl`:
+
+```sh
+VERSION=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' nerium/__version__.py) \
+GIT_COMMIT=$(git rev-parse HEAD) \
+docker buildx bake --push
+```
 
 ## Guidelines
 

@@ -40,7 +40,12 @@ pg = [
 pg-binary = [
     "psycopg[binary]>=3.2.13",
 ]
-serve = ["gevent", "gunicorn"]
+serve = [
+    "gevent",
+    "gunicorn",
+    # gunicorn's gevent worker imports packaging, but gunicorn 26.2.0 stopped declaring it
+    "packaging>=26.3",
+]
 snowflake = [
     "snowflake-sqlalchemy>=1.11.0",
 ]
